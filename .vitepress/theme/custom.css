@@ -1,0 +1,377 @@
+/* Site theme on top of the default VitePress theme. See docs/system/site.md#theme. */
+
+/* Brand colour #C83122. VitePress uses three brand shades:
+   -1 for link text, -2 for hover, -3 for button backgrounds (with white text).
+   Light mode uses #C83122 for links and buttons (5.4:1 on white).
+   Dark mode keeps #C83122 for buttons, but links use a lighter tint: #C83122 is only
+   3.2:1 on the dark background, below WCAG AA (4.5:1). #D96F64 is 5.2:1. */
+:root {
+  --vp-c-brand-1: #c83122;
+  --vp-c-brand-2: #aa2a1d;
+  --vp-c-brand-3: #c83122;
+  --vp-c-brand-soft: rgba(200, 49, 34, 0.14);
+}
+
+.dark {
+  --vp-c-brand-1: #d96f64;
+  --vp-c-brand-2: #cf4a3d;
+  --vp-c-brand-3: #c83122;
+  --vp-c-brand-soft: rgba(200, 49, 34, 0.16);
+}
+
+/* Tips and notes follow the brand colour by default. With a red brand, a TIP would look
+   like a CAUTION (VitePress red). Keep them on the default theme's indigo. */
+:root {
+  --vp-c-tip-1: var(--vp-c-indigo-1);
+  --vp-c-tip-2: var(--vp-c-indigo-2);
+  --vp-c-tip-3: var(--vp-c-indigo-3);
+  --vp-c-tip-soft: var(--vp-c-indigo-soft);
+
+  --vp-c-note-1: var(--vp-c-indigo-1);
+  --vp-c-note-2: var(--vp-c-indigo-2);
+  --vp-c-note-3: var(--vp-c-indigo-3);
+  --vp-c-note-soft: var(--vp-c-indigo-soft);
+}
+
+/* Light/dark switch. The default theme shows it in the nav bar only at 1280px and wider,
+   and hides it in the "…" menu below that. Show it in the nav bar from 768px, and drop the
+   copy in the "…" menu. Phones keep it in the ☰ menu, where the nav bar has no room. */
+@media (min-width: 768px) {
+  .VPNavBar .content-body .VPNavBarAppearance {
+    display: flex;
+    align-items: center;
+  }
+
+  .VPNavBarExtra .group:has(.item.appearance) {
+    display: none;
+  }
+
+  .VPNavBarExtra .group:has(.item.appearance) + .group {
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+
+/* Home hero banner: the splash picture behind the hero (cwebp -q 82 copies of the original
+   PNGs): aith-splash.webp by day in light mode, aith-splash-dark.webp at night in dark mode.
+   Both are 1870x841 with the same layout. It starts under the nav bar, because on desktop
+   the nav is see-through at the top of the home page, and its text can't be read over the
+   sky.
+   From 960px the picture fills the hero, with a fade on the left behind the text (white in
+   light mode, black in dark mode); the people are on the right. Below that it's a banner
+   above the text, cropped to the people, so the text doesn't cover them. The picture is
+   decoration: the title says it all. */
+.VPHome .VPHero {
+  position: relative;
+  isolation: isolate;
+  --hero-picture: url("./aith-splash.webp");
+}
+
+.dark .VPHome .VPHero {
+  --hero-picture: url("./aith-splash-dark.webp");
+}
+
+.VPHome .VPHero::before {
+  display: block;
+  margin: -48px -24px 32px;
+  aspect-ratio: 3 / 2;
+  background: var(--hero-picture) right center / cover no-repeat;
+  content: "";
+}
+
+@media (min-width: 640px) {
+  .VPHome .VPHero::before {
+    margin: -80px -48px 40px;
+    aspect-ratio: 2 / 1;
+  }
+}
+
+@media (min-width: 960px) {
+  /* Tall enough to show the whole picture (1870x841, so 45% of the width), up to 640px.
+     Light mode: a white fade, with the usual red title and dark text. */
+  .VPHome .VPHero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + min(45vw, 640px));
+    --hero-fade-start: rgba(255, 255, 255, 0.82);
+    --hero-fade-text: rgba(255, 255, 255, 0.75);
+    --hero-fade-end: rgba(255, 255, 255, 0);
+    --hero-text-shadow: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Dark mode: a black fade, with white text. */
+  .dark .VPHome .VPHero {
+    --vp-home-hero-name-color: #ffffff;
+    --hero-fade-start: rgba(0, 0, 0, 0.7);
+    --hero-fade-text: rgba(0, 0, 0, 0.6);
+    --hero-fade-end: rgba(0, 0, 0, 0);
+    --hero-text-shadow: rgba(0, 0, 0, 0.6);
+  }
+
+  .VPHome .VPHero .container {
+    width: 100%;
+  }
+
+  /* The fade follows the text, not the screen width: the text starts at the hero's 64px
+     padding, or where the 1152px-wide content is centred. It stays strong under the tagline
+     (440px wide), so the tagline is at least 4.5:1 everywhere, and fades out over the next
+     280px. */
+  .VPHome .VPHero::before {
+    --hero-text-left: max(64px, 50% - 576px);
+    position: absolute;
+    inset: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px)) 0 0;
+    z-index: -1;
+    margin: 0;
+    aspect-ratio: auto;
+    background:
+      linear-gradient(
+        90deg,
+        var(--hero-fade-start) 0,
+        var(--hero-fade-text) calc(var(--hero-text-left) + 460px),
+        var(--hero-fade-end) calc(var(--hero-text-left) + 740px)
+      ),
+      var(--hero-picture) center 60% / cover no-repeat;
+  }
+
+  .VPHome .VPHero .name {
+    text-shadow: 0 2px 8px var(--hero-text-shadow);
+  }
+
+  /* Narrower than the default 576px, so the text stays over the sky, clear of the people.
+     text-1, not the default text-2: text-2 is too faint over the picture. */
+  .VPHome .VPHero .tagline {
+    max-width: 440px;
+    color: var(--vp-c-text-1);
+    text-shadow: 0 1px 4px var(--hero-text-shadow);
+  }
+}
+
+/* Images in pages. Most are phone screenshots taken on a 2x screen (e.g. 728px wide for a
+   364px-wide phone), so at full column width they show at almost twice their real size.
+   Cap them on desktop. Phones keep the default: the full width of the page. */
+@media (min-width: 768px) {
+  .vp-doc img {
+    max-width: min(100%, 400px);
+  }
+}
+
+/* Collapsible sections: <details><summary> in pages (course format v1), e.g. one per
+   operating system. Styled like the default theme's custom blocks. */
+.vp-doc details {
+  margin: 16px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 0 16px;
+}
+
+.vp-doc details + details {
+  margin-top: -8px;
+}
+
+.vp-doc details > summary {
+  /* The default theme gives summary the same 16px margins as a paragraph. */
+  margin: 0;
+  padding: 12px 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vp-doc details[open] {
+  padding-bottom: 4px;
+}
+
+/* On phones, code blocks run edge to edge (negative margins), which would poke out of the
+   box. Keep them inside it, as the default theme does for its own custom blocks. */
+.vp-doc details div[class*='language-'],
+.vp-doc details li div[class*='language-'] {
+  margin: 16px 0;
+  border-radius: 8px;
+}
+
+.vp-doc details[open] > summary {
+  border-bottom: 1px solid var(--vp-c-divider);
+  margin-bottom: 16px;
+}
+
+/* Course cards from the :::courses block (.vitepress/courses-plugin.ts). The whole card is
+   clickable: the title link's ::after covers it. */
+.vp-doc .course-list {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.vp-doc .course-card {
+  position: relative;
+  border: 1px solid var(--vp-c-bg-soft);
+  border-radius: 12px;
+  padding: 20px 24px;
+  background-color: var(--vp-c-bg-soft);
+  transition: border-color 0.25s;
+}
+
+.vp-doc .course-card:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .course-card .course-card-meta {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc .course-card h2 {
+  /* The default theme makes doc headings relative, which would trap the ::after below. */
+  position: static;
+  margin: 4px 0 8px;
+  border-top: 0;
+  padding-top: 0;
+  font-size: 20px;
+}
+
+.vp-doc .course-card h2 a {
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+}
+
+.vp-doc .course-card h2 a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.vp-doc .course-card p:last-child {
+  margin: 0;
+  color: var(--vp-c-text-2);
+}
+
+/* Course Overview on the home page (.vitepress/course-overview-plugin.ts): the Markdown list
+   in course/index.md shown as cards. Sizes and colours copy the default theme's home feature
+   cards (VPFeature.vue). A written course's card is clickable: the title link's ::after
+   covers it. Planned courses (.planned) have no link, and show a "Coming soon" badge. */
+.vp-doc ol.course-overview {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: course;
+}
+
+@media (min-width: 640px) {
+  .vp-doc ol.course-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .vp-doc ol.course-overview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.vp-doc .course-overview > li {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--vp-c-bg-soft);
+  border-radius: 12px;
+  padding: 24px;
+  background-color: var(--vp-c-bg-soft);
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  counter-increment: course;
+  transition: border-color 0.25s;
+}
+
+/* The course number, in the feature card's icon box. */
+.vp-doc .course-overview > li::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  background-color: var(--vp-c-default-soft);
+  font-size: 20px;
+  color: var(--vp-c-text-2);
+  content: counter(course);
+}
+
+.vp-doc .course-overview > li:not(.planned)::before {
+  background-color: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+.vp-doc .course-overview > li:not(.planned):hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .course-overview > li > a {
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+}
+
+.vp-doc .course-overview > li > a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.vp-doc .course-overview > li > ol {
+  margin: 8px 0 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc .course-overview li li + li {
+  margin-top: 4px;
+}
+
+/* Links inside a card (e.g. to the glossary) sit above the card's own link. */
+.vp-doc .course-overview li li a {
+  position: relative;
+  z-index: 1;
+}
+
+/* Lines up with the middle of the number box. */
+.vp-doc .course-overview-badge {
+  position: absolute;
+  top: 36px;
+  right: 24px;
+  border-radius: 12px;
+  padding: 0 10px;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--vp-c-default-soft);
+  color: var(--vp-c-text-2);
+}
+
+/* Footer on every page. The default theme hides it on pages with a sidebar (all but the
+   home page), so the copyright notice would never show next to the course itself. Show it,
+   and from 960px move it right of the fixed sidebar, with the same padding as VPContent.
+   The sibling selector outranks the theme's scoped `.VPFooter.has-sidebar[data-v-…]`. */
+.VPContent.has-sidebar ~ .VPFooter.has-sidebar {
+  display: block;
+}
+
+@media (min-width: 960px) {
+  .VPContent.has-sidebar ~ .VPFooter.has-sidebar {
+    padding-left: calc(var(--vp-sidebar-width) + 32px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPContent.has-sidebar ~ .VPFooter.has-sidebar {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width) + 32px);
+  }
+}

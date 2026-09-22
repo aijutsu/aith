@@ -50,7 +50,7 @@ function prose(body) {
 const pages = publishedPages(ROOT)
 const knownPage = (p) => {
   const parts = p.split('/')
-  if (parts.length === 1) return p === 'index.md' || p === 'glossary.md'
+  if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md'].includes(p)
   if (parts.length === 2) return COURSE_DIR.test(parts[0]) && parts[1] === 'index.md'
   if (parts.length === 3) return COURSE_DIR.test(parts[0]) && LESSON_DIR.test(parts[1]) && parts[2] === 'index.md'
   return false
@@ -66,12 +66,22 @@ for (const page of pages) {
   check('page', frontmatter, `${where} frontmatter`)
 
   const text = prose(body)
-  for (const m of text.matchAll(/^\s*:{3,}\s*([A-Za-z][\w-]*)/gm)) {
+  // [ \t], not \s: \s crosses lines, so a closing ::: would read the next paragraph as a block name.
+  for (const m of text.matchAll(/^[ \t]*:{3,}[ \t]*([A-Za-z][\w-]*)/gm)) {
     if (!ALLOWED_BLOCKS.includes(m[1])) fail(where, `":::${m[1]}" is not an allowed block (allowed: ${ALLOWED_BLOCKS.join(', ')})`)
   }
   for (const m of text.matchAll(/<([A-Z][A-Za-z0-9]*)[\s/>]/g)) fail(where, `component tag <${m[1]}> is not allowed`)
   if (/<(script|style)[\s>]/i.test(text)) fail(where, '<script> and <style> are not allowed')
   if (/\{\{/.test(text)) fail(where, '"{{" is not allowed outside code (renderer template syntax)')
+
+  // Collapsible sections. Without a blank line after </summary>, the Markdown inside is shown as raw text.
+  const opened = text.match(/<details[\s>]/g)?.length ?? 0
+  const closed = text.match(/<\/details>/g)?.length ?? 0
+  if (opened !== closed) fail(where, `${opened} <details> but ${closed} </details>`)
+  for (const m of text.matchAll(/<\/summary>[ \t]*\n(?![ \t]*\n)/g)) {
+    const line = text.slice(0, m.index).split('\n').length
+    fail(where, `line ${line} of the body: leave a blank line after </summary>, or the Markdown inside the <details> is not rendered`)
+  }
 }
 
 // ---- Courses -------------------------------------------------------------

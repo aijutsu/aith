@@ -10,14 +10,15 @@ description: A hands-on course that helps everyday people use AI to build things
 These are the course materials for "AI in the Heartlands" presented by Aijutsu. All materials are open-source and you are free to follow along without paying for the workshops if you'd like. But again, if you'd like the workshops are priced at an affordable rate and you get to meet others like yourself, ask us questions about applying these concepts in the industry, and get help with the nitty-gritties which tends to happen since course materials can only account for the majority.
 
 - Workshop info is available at https://aijutsu.dev/ai-in-the-heartlands
-- The source for these materials is on GitHub at https://github.com/aijutsu/aith
+- These course materials are also freely available on GitHub at https://github.com/aijutsu/aith
+- The materials are free for you to learn from. Teaching them or reusing them needs our written approval. See the [Terms of Use](./terms.md)
 
 ## Pre-requisites
 
 1. ChatGPT Plus subscription plan or Claude Pro subscription plan (~$30/month)
 1. A laptop with >= 8GB RAM with full administration privileges
 
-## Course Overview
+## Courses Overview
 
 1. [Building community agents with NanoClaw](./001-building-agents-with-nanoclaw/index.md)
    1. Introduces a basic developer setup

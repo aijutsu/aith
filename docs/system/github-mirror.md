@@ -9,7 +9,7 @@ Gitea's built-in **push mirror** copies the repository to GitHub (Gitea › aiju
 
 ## Rules
 
-- **Never merge a pull request on GitHub, and never push to GitHub by hand.** The push mirror force-pushes every branch and tag, and deletes GitHub branches that Gitea doesn't have. Anything that lands only on GitHub is silently erased at the next sync, with no error. So take a GitHub pull request into Gitea instead:
+- **Never merge a pull request on `github.com/aijutsu/aith`, and never push to it by hand.** The push mirror force-pushes every branch and tag, and deletes GitHub branches that Gitea doesn't have. Anything that lands only on GitHub is silently erased at the next sync, with no error. So take a GitHub pull request into Gitea instead:
 
   ```bash
   git fetch github pull/<number>/head:pr-<number>   # the `github` remote is github.com/aijutsu/aith
@@ -18,6 +18,7 @@ Gitea's built-in **push mirror** copies the repository to GitHub (Gitea › aiju
   ```
 
   Then close the GitHub pull request with a link to the merged commit. (GitHub keeps `pull/<number>/head` refs even though the mirror prunes branches.)
+- **Fork submodules are different: they live on GitHub, and you push to them directly.** The mirror only touches `aijutsu/aith`. A fork such as `github.com/aijutsu/aith-nanoclaw-codex-telegram` is its own repository, with no copy on Gitea. Push it from inside the submodule, or let `git push` to Gitea push it first (`push.recurseSubmodules on-demand`). See [Fork submodules](../../AGENTS.md#fork-submodules).
 - **CI lives in `.gitea/workflows/` only.** Gitea reads `.gitea/workflows/` *or* `.github/workflows/`: whichever exists first wins, and the other is ignored. A `.github/workflows/` directory would not run on Gitea. It would also make the mirror's token need the Workflows permission (see below).
 
 ## Setting it up

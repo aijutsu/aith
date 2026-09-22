@@ -13,7 +13,7 @@ export const ROOT = fileURLToPath(new URL('..', import.meta.url))
 export const CONTENT_DIR = 'course'
 export const COURSE_DIR = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*$/
 export const LESSON_DIR = /^(\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*$/
-export const ALLOWED_BLOCKS = ['glossary']
+export const ALLOWED_BLOCKS = ['glossary', 'courses']
 
 /** Submodules from .gitmodules, as { path, url } with repo-relative paths. */
 export function submodules(root = ROOT) {

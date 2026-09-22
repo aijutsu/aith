@@ -77,7 +77,7 @@ From the report's "Post-update candidates" section and any "Migration:" instruct
 
 Upstream update tooling is usually built for a live install. NanoClaw's `/update-nanoclaw`, `/update-skills`, and `/migrate-*` skills are examples: they merge upstream, restart services, and rewrite `.env` and data. Running them here would change the pinned checkout or this machine. So present the classified list and get the user's go-ahead before running anything from the submodule, and never run it inside the pinned checkout. If an approved step leaves the submodule dirty (`git -C "$SUB" status --porcelain` is not empty), stop and tell the user — a dirty submodule is no longer the pinned upstream version.
 
-**Fork:** the checkout is Aijutsu's customised install, so the project's own update tool is how the update gets applied. Use it in step 5 instead of avoiding it. For NanoClaw, that tool is `/update-nanoclaw`, run from inside `$SUB` on `main`. By default it merges `upstream/main`, so tell it to pass `$TARGET` as `--upstream-ref` to its `prepare` step. It refreshes installed skills, runs the tests, and may stop and restart the NanoClaw service on this machine. Say that to the user, and get their go-ahead before running it. All the other rules above still apply.
+**Fork:** the checkout is Aijutsu's customised install, so the project's own update tool is how the update gets applied. Use it in step 5 instead of avoiding it. For NanoClaw, that tool is `/update-nanoclaw`, run from inside `$SUB` on `main`. By default it merges `upstream/main`, so tell it to pass `$TARGET` as `--upstream-ref` to its `prepare` step. It refreshes installed skills, runs the tests, and may stop and restart the NanoClaw service on this machine. If no service is installed or running, it skips the stop, restart, and health steps (`scripts/update/service.ts`), so a checkout that isn't running is fine. Say that to the user, and get their go-ahead before running it. All the other rules above still apply.
 
 ## 5. Move the pin
 
@@ -90,7 +90,12 @@ git -C "$ROOT" add "$SUBREL"
 git -C "$ROOT" diff --cached --submodule=log -- "$SUBREL"   # should show OLD..NEW
 ```
 
-**Fork:** don't run `checkout --detach` here, because it would throw away the fork's customisations. On `main` instead, merge `$TARGET` with the project's update tool from step 4. If there is no such tool, or it can't finish (for example, because this checkout isn't a running install), use `git -C "$SUB" merge --no-edit "$TARGET"` instead. Resolve conflicts so the fork keeps its customisations, then run the project's tests. Once the tests pass, push the fork and record its new `main` as the pin:
+**Fork:** don't run `checkout --detach` here, because it would throw away the fork's customisations. On `main` instead, merge `$TARGET` with the project's update tool from step 4.
+
+- **NanoClaw: `/update-nanoclaw` is the only way.** NanoClaw's own rule is that every update goes through it, never a raw `git pull` or `git merge`: it runs migrations and refreshes installed channels and providers, and a plain merge skips both. If it fails or stops, don't fall back to `git merge`. Let it roll back, then stop and tell the user what it reported. If it reports a conflict in `CLAUDE.md`, keep upstream's text and put the "Aijutsu fork" section back as the last section (`AGENTS.md` → Fork submodules). Once it has finished, check that the section is still the last one in the file.
+- **A fork of a project with no update tool:** run `git -C "$SUB" merge --no-edit "$TARGET"`. Resolve conflicts so the fork keeps its customisations, then run the project's tests.
+
+Once the update has finished and the tests pass, push the fork and record its new `main` as the pin:
 
 ```bash
 NEW=$(git -C "$SUB" rev-parse HEAD)

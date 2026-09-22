@@ -25,8 +25,10 @@ The content root is `course/`. A file's role comes from where it is:
 | Path | Role |
 | --- | --- |
 | `course/index.md` | Home page of this repository's courses. Must link to every course. |
+| `course/courses.md` | Courses page. Lists every course with a `:::courses` block. |
 | `course/glossary.yaml` | The single glossary (data). |
 | `course/glossary.md` | Glossary page. Shows the glossary with a `:::glossary` block. |
+| `course/terms.md` | Terms of Use page: the copyright, what readers may do with the materials, and what needs written approval from Aijutsu. |
 | `course/NNN-slug/` | A course. `NNN` is a three-digit order number (`001`, `002`, …). |
 | `course/NNN-slug/course.yaml` | The course manifest. Required. |
 | `course/NNN-slug/index.md` | The course's main page. Required. |
@@ -107,10 +109,25 @@ Allowed:
 
 - CommonMark, plus GitHub tables and task lists.
 - GitHub alerts: `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`.
+- Collapsible sections, for steps that differ by operating system: `<details>` with a `<summary>`. They open and close on GitHub, on the site, and in any CommonMark tool.
+
+  ```markdown
+  <details name="install-git">
+  <summary>macOS</summary>
+
+  1. Open Terminal.
+
+  </details>
+  ```
+
+  - Leave a blank line after `</summary>` and before `</details>`. Without it, the Markdown inside is shown as raw text. `make validate` checks the first one.
+  - Give the sections of one group the same `name`. Opening one then closes the others, like an accordion. Browsers that don't support `name` just let several stay open.
+  - Put them at the top level of the page (under a heading), not inside a list item.
 - Named blocks from this list, written `:::name` on their own line and closed with `:::`:
 
   | Block | Meaning |
   | --- | --- |
+  | `courses` | Lists every course in order, from each `course.yaml` (`title`, `summary`), with a link to the course. Used only in `course/courses.md`. |
   | `glossary` | Shows the whole glossary from `glossary.yaml`. Used only in `course/glossary.md`. |
 
 Not allowed (the validator rejects these outside code blocks and inline code):
@@ -128,7 +145,7 @@ Not allowed (the validator rejects these outside code blocks and inline code):
 
 | Command | Checks |
 | --- | --- |
-| `make validate` | Schemas; page locations; no renderer keys or disallowed syntax; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
+| `make validate` | Schemas; page locations; no renderer keys or disallowed syntax; `<details>` closed, with a blank line after `</summary>`; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
 | `make site-build` | Everything the renderer needs, including **dead links** (the build fails on any). |
 
 CI runs both on every pull request.

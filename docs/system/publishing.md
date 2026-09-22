@@ -22,7 +22,21 @@ Terraform (deploy/infra/cloudflare) owns the Worker and its custom domain aith.a
 
 Keep that split. **Don't add `routes` to `wrangler.jsonc`**: Terraform owns the domain, and wrangler only touches domains it lists. Keep `workers_dev` and `preview_urls` `false` in `wrangler.jsonc`, matching `subdomain` in Terraform. Otherwise each tool undoes the other.
 
-We use Workers static assets, not Cloudflare Pages. Cloudflare recommends Workers for new projects, and `cloudflare_pages_project` has open drift bugs in provider v5.
+We use Workers static assets, not Cloudflare Pages. Cloudflare recommends Workers for new projects, and `cloudflare_pages_project` has open drift bugs in provider v5 (see [decisions.md](./decisions.md)). How the site itself is put together is in [site.md](./site.md).
+
+## Status and versions
+
+Live since 2026-09-22. The first CI deploy was Worker version `ac310a99…`, from commit `009d5c2`.
+
+| Thing | Version | Where it's pinned |
+| --- | --- | --- |
+| VitePress | 1.6.4 | `package.json` (`^1.6.4`), `package-lock.json` |
+| wrangler | 4.136.1 | `package.json` (`^4`), `package-lock.json` |
+| Node.js | 24.12.0 in CI, 24.x locally | `.gitea/workflows/site.yml` `NODE_VERSION`, `.nvmrc` |
+| Terraform | 1.15.1 in CI, at least 1.11 required | `.gitea/workflows/site.yml` `TERRAFORM_VERSION`, `versions.tf` |
+| Cloudflare provider | 5.25.0 | `versions.tf` (`~> 5.25`), `.terraform.lock.hcl` |
+| Gitea | 1.24.6 | gohan.aijutsu.dev (zworker `deploy/charts/gitea`) |
+| Gitea runner | `gitea/runner:1.0.0`, label `ubuntu-latest`, job cache off, `network: host` | zworker `deploy/charts/gitea-actions` |
 
 ## Working on the site
 

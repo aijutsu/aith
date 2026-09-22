@@ -34,6 +34,10 @@ terms:
     type: SaaS
     description: An AI assistant made by the company Anthropic. You can chat with it, and it can also help you write, study, and build software.
     url: https://claude.ai/
+  - term: Claude Code
+    type: Tool
+    description: An AI helper for writing code, made by Anthropic, the company behind Claude. You tell it what you want in normal words, and it reads, writes and runs code for you. It comes with a Claude Pro plan or higher.
+    url: https://code.claude.com/docs
   - term: Cloudflare
     type: Cloud Service Provider
     description: A company that helps websites load fast and stay safe from attacks. It also lets you put your own websites and apps on the internet, often for free.
@@ -102,6 +106,10 @@ terms:
     type: Law
     description: Short for Health Insurance Portability and Accountability Act. A United States law that protects people's health information, like medical records. Hospitals, clinics, and companies that work with them must keep this information private and safe.
     url: https://www.hhs.gov/hipaa/index.html
+  - term: Homebrew
+    type: Tool
+    description: An app store for the terminal on a Mac. You type one command, like `brew install git`, and Homebrew downloads and installs the program for you. It works on Linux too.
+    url: https://brew.sh/
   - term: ISO 27001
     type: Compliance Standard
     description: A world standard for keeping information safe inside a company. A company with this certificate has been checked by an outside expert, who confirmed that it has good rules to protect its data.
@@ -138,6 +146,10 @@ terms:
     type: Software
     description: A popular AI assistant that can do many things, but it is very big and hard to understand. NanoClaw was made as a smaller and safer idea based on OpenClaw.
     url: https://github.com/openclaw/openclaw
+  - term: OrbStack
+    type: Software
+    description: An app for Macs that runs Docker containers, like Docker Desktop, but smaller and lighter. It is free for personal use.
+    url: https://orbstack.dev/
   - term: PDPA
     type: Law
     description: Short for Personal Data Protection Act. A Singapore law that protects people's personal information, like names, phone numbers, and NRIC numbers. Companies usually need to ask for permission before they collect or use this information, and they must keep it safe.
@@ -166,6 +178,10 @@ terms:
     type: Software
     description: A tool for building workflows, like Trigger.dev. It remembers how far each workflow has gone, so if a computer crashes in the middle, the work continues from where it stopped instead of starting again. Companies use it for jobs that must not fail, like payments.
     url: https://temporal.io/
+  - term: Terminal
+    type: Tool
+    description: A window where you control your computer by typing commands, instead of clicking. On a Mac, it is the Terminal app. On Windows, this course uses the Ubuntu terminal from WSL.
+    url: https://en.wikipedia.org/wiki/Terminal_emulator
   - term: Terraform
     type: Tool
     description: A tool that lets you set up cloud computers and services by writing what you want in a file, instead of clicking buttons on a website. You can then build the same setup again and again, and see exactly what changed. It works with AWS, GCP, Cloudflare, DigitalOcean, and many others.
@@ -174,6 +190,10 @@ terms:
     type: Software
     description: A tool for building workflows, which are lists of steps that run one after another in the background. For example, it can send a report every morning or run a long AI task. If a step fails, it tries again so the job still finishes.
     url: https://trigger.dev/
+  - term: Ubuntu
+    type: Software
+    description: A free and popular version of Linux. Linux is a system that runs a computer, like Windows or macOS. Many servers use Ubuntu. On Windows, WSL runs Ubuntu for you.
+    url: https://ubuntu.com/
   - term: WhatsApp
     type: Messaging App
     description: A free messaging app owned by Meta, the company behind Facebook. It is one of the most used chat apps in Singapore and around the world. NanoClaw can connect your AI agents to WhatsApp, so you can message them like a friend.
@@ -182,3 +202,7 @@ terms:
     type: Tool
     description: A tool from Cloudflare that you use by typing commands. It lets you test your website or app on your own computer, and then put it on Cloudflare for everyone to see.
     url: https://developers.cloudflare.com/workers/wrangler/
+  - term: WSL
+    type: Software
+    description: Short for Windows Subsystem for Linux. A part of Windows that runs Linux inside Windows, so you can use Linux programs without a second computer. NanoClaw needs it to run on Windows.
+    url: https://learn.microsoft.com/en-us/windows/wsl/about

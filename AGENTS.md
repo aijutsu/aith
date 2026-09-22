@@ -4,9 +4,11 @@ Instructions for any AI agent working in this repository.
 
 ## What this repository is
 
-Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is open source. The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
+Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is open source: anyone may learn from it for free, but the materials are copyright Aijutsu Pte. Ltd., and teaching or reusing them needs written approval (the [Terms of Use](course/terms.md)). The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
 
-The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror, kept in sync by Gitea's push mirror, which overwrites it: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)).
+The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror, kept in sync by Gitea's push mirror, which overwrites it: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)). This rule is only for `aijutsu/aith`. [Fork submodules](#fork-submodules) such as `aijutsu/aith-nanoclaw-codex-telegram` live on GitHub and have no copy on Gitea. Push them to GitHub directly.
+
+**Read the docs before you implement, and write back to them after.** Start at [docs/README.md](docs/README.md) and read the docs that cover the area you are changing. When you finish, update those docs in the same change: what changed, new decisions in [docs/system/decisions.md](docs/system/decisions.md), and anything that cost you time in [docs/system/known-issues.md](docs/system/known-issues.md).
 
 **Your main responsibility is to keep the course materials up to date**: accurate for the pinned versions of the software they reference, accurate about the outside services they mention (plans, prices, sign-up steps), and consistent with the rules below.
 
@@ -15,14 +17,24 @@ The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin
 - `README.md` (the apex README) — for contributors: what the repository is, how to preview and check the site, and where the docs are. Not published.
 - `course/` — all published course material, in [course format v1](docs/system/course-format.md).
   - `course/index.md` — the site's home page: why the course exists, prerequisites, and the Course Overview (every course, in order).
+  - `course/courses.md` — the Courses page. Its `:::courses` block lists every course from its `course.yaml`, so it needs no edits when a course is added.
   - `course/glossary.yaml` — the **only** glossary in the repository. `course/glossary.md` shows it on the site.
+  - `course/terms.md` — the Terms of Use. The site footer (`themeConfig.footer` in `.vitepress/config.mts`) repeats its copyright notice: change both together, and update the "last changed" date at the top of the terms.
   - `course/NNN-<slug>/` — one directory per course, numbered in course order (e.g. `course/001-building-agents-with-nanoclaw/`).
     - `course.yaml` — the course manifest, with a stable `id` that never changes.
     - `index.md` — the course's main page: the index of that course's materials, organised by topic, plus a References table.
     - `README.md` — optional notes for contributors. READMEs are never published.
     - Submodules for the Git repositories that course uses (e.g. `course/001-building-agents-with-nanoclaw/nanoclaw`). A submodule is either an upstream copy or, when a course needs a customised version, an Aijutsu fork (see [Fork submodules](#fork-submodules)). Submodules are never published.
 - `docs/updates.md` — the Submodule Update Events log: one row per submodule bump, written by the `update-submodule` skill.
-- `docs/system/` — how the repository works: `course-format.md` (the content rules), `publishing.md` (site build, Cloudflare, Terraform), and `github-mirror.md` (Gitea and the GitHub mirror).
+- `docs/README.md` — the index of all contributor docs. Read it before implementing anything.
+- `docs/features/` — what learners and authors can do (reading the site, adding a course).
+- `docs/system/` — how the repository works:
+  - `course-format.md` — the content rules.
+  - `site.md` — the VitePress renderer.
+  - `publishing.md` — site build, Cloudflare, Terraform.
+  - `github-mirror.md` — Gitea and the GitHub mirror.
+  - `decisions.md` — what we chose and why.
+  - `known-issues.md` — gotchas and open follow-ups.
 - `.gitea/workflows/site.yml` — Gitea Actions CI: check, build, and deploy. Don't add `.github/workflows/`: Gitea would ignore it.
 - `format/` — the course format's JSON Schemas, content discovery code, and validator. `.vitepress/` — the site's VitePress config.
 - `deploy/infra/cloudflare/` — Terraform for the site's Cloudflare Worker and domain. Its settings are in `deploy/config/`.
@@ -54,7 +66,7 @@ Everything under `course/` follows [course format v1](docs/system/course-format.
 - `index.md` is the published page. READMEs and submodules are never published.
 - Every course has a `course.yaml`. Its `id` never changes, even if the folder or title does. Folder numbers only set the order.
 - Page frontmatter is only `title` and an optional `description`. No renderer keys (`layout`, `hero`, …).
-- Markdown is CommonMark, GitHub tables and task lists, GitHub alerts (`> [!NOTE]`), and the allowed `:::` blocks. No components, `<script>`, VitePress containers (`::: tip`), or `{{ }}`.
+- Markdown is CommonMark, GitHub tables and task lists, GitHub alerts (`> [!NOTE]`), `<details>` collapsible sections (e.g. one per operating system), and the allowed `:::` blocks. No components, `<script>`, VitePress containers (`::: tip`), or `{{ }}`.
 - Link pages with relative `.md` links. Never link to a README or into a submodule with a relative link; use a full GitHub URL for submodule files.
 - Anything only the site needs goes in `.vitepress/`, not in `course/`.
 
@@ -68,10 +80,12 @@ CI (Gitea Actions, `.gitea/workflows/site.yml`) checks every pull request and pu
 
 Every Git repository the course materials reference must be included as a submodule, pinned to a specific version, inside the course directory that uses it. A link in a References table is fine, but only in addition to the submodule — never instead of it.
 
+The step-by-step flows for every kind of submodule change are in [Updating submodules](README.md#updating-submodules) in the apex README. That section is the reference for humans. The rules below are the same flows, written for agents. Keep the two in step: when you change one, change the other in the same commit.
+
 These rules apply to every submodule:
 
 - List every submodule in its course's `course.yaml` under `software` (`name`, `path`, `url`, and `upstream` for forks). `make validate` checks this list against `.gitmodules`.
-- Change a pin only through the `update-submodule` skill (see [Bumping a submodule version](#bumping-a-submodule-version)). Don't set `branch =` in `.gitmodules`, and don't run `git submodule update --remote` outside a bump.
+- A pin moves in only two ways. (1) To a newer upstream version, for any submodule: only through the `update-submodule` skill (see [Bumping a submodule version](#bumping-a-submodule-version)). (2) To a new customisation commit, for a fork submodule only: by the flow in [Fork submodules](#fork-submodules). Don't set `branch =` in `.gitmodules`, and don't run `git submodule update --remote`.
 - A submodule's own `CLAUDE.md`, `AGENTS.md`, and `.claude/` (NanoClaw has all three) are upstream's instructions for developing that project. Treat them as reference material for the course, not as rules for this repository. The one exception: when you run a fork submodule's own skills from inside it, follow its instructions for that work. This repository's rules still decide what gets committed and pushed.
 
 ```bash
@@ -102,7 +116,10 @@ Use a fork when the course needs a customised version of a project, for example 
 
 - **Where it lives.** Fork into the `aijutsu` GitHub org, keep it public (readers clone it with `--recurse-submodules`), and name it `aith-<project>-<customisation>`. Fork the default branch only (`gh repo fork <owner>/<repo> --org aijutsu --fork-name <name> --default-branch-only --clone=false`). NanoClaw's skills fetch channel and provider code from the first remote that has the `channels` or `providers` branch, trying `origin` first (`scripts/skill-apply.ts`). A copy of those branches in the fork would go stale, and skills would quietly install old code.
 - **Remotes.** In `.gitmodules`, the URL is the fork over HTTPS. Inside the submodule, `origin` is the fork (with an SSH push URL), and `upstream` is the original project.
-- **How to change it.** Use the project's own customisation tools where they exist (NanoClaw: its `/add-*`, `/customize`, and `/update-nanoclaw` skills), run from inside the submodule. Don't hand-edit upstream code. Work on `main`: after a clone the submodule is on a detached HEAD, and commits made there are easy to lose.
+- **Start from the pin.** Work on `main`: after a clone the submodule is on a detached HEAD, and commits made there are easy to lose. Before any change, the fork's `main` must equal the recorded pin, and `git -C <fork> status --porcelain` must be empty. If not, stop and ask.
+- **Taking upstream changes.** Use the project's own update tool. For NanoClaw, that is `/update-nanoclaw`, and only that: NanoClaw's rule is that every update goes through it, never a raw `git pull`, `git merge`, or `git rebase` of upstream, because it also runs migrations and refreshes installed channels and providers. If it fails, let it roll back and report. Don't finish the job by hand. The `update-submodule` skill drives this.
+- **Customising.** Use the project's own customisation tools, run from inside the submodule. For NanoClaw, every change is a skill (`docs/skills-model.md`): apply an existing one (`/add-*`, `/customize`), or, when none fits, edit the code, get it working, then turn the edit into a skill in the fork's `.claude/skills/<name>/` following `docs/skill-guidelines.md`. Don't pin edits that aren't a skill yet. After a customisation, add the skill to the "Customised with" column of the table below.
+- **Instructions inside the fork.** An agent started inside the submodule may not see this file. Claude Code reads every `CLAUDE.md` from its folder up to `/`, so it sees both. Codex stops at the Git root, and inside a submodule that is the submodule itself, so Codex sees only the fork's own `AGENTS.md`. So every fork ends its own instructions file (NanoClaw: `CLAUDE.md`, which its `AGENTS.md` links to) with a short "Aijutsu fork" section that points here. That section is the one allowed hand edit to an upstream file. Keep it last, keep it in step with this section, and when an update brings a conflict there, keep upstream's text and put the section back at the end.
 - **Secrets.** Before every commit, read `git -C <fork> status`. Never commit `.env` files, keys, tokens, or runtime data. NanoClaw's `.gitignore` already covers `.env*`, `*.keys.json`, `data/`, `store/`, `groups/`, and `logs/`. Stop and ask if anything like that shows up anyway.
 - **Pin.** The pin is a commit on the fork's `main` that has been pushed to the fork. The release-tag rule doesn't apply. Push the fork before (or together with) the course repository commit that records the pin. `push.recurseSubmodules on-demand` does this for you.
 
@@ -113,18 +130,27 @@ git -C $N switch main
 git -C $N remote set-url --push origin git@github.com:aijutsu/<fork-name>.git
 git -C $N remote add upstream <original-project-url>
 
+# Start from the pin
+git submodule update --init --recursive
+git -C $N fetch origin && git -C $N switch main && git -C $N merge --ff-only origin/main
+test "$(git -C $N rev-parse HEAD)" = "$(git ls-files -s $N | awk '{print $2}')"   # fork main == pin
+
 # Save a skill's changes (skills don't commit for you)
 git -C $N status                                                 # no .env, keys, or data
 git -C $N add -A && git -C $N commit -m "Apply /add-telegram skill"
-git add $N && git commit -m "Pin NanoClaw fork: add Telegram"
+git add $N                                                       # then update the table below
+make validate site-build
+git commit -m "Pin NanoClaw fork: add Telegram"
 git push                                                         # pushes the fork's main first
 ```
+
+Never push commits to a fork without moving the pin in the same push. The next update checks that the fork's `main` equals the pin, and stops if it doesn't.
 
 Current fork submodules:
 
 | Submodule | Fork | Upstream | Customised with |
 | --- | --- | --- | --- |
-| `course/001-building-agents-with-nanoclaw/nanoclaw` | https://github.com/aijutsu/aith-nanoclaw-codex-telegram | https://github.com/nanocoai/nanoclaw | `/add-codex`, `/add-telegram` |
+| `course/001-building-agents-with-nanoclaw/nanoclaw` | https://github.com/aijutsu/aith-nanoclaw-codex-telegram | https://github.com/nanocoai/nanoclaw | `/add-codex`, `/add-telegram`, and the "Aijutsu fork" section at the end of `CLAUDE.md` |
 
 When you add, customise, or retire a fork, update this table, the course's `course.yaml` `software` entry, and the References table in the course's `index.md` in the same change.
 
