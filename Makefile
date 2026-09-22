@@ -3,17 +3,18 @@
 
 ENV ?= production
 TF_ARGS ?=
-TF_DIR := deploy/infra/cloudflare
 TF_CONFIG := $(CURDIR)/deploy/config
-TF := terraform -chdir=$(TF_DIR)
-R2_ENDPOINT = https://$(CLOUDFLARE_ACCOUNT_ID).r2.cloudflarestorage.com
+# R2 endpoint for the Terraform state bucket. Built from the account ID so it isn't committed;
+# an AWS_ENDPOINT_URL_S3 already in your environment wins.
+AWS_ENDPOINT_URL_S3 ?= https://$(CLOUDFLARE_ACCOUNT_ID).r2.cloudflarestorage.com
 
 .DEFAULT_GOAL := help
-.PHONY: help install site site-build site-preview validate deploy \
-	infra-init infra-plan infra-apply infra-validate check-account
+.PHONY: help install site site-build site-preview validate deploy check-env .tf-init .tf \
+	deploy-tf-reconfigure deploy-tf-validate \
+	deploy-tf-cloudflare-init deploy-tf-cloudflare-plan deploy-tf-cloudflare-apply
 
 help: ## List the targets
-	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-16s %s\n", $$1, $$2}'
+	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-28s %s\n", $$1, $$2}'
 
 ## ---- Course site ----
 
@@ -35,25 +36,53 @@ validate: ## Check course/ against course format v1
 deploy: site-build ## Upload the built site to the Cloudflare Worker (needs CLOUDFLARE_* env)
 	npx wrangler deploy
 
-## ---- Infrastructure (Terraform, deploy/infra/cloudflare) ----
+## ---- Infrastructure (Terraform, deploy/infra/<module>) ----
 
-# Terraform's account ID and R2 state endpoint both come from CLOUDFLARE_ACCOUNT_ID.
-infra-init infra-plan infra-apply: export TF_VAR_account_id := $(CLOUDFLARE_ACCOUNT_ID)
-infra-init infra-plan infra-apply: export AWS_ENDPOINT_URL_S3 = $(R2_ENDPOINT)
+# Every module gets deploy-tf-<module>-init/-plan/-apply, all going through .tf with
+# INFRA=<module> ENV=<env> CMD=<command> (the same pattern as zworker). Settings come from
+# deploy/config/<env>.tfvars. State goes in the shared aijutsu-terraform-state R2 bucket,
+# with the key from deploy/config/<env>.tfbackend.
+#
+# init needs AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (the R2 state key pair) because it READS
+# the state, so check-env stops early with a clear message instead of a backend error.
+# Terraform's account ID and the bucket's endpoint both come from CLOUDFLARE_ACCOUNT_ID.
+.tf-init .tf deploy-tf-reconfigure: export TF_VAR_account_id := $(CLOUDFLARE_ACCOUNT_ID)
+.tf-init .tf deploy-tf-reconfigure: export AWS_ENDPOINT_URL_S3 := $(AWS_ENDPOINT_URL_S3)
 
-check-account:
+check-env:
+	@test -n "$(INFRA)" || { echo "INFRA is not set: use a deploy-tf-<module>-* target, or pass INFRA=<folder in deploy/infra>."; exit 1; }
 	@test -n "$(CLOUDFLARE_ACCOUNT_ID)" || { echo "CLOUDFLARE_ACCOUNT_ID is not set. See .envrc.example."; exit 1; }
+	@test -n "$$AWS_ACCESS_KEY_ID" -a -n "$$AWS_SECRET_ACCESS_KEY" || { echo "AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (R2 state credentials) are not set. See .envrc.example."; exit 1; }
 
-infra-init: check-account ## Initialise Terraform with the R2 state backend
-	$(TF) init -backend-config=$(TF_CONFIG)/$(ENV).tfbackend
+# -input=false is on init ONLY, deliberately. It makes a changed backend, or state that needs
+# migrating, fail instead of prompting (see deploy-tf-reconfigure). CMD runs with input enabled,
+# which is what lets apply ask for confirmation: there is no -auto-approve anywhere.
+.tf-init: check-env
+	cd ./deploy/infra/$(INFRA) && terraform init -input=false -backend-config=$(TF_CONFIG)/$(ENV).tfbackend
 
-infra-plan: check-account ## Show planned infrastructure changes (ENV=production)
-	$(TF) plan -var-file=$(TF_CONFIG)/$(ENV).tfvars $(TF_ARGS)
+.tf: .tf-init
+	cd ./deploy/infra/$(INFRA) && terraform $(CMD) -var-file=$(TF_CONFIG)/$(ENV).tfvars $(TF_ARGS)
 
-infra-apply: check-account ## Apply infrastructure changes (ENV=production)
-	$(TF) apply -var-file=$(TF_CONFIG)/$(ENV).tfvars $(TF_ARGS)
+# Re-initialise a module after its backend settings (bucket or key) change. .tf fails in that
+# case rather than guessing between moving the state (-migrate-state) and adopting what is at
+# the new location (-reconfigure). Picking the wrong one loses state, so a human chooses:
+#   make deploy-tf-reconfigure INFRA=cloudflare
+deploy-tf-reconfigure: check-env
+	cd ./deploy/infra/$(INFRA) && terraform init -input=false -reconfigure -backend-config=$(TF_CONFIG)/$(ENV).tfbackend
 
-infra-validate: ## Check Terraform formatting and validity (no credentials needed)
+deploy-tf-validate: ## Check formatting and validity of every Terraform module (no credentials)
 	terraform fmt -check -recursive deploy
-	$(TF) init -backend=false -input=false >/dev/null
-	$(TF) validate
+	@for d in deploy/infra/*/; do \
+	  echo "terraform validate $$d"; \
+	  terraform -chdir=$$d init -backend=false -input=false >/dev/null && terraform -chdir=$$d validate || exit 1; \
+	done
+
+# cloudflare: the Worker and custom domain that serve https://aith.aijutsu.dev.
+deploy-tf-cloudflare-init: ## Initialise the cloudflare module with its R2 state backend
+	@$(MAKE) .tf-init INFRA=cloudflare ENV=production
+
+deploy-tf-cloudflare-plan: ## Show planned changes to the cloudflare module
+	@$(MAKE) .tf INFRA=cloudflare ENV=production CMD=plan
+
+deploy-tf-cloudflare-apply: ## Apply the cloudflare module (asks for confirmation)
+	@$(MAKE) .tf INFRA=cloudflare ENV=production CMD=apply

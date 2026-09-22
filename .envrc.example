@@ -1,10 +1,14 @@
 # Copy to .envrc (gitignored), fill in, then run `direnv allow`.
 # Only needed to run Terraform or deploy by hand. See docs/system/publishing.md.
 
-# Cloudflare account that hosts aith.aijutsu.dev.
+# Cloudflare account that hosts aith.aijutsu.dev and the Terraform state bucket.
+# The Makefile also builds the state bucket's R2 endpoint from it (AWS_ENDPOINT_URL_S3).
 export CLOUDFLARE_ACCOUNT_ID=
 # API token: Account > Workers Scripts > Edit, and Zone (aijutsu.dev) > Zone > Read.
 export CLOUDFLARE_API_TOKEN=
-# R2 API token (S3 credentials) with Object Read & Write on the aith-tfstate bucket.
+# Terraform state credentials: an R2 S3-API key pair (R2 > Manage API tokens >
+# Object Read & Write) scoped to the shared `aijutsu-terraform-state` bucket.
+# It is the same pair zworker uses: one pair serves every aijutsu project.
+# Needed at `make deploy-tf-cloudflare-init` too, not only plan/apply, because init reads the state.
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=

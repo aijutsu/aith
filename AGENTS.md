@@ -6,6 +6,8 @@ Instructions for any AI agent working in this repository.
 
 Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is open source. The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
 
+The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror of `main`: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)).
+
 **Your main responsibility is to keep the course materials up to date**: accurate for the pinned versions of the software they reference, accurate about the outside services they mention (plans, prices, sign-up steps), and consistent with the rules below.
 
 ## Layout
@@ -20,7 +22,8 @@ Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that te
     - `README.md` — optional notes for contributors. READMEs are never published.
     - Submodules for the Git repositories that course uses (e.g. `course/001-building-agents-with-nanoclaw/nanoclaw`). A submodule is either an upstream copy or, when a course needs a customised version, an Aijutsu fork (see [Fork submodules](#fork-submodules)). Submodules are never published.
 - `docs/updates.md` — the Submodule Update Events log: one row per submodule bump, written by the `update-submodule` skill.
-- `docs/system/` — how the repository works: `course-format.md` (the content rules) and `publishing.md` (site build, Cloudflare, Terraform).
+- `docs/system/` — how the repository works: `course-format.md` (the content rules), `publishing.md` (site build, Cloudflare, Terraform), and `github-mirror.md` (Gitea and the GitHub mirror).
+- `.gitea/workflows/` — Gitea Actions: `site.yml` (check, build, deploy) and `mirror-to-github.yml`. Don't add `.github/workflows/`: Gitea would ignore it.
 - `format/` — the course format's JSON Schemas, content discovery code, and validator. `.vitepress/` — the site's VitePress config.
 - `deploy/infra/cloudflare/` — Terraform for the site's Cloudflare Worker and domain. Its settings are in `deploy/config/`.
 - `Makefile` — every command (`make help` lists them). `.claude/skills/` — skills for maintaining this repository.
@@ -59,7 +62,7 @@ To change the format itself, update the spec, the schemas in `format/schema/`, a
 
 ## Publishing
 
-CI (`.github/workflows/site.yml`) checks every pull request and publishes `main` to https://aith.aijutsu.dev. See [publishing.md](docs/system/publishing.md). Terraform in `deploy/infra/cloudflare/` owns the Cloudflare Worker and its domain. `make deploy` (wrangler) uploads the built site. Don't add `routes` to `wrangler.jsonc`. Never commit `.envrc`, API tokens, or Terraform state.
+CI (Gitea Actions, `.gitea/workflows/site.yml`) checks every pull request and publishes `main` to https://aith.aijutsu.dev. See [publishing.md](docs/system/publishing.md). Terraform in `deploy/infra/cloudflare/` owns the Cloudflare Worker and its domain. `make deploy` (wrangler) uploads the built site. Infrastructure targets follow one pattern: `make deploy-tf-<module>-init`, `-plan` and `-apply` for each folder in `deploy/infra/` (today: `deploy-tf-cloudflare-*`). Add the same three targets when you add a module. Don't add `routes` to `wrangler.jsonc`. Never commit `.envrc`, API tokens, or Terraform state.
 
 ## Referenced repositories
 
@@ -72,7 +75,7 @@ These rules apply to every submodule:
 - A submodule's own `CLAUDE.md`, `AGENTS.md`, and `.claude/` (NanoClaw has all three) are upstream's instructions for developing that project. Treat them as reference material for the course, not as rules for this repository. The one exception: when you run a fork submodule's own skills from inside it, follow its instructions for that work. This repository's rules still decide what gets committed and pushed.
 
 ```bash
-git clone --recurse-submodules git@github.com:aijutsu/aith.git   # fresh clone
+git clone --recurse-submodules git@gohans.aijutsu.dev:aijutsu/aith.git   # fresh clone (Gitea)
 git submodule update --init --recursive                          # existing clone
 git submodule status                                             # show every pin
 git config push.recurseSubmodules on-demand                      # once per clone: pushing this repo pushes fork submodules first

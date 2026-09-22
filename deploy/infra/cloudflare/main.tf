@@ -22,6 +22,9 @@ resource "cloudflare_worker" "site" {
 
 # Attaches the hostname to the Worker. Cloudflare creates the DNS record and
 # certificate itself, and refuses if the hostname already has a CNAME record.
+# It also refuses (code 100124) while the Worker has no deployment. So on the very first
+# setup, apply the Worker alone, run `make deploy`, then apply again
+# (docs/system/publishing.md, "First-time setup").
 resource "cloudflare_workers_custom_domain" "site" {
   account_id = var.account_id
   zone_id    = data.cloudflare_zone.this.id

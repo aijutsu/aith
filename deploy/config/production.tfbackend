@@ -1,4 +1,8 @@
-# R2 bucket for deploy/infra/cloudflare state. Create the bucket once by hand
-# (docs/system/publishing.md). The endpoint comes from AWS_ENDPOINT_URL_S3.
-bucket = "aith-tfstate"
-key    = "cloudflare/production.tfstate"
+# Terraform state for deploy/infra/cloudflare lives in the shared aijutsu state bucket.
+# The bucket is provisioned by zworker (deploy/infra/cloudflare-r2-tfstate), so there is
+# nothing to create here. Projects are separated by key: <project>/<module>/terraform.tfstate.
+# Another environment needs its own key, or it would overwrite this state.
+# The endpoint is not set here, to keep the account ID out of this public repo:
+# the Makefile sets AWS_ENDPOINT_URL_S3 from CLOUDFLARE_ACCOUNT_ID.
+bucket = "aijutsu-terraform-state"
+key    = "aith/cloudflare/terraform.tfstate"

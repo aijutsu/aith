@@ -4,7 +4,7 @@
 
 **To follow the course, go to https://aith.aijutsu.dev.** The same pages are in [`course/`](./course/index.md) if you prefer to read them on GitHub. Workshop info is at https://aijutsu.dev/ai-in-the-heartlands.
 
-This README is for people who contribute to the course materials. All materials are open source, and pull requests are welcome.
+This README is for people who contribute to the course materials. All materials are open source, and pull requests are welcome on GitHub. GitHub is a public mirror: the maintainers work on Aijutsu's own Git server and bring your pull request across from there (see [github-mirror.md](./docs/system/github-mirror.md)).
 
 ## How this repository works
 
@@ -19,7 +19,9 @@ This README is for people who contribute to the course materials. All materials 
 You need Git, Node.js 22 or newer, and `make`.
 
 ```bash
-git clone --recurse-submodules git@github.com:aijutsu/aith.git
+git clone --recurse-submodules https://github.com/aijutsu/aith.git
+# Aijutsu maintainers clone from Gitea instead:
+#   git clone --recurse-submodules git@gohans.aijutsu.dev:aijutsu/aith.git
 cd aith
 make install     # install the site's tools
 make site        # preview the site at http://localhost:5173 while you edit
@@ -40,5 +42,6 @@ Run `make help` to see every command.
 | --- | --- |
 | [docs/system/course-format.md](./docs/system/course-format.md) | Where course files go, `course.yaml`, the glossary, and which Markdown you can use. |
 | [docs/system/publishing.md](./docs/system/publishing.md) | How the site is built and deployed, and the Cloudflare and Terraform setup. |
+| [docs/system/github-mirror.md](./docs/system/github-mirror.md) | Where the repository lives (Gitea), and how the public GitHub mirror works. |
 | [docs/updates.md](./docs/updates.md) | Log of every submodule version change. |
 | [AGENTS.md](./AGENTS.md) | Writing rules and maintenance rules. |

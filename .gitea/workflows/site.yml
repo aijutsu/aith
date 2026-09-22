@@ -1,0 +1,87 @@
+# Gitea Actions: checks every change to the course, and publishes main to
+# https://aith.aijutsu.dev. See docs/system/publishing.md.
+#
+# Notes for whoever maintains this (the same runner rules as aijutsu/observatory):
+#   - No `container:` image. actions/checkout is a JavaScript action that runs with
+#     the job container's own node. The runner's default ubuntu-latest image has
+#     node, git and make; most other images have no node, and checkout dies (exit 127).
+#   - actions/checkout@v4 is the only action used. Gitea fetches `uses:` actions from
+#     github.com ([actions] DEFAULT_ACTIONS_URL). Node and Terraform are installed
+#     below with curl at pinned versions instead of setup-* actions, whose current
+#     releases need the node24 action runtime.
+#   - The runner has no job cache (act_runner `cache.enabled: false`), so there is no
+#     npm cache step.
+#   - Every check is a `make` target, the same one you run locally.
+#   - Repository secrets (Settings → Actions → Secrets): CLOUDFLARE_API_TOKEN (the CI
+#     token in docs/system/publishing.md) and CLOUDFLARE_ACCOUNT_ID. Gitea rejects
+#     secret names that start with GITHUB_ or GITEA_.
+name: Site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch makes the in-flight run irrelevant. Gitea honours this
+# from 1.26 (go-gitea#32751); gohan.aijutsu.dev runs 1.24.6, which accepts and ignores it,
+# so two quick pushes to main can deploy out of order. Push again if the site looks stale.
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Tracks .nvmrc (major version) and the Node used locally. wrangler 4 needs >= 22.
+  NODE_VERSION: "24.12.0"
+  # Tracks the Terraform used locally. deploy/infra/cloudflare needs >= 1.11.
+  TERRAFORM_VERSION: "1.15.1"
+
+jobs:
+  site:
+    name: Check, build, and deploy the course site
+    runs-on: ubuntu-latest
+    # No `container:` (see the header).
+    steps:
+      # Full history gives each page its "last updated" date. Submodules are not
+      # checked out: the site never publishes them.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js and Terraform
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            x86_64|amd64)  nodearch=x64;   tfarch=amd64 ;;
+            aarch64|arm64) nodearch=arm64; tfarch=arm64 ;;
+            *) echo "::error::unsupported runner architecture $(uname -m)"; exit 1 ;;
+          esac
+          fetch() { if command -v curl >/dev/null; then curl -fsSL "$1"; else wget -qO- "$1"; fi; }
+          tools="$HOME/toolchain"
+          mkdir -p "$tools/bin"
+
+          fetch "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${nodearch}.tar.gz" | tar -xz -C "$tools"
+          nodebin="$tools/node-v${NODE_VERSION}-linux-${nodearch}/bin"
+
+          # Terraform ships as .zip only. Fall back to python3 if the image has no unzip.
+          fetch "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${tfarch}.zip" > /tmp/terraform.zip
+          if command -v unzip >/dev/null; then
+            unzip -q -o -d "$tools/bin" /tmp/terraform.zip
+          else
+            python3 -m zipfile -e /tmp/terraform.zip "$tools/bin"
+            chmod +x "$tools/bin/terraform"
+          fi
+
+          echo "$nodebin" >> "$GITHUB_PATH"
+          echo "$tools/bin" >> "$GITHUB_PATH"
+          "$nodebin/node" --version
+          "$tools/bin/terraform" version
+
+      - name: Check content, build the site, check Terraform
+        run: make install validate site-build deploy-tf-validate
+
+      - name: Deploy to Cloudflare
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: make deploy

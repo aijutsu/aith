@@ -1,0 +1,65 @@
+name: Mirror to GitHub
+
+# Pushes `main` to github.com/aijutsu/aith on every push here. GitHub is the public,
+# read-only copy that learners and the site's "Suggest a change" links use; this Gitea
+# repo is the source of truth. See docs/system/github-mirror.md.
+#
+# Fast-forward only — this never force-pushes, so it cannot rewrite history on the
+# GitHub side. A diverged target must fail the job loudly, not be overwritten. So never
+# merge a pull request on GitHub: apply it here, and the mirror carries it across.
+#
+# HEADS UP for future changes: Gitea's [actions] WORKFLOW_DIRS is precedence, not
+# union — the first of `.gitea/workflows` / `.github/workflows` that exists wins and
+# the rest are never consulted. Adding `.github/workflows/` will NOT run on Gitea; put
+# Gitea CI in this directory instead.
+#
+# Required Gitea repository secret (Settings → Actions → Secrets):
+#   MIRROR_GITHUB_TOKEN — GitHub PAT for aijutsu/aith.
+#     fine-grained: Contents read+write  (Workflows read+write only becomes necessary
+#                   if this repo ever gains a .github/workflows/ dir — GitHub rejects
+#                   the ENTIRE push without it)
+#     classic:      repo  (+ workflow, same caveat)
+#   Gitea rejects secret names starting with GITHUB_ or GITEA_ — those prefixes are
+#   reserved — which is why this is not called GITHUB_TOKEN.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    # Must match a label the act_runner registered with (Settings → Actions → Runners).
+    # No fallback matching: an unmatched label leaves the job queued forever, silently.
+    runs-on: ubuntu-latest
+    # Belt and braces: a workflow_dispatch fired from another branch must never push
+    # that branch's tip onto the target's main.
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # A shallow clone cannot be pushed ("shallow update not allowed").
+          fetch-depth: 0
+          # Keep the automatic Gitea job token out of .git/config, so the push below
+          # can only ever authenticate with the GitHub PAT.
+          persist-credentials: false
+
+      - name: Push main to GitHub
+        env:
+          # Injected as env rather than interpolated into the script body, so the
+          # echoed "Run" block never contains the value.
+          MIRROR_GITHUB_TOKEN: ${{ secrets.MIRROR_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MIRROR_GITHUB_TOKEN:-}" ]; then
+            echo "::error::MIRROR_GITHUB_TOKEN is not set — add it in Settings → Actions → Secrets"
+            exit 1
+          fi
+          # No-op under a container runner (root owns the workspace); earns its keep
+          # on a `<label>:host` runner where uids can differ.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # URL passed inline rather than via `git remote add`, so the PAT never lands
+          # in .git/config. Gitea masks secret values in job logs.
+          # HEAD: not main: — actions/checkout leaves a detached HEAD.
+          # No --force: a diverged target must fail loudly, not be overwritten.
+          git push "https://x-access-token:${MIRROR_GITHUB_TOKEN}@github.com/aijutsu/aith.git" \
+            HEAD:refs/heads/main
