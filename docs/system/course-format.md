@@ -29,10 +29,11 @@ The content root is `course/`. A file's role comes from where it is:
 | `course/glossary.yaml` | The single glossary (data). |
 | `course/glossary.md` | Glossary page. Shows the glossary with a `:::glossary` block. |
 | `course/terms.md` | Terms of Use page: the copyright, what readers may do with the materials, and what needs written approval from Aijutsu. |
+| `course/about.md` | About page: who makes the courses (Aijutsu), what else they do, and how to reach them. |
 | `course/NNN-slug/` | A course. `NNN` is a three-digit order number (`001`, `002`, …). |
 | `course/NNN-slug/course.yaml` | The course manifest. Required. |
 | `course/NNN-slug/index.md` | The course's main page. Required. |
-| `course/NNN-slug/NN-slug/index.md` | A lesson. **Reserved:** allowed, but lesson fields are defined when the first lesson is written. |
+| `course/NNN-slug/NN-slug/index.md` | A lesson: one part of a course, on its own page. `NN` is a two-digit order number (`01`, `02`, …). Its frontmatter also has an `id` (see [Lesson frontmatter](#lesson-frontmatter)). |
 
 Slugs use lowercase letters, digits, and single hyphens. Any other Markdown file under `course/` is an error, so new kinds of pages are added to this spec first.
 
@@ -83,7 +84,23 @@ description: One plain-English sentence.         # optional
 ---
 ```
 
-No other keys are allowed. In particular, no renderer keys such as `layout`, `hero`, `sidebar`, or `outline`. The site decides those itself (the home page's hero is built from its `title` and `description`).
+No other keys are allowed (lessons add one, below). In particular, no renderer keys such as `layout`, `hero`, `sidebar`, or `outline`. The site decides those itself (the home page's hero is built from its `title` and `description`).
+
+### Lesson frontmatter
+
+Schema: [`format/schema/lesson.schema.json`](../../format/schema/lesson.schema.json). A lesson has the page fields, plus a required `id`:
+
+```yaml
+---
+id: installations # never change this, even if the folder or title changes
+title: Installations
+description: Get your computer ready for the course.
+---
+```
+
+- `id` is a slug, unique within its course. Base it on the folder name without the number: `01-installations/` → `installations`.
+- **Never change it** once the lesson is published, even if the folder, number or title changes. A platform tracks learner progress by the course `id` and the lesson `id` together.
+- Lesson ids were defined in v1 before any lesson was published, so no published content changed meaning.
 
 ## `glossary.yaml`
 
@@ -145,7 +162,7 @@ Not allowed (the validator rejects these outside code blocks and inline code):
 
 | Command | Checks |
 | --- | --- |
-| `make validate` | Schemas; page locations; no renderer keys or disallowed syntax; `<details>` closed, with a blank line after `</summary>`; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
+| `make validate` | Schemas; page locations; no renderer keys or disallowed syntax; `<details>` closed, with a blank line after `</summary>`; every lesson has an `id`, unique within its course; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
 | `make site-build` | Everything the renderer needs, including **dead links** (the build fails on any). |
 
 CI runs both on every pull request.
@@ -161,4 +178,4 @@ CI runs both on every pull request.
 
 ## Reserved for later versions
 
-Ideas kept open so they can be added without breaking v1: lesson fields (`id`, `duration`, `outcomes`), exercise/solution/checkpoint blocks, notes for instructors only, and translations.
+Ideas kept open so they can be added without breaking v1: lesson fields (`duration`, `outcomes`), exercise/solution/checkpoint blocks, notes for instructors only, and translations.

@@ -5,7 +5,7 @@ The course site at https://aith.aijutsu.dev is built from `course/` and served b
 ```
 course/**  ──make validate──▶  checked content
            ──make site-build─▶  .vitepress/dist/   (VitePress; fails on dead links)
-           ──make deploy─────▶  Worker "aith" (static assets, uploaded by wrangler)
+           ──make deploy─────▶  Worker "aith" (static assets + worker/ script, uploaded by wrangler)
                                    ▲
 Terraform (deploy/infra/cloudflare) owns the Worker and its custom domain aith.aijutsu.dev
 ```
@@ -18,9 +18,12 @@ Terraform (deploy/infra/cloudflare) owns the Worker and its custom domain aith.a
 | How the site looks and navigates | VitePress config | `.vitepress/config.mts`, `.vitepress/glossary-plugin.ts` |
 | The Worker `aith`, and `aith.aijutsu.dev` (DNS record and certificate) | Terraform | `deploy/infra/cloudflare/`, settings in `deploy/config/<env>.tfvars` |
 | The site's files on the Worker (versions and deployments) | wrangler | `wrangler.jsonc`, run by `make deploy` |
+| The Worker's script: the Plausible analytics proxy, run only for `/js/p.js` and `/api/e` | wrangler (bundles it on deploy) | `worker/`, [analytics.md](./analytics.md) |
 | Terraform state | The shared aijutsu R2 bucket `aijutsu-terraform-state`, key `aith/cloudflare/terraform.tfstate`. zworker provisions the bucket (`deploy/infra/cloudflare-r2-tfstate`). | `deploy/config/<env>.tfbackend` |
 
 Keep that split. **Don't add `routes` to `wrangler.jsonc`**: Terraform owns the domain, and wrangler only touches domains it lists. Keep `workers_dev` and `preview_urls` `false` in `wrangler.jsonc`, matching `subdomain` in Terraform. Otherwise each tool undoes the other.
+
+The Worker has a small script (`worker/`) for the analytics proxy. `assets.run_worker_first` runs it only for the two analytics paths, so every page is still served straight from the static assets. The script needs no Terraform change: Terraform owns the Worker itself, and each `wrangler deploy` uploads the script and the files together as one version.
 
 We use Workers static assets, not Cloudflare Pages. Cloudflare recommends Workers for new projects, and `cloudflare_pages_project` has open drift bugs in provider v5 (see [decisions.md](./decisions.md)). How the site itself is put together is in [site.md](./site.md).
 
@@ -46,6 +49,8 @@ make site           # live preview at http://localhost:5173
 make validate       # course format checks
 make site-build     # production build into .vitepress/dist
 make site-preview   # serve the production build
+make worker-test    # test the Worker's analytics proxy
+make worker-dev     # the production build and the Worker together, at http://localhost:8787
 ```
 
 Editing `course/glossary.yaml` while `make site` is running needs a restart of `make site`, because pages are cached by their Markdown source.
@@ -56,7 +61,7 @@ Editing `course/glossary.yaml` while `make site` is running needs a restart of `
 
 CI runs on Gitea Actions (`.gitea/workflows/site.yml`) at https://gohan.aijutsu.dev/aijutsu/aith, on every pull request and every push to `main`. Gitea's push mirror copies the repository to the public GitHub copy (see [github-mirror.md](./github-mirror.md)). The CI workflow runs these steps:
 
-1. Install pinned Node.js and Terraform (versions in the workflow's `env:`), then `make install validate site-build deploy-tf-validate`.
+1. Install pinned Node.js and Terraform (versions in the workflow's `env:`), then `make install validate worker-test site-build deploy-tf-validate`.
 2. On `main` only: `make deploy`, which rebuilds and runs `wrangler deploy`.
 
 It needs two repository secrets: `CLOUDFLARE_API_TOKEN` (the CI token below) and `CLOUDFLARE_ACCOUNT_ID`.

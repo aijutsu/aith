@@ -128,6 +128,7 @@ This site has no accounts, and it never asks for your personal details.
 - The site remembers whether you chose light or dark mode. It keeps that choice in your own browser.
 - Search runs in your browser. What you type in the search box is not sent to us.
 - Our hosting company, [Cloudflare](./glossary.md#cloudflare), handles basic technical details to deliver the site and protect it from attacks. For example, it sees your IP address, which is the address of your internet connection.
+- We count visits with [Plausible](./glossary.md#plausible), a privacy-friendly tool that we run ourselves. It shows us which pages people read, which sites sent them here, and their country and type of device. It uses no cookies (small files that sites save in your browser), it doesn't follow you to other sites, and it doesn't build a profile of you. To count each visitor once, it uses a code made from your IP address and browser that changes every day. Your IP address itself is not stored.
 - If you email us, we use what you send only to reply to you and to deal with your request.
 
 ## Changes to these terms

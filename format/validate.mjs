@@ -25,7 +25,7 @@ const fail = (where, message) => errors.push(`${where}: ${message}`)
 const ajv = new Ajv2020({ allErrors: true })
 const schema = (name) =>
   ajv.compile(JSON.parse(readFileSync(new URL(`./schema/${name}.schema.json`, import.meta.url), 'utf8')))
-const validators = { course: schema('course'), page: schema('page'), glossary: schema('glossary') }
+const validators = { course: schema('course'), page: schema('page'), lesson: schema('lesson'), glossary: schema('glossary') }
 
 function check(kind, data, where) {
   const validate = validators[kind]
@@ -50,7 +50,7 @@ function prose(body) {
 const pages = publishedPages(ROOT)
 const knownPage = (p) => {
   const parts = p.split('/')
-  if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md'].includes(p)
+  if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md', 'about.md'].includes(p)
   if (parts.length === 2) return COURSE_DIR.test(parts[0]) && parts[1] === 'index.md'
   if (parts.length === 3) return COURSE_DIR.test(parts[0]) && LESSON_DIR.test(parts[1]) && parts[2] === 'index.md'
   return false
@@ -63,7 +63,8 @@ for (const page of pages) {
     continue
   }
   const { frontmatter, body } = readPage(ROOT, page)
-  check('page', frontmatter, `${where} frontmatter`)
+  // Lessons (NNN-slug/NN-slug/index.md) also need a stable id.
+  check(page.split('/').length === 3 ? 'lesson' : 'page', frontmatter, `${where} frontmatter`)
 
   const text = prose(body)
   // [ \t], not \s: \s crosses lines, so a closing ::: would read the next paragraph as a block name.
@@ -106,6 +107,15 @@ for (const course of courses) {
   const { id, software = [] } = course.manifest
   if (courseIds.has(id)) fail(`${where}/course.yaml`, `id "${id}" is also used by ${courseIds.get(id)}`)
   courseIds.set(id, where)
+
+  // Lesson ids are unique within their course. (Their shape is checked with the page frontmatter.)
+  const lessonIds = new Map()
+  for (const lesson of course.lessons) {
+    const lessonId = lesson.frontmatter.id
+    if (lessonId === undefined) continue
+    if (lessonIds.has(lessonId)) fail(`${where}/${lesson.dir}/index.md`, `lesson id "${lessonId}" is also used by ${lessonIds.get(lessonId)}`)
+    else lessonIds.set(lessonId, lesson.dir)
+  }
 
   const escaped = course.dir.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
   if (!new RegExp(`\\]\\((\\./)?${escaped}/(index\\.md)?(#[^)]*)?\\)`).test(home)) {

@@ -1,5 +1,8 @@
 .remember
 
+# macOS Finder metadata, in every folder
+.DS_Store
+
 # Site
 node_modules/
 .vitepress/dist/

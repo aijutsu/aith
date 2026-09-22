@@ -20,9 +20,11 @@ The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin
   - `course/courses.md` — the Courses page. Its `:::courses` block lists every course from its `course.yaml`, so it needs no edits when a course is added.
   - `course/glossary.yaml` — the **only** glossary in the repository. `course/glossary.md` shows it on the site.
   - `course/terms.md` — the Terms of Use. The site footer (`themeConfig.footer` in `.vitepress/config.mts`) repeats its copyright notice: change both together, and update the "last changed" date at the top of the terms.
+  - `course/about.md` — About Aijutsu, the company that makes the courses. Its content comes from https://aijutsu.dev: when that site changes what Aijutsu does, update this page. It has its own writing rules (see [Writing rules](#writing-rules)).
   - `course/NNN-<slug>/` — one directory per course, numbered in course order (e.g. `course/001-building-agents-with-nanoclaw/`).
     - `course.yaml` — the course manifest, with a stable `id` that never changes.
     - `index.md` — the course's main page: the index of that course's materials, organised by topic, plus a References table.
+    - `NN-<slug>/index.md` — optional lessons: one part of the course per page, numbered in order (e.g. `01-installations/`). Each has an `id` in its frontmatter (e.g. `id: installations`) that never changes, like a course's `id`. The sidebar lists them by itself.
     - `README.md` — optional notes for contributors. READMEs are never published.
     - Submodules for the Git repositories that course uses (e.g. `course/001-building-agents-with-nanoclaw/nanoclaw`). A submodule is either an upstream copy or, when a course needs a customised version, an Aijutsu fork (see [Fork submodules](#fork-submodules)). Submodules are never published.
 - `docs/updates.md` — the Submodule Update Events log: one row per submodule bump, written by the `update-submodule` skill.
@@ -30,13 +32,15 @@ The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin
 - `docs/features/` — what learners and authors can do (reading the site, adding a course).
 - `docs/system/` — how the repository works:
   - `course-format.md` — the content rules.
-  - `site.md` — the VitePress renderer.
+  - `site.md` — the VitePress renderer, including SEO and AEO metadata.
+  - `analytics.md` — Plausible analytics through the site's Worker.
   - `publishing.md` — site build, Cloudflare, Terraform.
   - `github-mirror.md` — Gitea and the GitHub mirror.
   - `decisions.md` — what we chose and why.
   - `known-issues.md` — gotchas and open follow-ups.
 - `.gitea/workflows/site.yml` — Gitea Actions CI: check, build, and deploy. Don't add `.github/workflows/`: Gitea would ignore it.
-- `format/` — the course format's JSON Schemas, content discovery code, and validator. `.vitepress/` — the site's VitePress config.
+- `format/` — the course format's JSON Schemas, content discovery code, and validator. `.vitepress/` — the site's VitePress config, including its SEO metadata (`seo.ts`) and analytics snippet (`analytics.ts`).
+- `worker/` — the `aith` Worker's script: the Plausible analytics proxy (`make worker-test`). Everything else the Worker serves is the built site.
 - `deploy/infra/cloudflare/` — Terraform for the site's Cloudflare Worker and domain. Its settings are in `deploy/config/`.
 - `Makefile` — every command (`make help` lists them). `.claude/skills/` — skills for maintaining this repository.
 
@@ -51,6 +55,13 @@ All published course material is written for non-technical readers, in basic-to-
 - When a technical term is unavoidable, explain it in plain words where it first appears, or link to its glossary entry.
 - When the reader must type a command, show the exact command and say what should happen after it runs.
 - Match the voice of the existing glossary, e.g. "Think of it like a USB plug for AI: one standard plug that works with many different things."
+
+**One exception: `course/about.md`** (About Aijutsu). It is Aijutsu's company page, not course material, and it is written for answer engines (AEO) as much as for learners:
+
+- Write in Aijutsu's voice ("we"), and use the proper technical and business terms. The plain-English rules above don't apply, and new terms on this page don't need glossary entries (link to existing ones where they fit).
+- Phrase each heading as a question people ask ("Who founded Aijutsu?"), and make the first sentence under it a complete answer that names Aijutsu, so it still makes sense when an answer engine quotes it alone.
+- Keep the "at a glance" facts table, and use the same names everywhere: Aijutsu, Aijutsu Pte. Ltd., Joseph Matthias Goh, AI in the Heartlands.
+- Don't attribute the text to Aijutsu's website ("the website says"), and don't copy prices: link to https://aijutsu.dev/pricing.
 
 ## Glossary
 

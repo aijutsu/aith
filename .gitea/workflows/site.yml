@@ -76,8 +76,8 @@ jobs:
           "$nodebin/node" --version
           "$tools/bin/terraform" version
 
-      - name: Check content, build the site, check Terraform
-        run: make install validate site-build deploy-tf-validate
+      - name: Check content, test the Worker, build the site, check Terraform
+        run: make install validate worker-test site-build deploy-tf-validate
 
       - name: Deploy to Cloudflare
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

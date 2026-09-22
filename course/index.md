@@ -40,9 +40,12 @@ These are the course materials for "AI in the Heartlands" presented by Aijutsu. 
     1. Introduces standard deployments via DigitalOcean/Cloudflare
 1. Building a homelab
     1. Introduces self-managed infrastructure
-    1. Introduces security and compliance principles
-    1. Introdces deploying your own model via Ollama
+    1. Introduces common homelab software
+    1. Introduces some security and compliance best-practices
+    1. Introduces deploying your own model via Ollama
 1. Deployments, security, compliance, and operations
+    1. Introduces Managed Kubernetes on DigitalOcean as a deployment platform
+    1. Introduces runbooks
 
 ## Glossary
 

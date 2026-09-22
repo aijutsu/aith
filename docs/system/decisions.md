@@ -307,3 +307,80 @@ The details, with file paths, are in `course/001-building-agents-with-nanoclaw/R
 - A custom switch component, or a script in `head` that sets the theme: VitePress's own `initialValue` already feeds both the no-flash head script and the switch. It only needs a `@ts-expect-error`, because VitePress's type lists only `'dark'`.
 
 **Accepted cost:** Learners whose device is set to dark see light mode on their first visit, until they flip the switch.
+
+## 2026-09-22 — One top nav link, "Courses Overview"; an About Aijutsu page
+
+**Chosen:**
+- The top nav has one link, "Courses Overview", to the Courses page (`/courses`). The "Glossary" link is gone from it. The glossary stays in the sidebar ("Reference") and in the home hero's buttons.
+- A new page, `course/about.md` ("About Aijutsu"), in the sidebar's "Reference" group, after the Terms of Use. It says who makes the courses, what Aijutsu does, how it works, who the founder is, and what the name means. It is written from https://aijutsu.dev, in the course's plain-English style.
+- The page is a new known page in the course format (the Layout table, and `knownPage()` in `format/validate.mjs`). An optional page is an addition, so the format stays at v1.
+
+**Why:** Aijutsu asked for a simpler top bar and an About page. The About page links to aijutsu.dev for prices instead of copying them, so the course doesn't carry prices that go out of date (AGENTS.md makes the course responsible for keeping prices it quotes correct).
+
+**Open question:** "Courses Overview" in the nav goes to the Courses page, which lists only the courses that are written. The home page's "Courses Overview" section lists every planned course. If readers expect the full plan, point the nav link at `/#courses-overview`, or rename one of the two.
+
+## 2026-09-22 — The About page is written in Aijutsu's voice, for answer engines
+
+**Chosen:** This changes the style of the About page from the entry above. `course/about.md` is the one page under `course/` that the plain-English writing rules don't cover. It is written in Aijutsu's voice ("we"), with proper technical and business terms, and structured for answer engine optimisation (AEO):
+- question headings ("What does Aijutsu do?", "Who founded Aijutsu?"), each answered in its first sentence, which names Aijutsu;
+- an "at a glance" facts table (legal name, UEN, founder, focus areas, services, contact);
+- the same names everywhere, and a frontmatter `description` that summarises the company in one sentence.
+
+It doesn't say where its text comes from, and it links to aijutsu.dev for prices. The rules are in AGENTS.md ("Writing rules").
+
+**Why:**
+- Aijutsu asked for it. The page describes a company to potential clients and partners, and to AI answer engines, not a skill to learners. Rewording "readiness sprint" or "ISO 27001" into plain English would make it less precise for the people who need those terms.
+- Answer engines quote single passages. A heading that matches the question, and an answer that names Aijutsu, can be quoted on its own.
+
+**Turned down:** Structured data (schema.org `Organization` as JSON-LD). It helps answer engines further, but `course/` allows no `<script>`. If wanted, `config.mts` can add it to the `/about` page's `<head>` (`transformHead`), without touching `course/`.
+
+## 2026-09-22 — Course 001 is split into lessons; lessons use page frontmatter only
+
+**Chosen:** The course page (`001-building-agents-with-nanoclaw/index.md`) states the objectives, lists the lessons, and keeps the References table. The content moved into two lessons: `01-installations/` (prerequisites, terminal, Git, Docker, Codex) and `02-setting-up-nanoclaw/` (Telegram bot, download, setup, first message). Their steps are numbered from 1 in each lesson. Lessons are the `NN-slug/index.md` pages the format already allowed. They have the same frontmatter as any page. The site already listed them in the sidebar, and the Courses page counts them.
+
+**Why:** The single page had grown to over 400 lines. Lessons give learners short pages, a place to stop, and "Next page" links.
+
+**Still open:** a lesson `id`, like a course's `id`, so a platform can track progress even if a lesson folder is renamed. It is still reserved, together with `duration` and `outcomes`. Adding a required field is easy before the lessons are published, and harder after (see [Versions](./course-format.md#versions)).
+
+## 2026-09-22 — Lessons have a stable `id` in their frontmatter
+
+**Chosen:** Every lesson's frontmatter has a required `id`: a slug, unique within its course, that never changes. It is the folder name without its number (`01-installations/` → `installations`), the same rule as course ids. `format/schema/lesson.schema.json` checks its shape, and `make validate` checks that it is unique in the course. Course 001's lessons are `installations` and `setting-up-nanoclaw`.
+
+**Why:** A lesson's folder, and so its URL, can change when lessons are added, split or renumbered. A future platform needs something fixed to track progress by: the course `id` plus the lesson `id`. It was added before any lesson was published, so the format stays at v1.
+
+**Turned down:**
+- A `lessons:` list in `course.yaml`: a second place to keep in step with the folders, far from the page it describes.
+- Using the folder name as the id: renumbering a lesson would change it.
+
+**Supersedes:** the "Still open" note in "Course 001 is split into lessons" above.
+
+## 2026-09-22 — SEO and AEO metadata, worked out from the course format's data
+
+**Chosen:** `.vitepress/seo.ts` adds, at build time: a canonical URL, Open Graph and Twitter tags, and one schema.org JSON-LD `@graph` per page (`transformHead`); `robots.txt`, `llms.txt` and a fixed-URL social card (`buildEnd`); and VitePress's own `sitemap.xml`. Details in [site.md](./site.md#seo-and-aeo).
+
+**Why:**
+- Aijutsu asked for SEO and AEO metadata. Answer engines quote structured facts and llms.txt; search engines need canonicals and a sitemap.
+- Everything comes from frontmatter, `course.yaml` and `glossary.yaml`, so `course/` gets no SEO keys, and a new course or term gets its metadata by itself. The glossary becomes a `DefinedTermSet`, which answer engines can quote term by term.
+- Aijutsu's JSON-LD `@id` is `https://aijutsu.dev/#organization`, the one aijutsu.dev uses, so engines join the two sites' Aijutsu into one organisation.
+- `robots.txt` allows every crawler. AEO needs answer engines to read the site.
+
+**Turned down:**
+- SEO fields in page frontmatter (`image`, `keywords`, …): a course format change, and renderer data in `course/`. The title and description are enough.
+- A per-page social card (with the page title drawn on it): more build tooling for little gain. One card for the whole site.
+- Blocking AI training crawlers (such as `CCBot` and `Google-Extended`) while allowing answer engines: a trade-off Aijutsu hasn't asked for. It is two lines in `ROBOTS_TXT` if wanted.
+
+## 2026-09-22 — Plausible analytics through the site's own Worker
+
+**Chosen:** Cookieless Plausible analytics, self-hosted at ponzu.aijutsu.dev, through the `aith` Worker on disguised same-origin paths (`/js/p.js`, `/api/e`). The Worker gets a script (`worker/`); `assets.run_worker_first` runs it only for those two paths. The page's snippet runs only on `aith.aijutsu.dev`. The Terms of Use's privacy section says what it records. Details in [analytics.md](./analytics.md).
+
+**Why:**
+- Aijutsu asked for Plausible, proxied so ad-blockers don't block it, following aijutsu/website. It uses the same Plausible, the same "new script", the same Access bypass, and the same safeguards (forward the visitor's IP and User-Agent; turn an upstream redirect into a 502).
+- Same-origin on `aith.aijutsu.dev` is the most first-party option: no CORS, and no second hostname for blocklists to learn.
+- `run_worker_first` keeps every page a plain static-asset response, with no Worker invocation.
+
+**Turned down:**
+- Sending events through the website's proxy on `anya.aijutsu.dev`: it would tie this public repository's analytics to another repository's Worker, and it's cross-origin.
+- A separate analytics Worker and hostname: more Terraform and DNS for the same result.
+- The classic Plausible script with `data-domain` (works without a per-site file name): aijutsu.dev uses the new script, and one pattern is easier to run.
+
+**Accepted cost:** Analytics stays off until the site is added in Plausible and its tracker's file name is set as `PLAUSIBLE_SCRIPT` in `wrangler.jsonc` ([analytics.md](./analytics.md#turning-it-on)). Until then the Worker answers `/js/p.js` with 404, and nothing is sent.

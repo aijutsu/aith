@@ -34,6 +34,8 @@ make validate    # checks course/ against the course format
 make site-build  # builds the site; fails if any link is broken
 ```
 
+If you changed `worker/` (the site's analytics proxy), also run `make worker-test`.
+
 Run `make help` to see every command.
 
 ## Updating submodules

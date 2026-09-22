@@ -154,6 +154,10 @@ terms:
     type: Law
     description: Short for Personal Data Protection Act. A Singapore law that protects people's personal information, like names, phone numbers, and NRIC numbers. Companies usually need to ask for permission before they collect or use this information, and they must keep it safe.
     url: https://www.pdpc.gov.sg/
+  - term: Plausible
+    type: Software
+    description: A tool that counts visits to a website, like how many people read each page, without cookies and without tracking people from site to site. Think of it like a people counter at a shop door that doesn't know who anyone is. Aijutsu runs its own copy to count visits to this course site.
+    url: https://plausible.io/
   - term: PostgreSQL
     type: Software
     description: A popular free database. It stores information in tables with rows and columns, like a very powerful spreadsheet with strict rules about what can go into each column.

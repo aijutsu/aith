@@ -14,6 +14,8 @@ The one rule behind everything here: **`course/` stays renderer-neutral.** Anyth
 | `.vitepress/glossary-plugin.ts` | Renders the `:::glossary` block from `course/glossary.yaml`. |
 | `.vitepress/theme/index.ts`, `.vitepress/theme/custom.css` | The default theme with the site's brand colour and the light/dark switch placement. See [Theme](#theme). |
 | `.vitepress/theme/aith-splash.webp`, `.vitepress/theme/aith-splash-dark.webp` | The pictures behind the home hero: by day for light mode, at night for dark mode. `cwebp -q 82` copies of the original PNGs (2.3 MB to 278 KB, and 2.5 MB to 343 KB). Only `custom.css` uses them. See [Hero banner](#theme). |
+| `.vitepress/seo.ts`, `.vitepress/og-image.jpg` | Search and answer-engine metadata, and the 1200×630 social card. See [SEO and AEO](#seo-and-aeo). |
+| `.vitepress/analytics.ts`, `worker/` | Plausible analytics, proxied through the site's own Worker. See [analytics.md](./analytics.md). |
 | `format/courses.mjs` | Content discovery (courses, published pages, submodule paths, anchor slugs). Shared with the validator, so the site and `make validate` read the layout the same way. |
 | `package.json`, `package-lock.json` | Pinned dev dependencies: `vitepress ^1.6.4`, `markdown-it-container`, `gray-matter`, `yaml`, `ajv`, `wrangler ^4`. Use `make install` (`npm ci`). There are no npm scripts: the Makefile is the only entry point. |
 | `.nvmrc` | Node 24. wrangler 4 needs Node 22 or newer. |
@@ -33,12 +35,12 @@ The one rule behind everything here: **`course/` stays renderer-neutral.** Anyth
   Both are raw HTML (`v-html`), so links in them are plain `<a href="/…">`, and the build's dead-link check doesn't see them. The year (2026) is the year of first publication, so it is written in, not worked out at build time. The notice and `course/terms.md` must say the same thing: change them together, and update the "last changed" date at the top of the terms page.
 - **Navigation is generated.** `discoverCourses()` finds every `course/NNN-slug/` folder:
   - course titles come from `course.yaml`;
-  - lessons (reserved in format v1) come from `NN-slug/index.md` frontmatter.
+  - lessons come from `NN-slug/index.md` frontmatter, listed under their course in folder order. The default theme turns the sidebar order into "Previous page" and "Next page" links at the bottom of each page, so learners can read a course from start to end.
 
   Nothing is hand-maintained. A new course shows up in the sidebar and on the Courses page as soon as its folder and `course.yaml` exist.
 
-  The sidebar's "Reference" group is the one hand-written part: Glossary, then Terms of Use. The prev/next links at the bottom of a page follow the sidebar order, so the Glossary page's "Next page" is the Terms of Use.
-- **"Courses" goes to the Courses page.** The nav link and the sidebar's "Courses" heading both go to `/courses`. The nav link's `activeMatch` (`^/(courses|\d{3}-)`) keeps it highlighted on every course and lesson page too.
+  The sidebar's "Reference" group is the one hand-written part: Glossary, Terms of Use, then About Aijutsu (`course/about.md`). The prev/next links at the bottom of a page follow the sidebar order, so the Glossary's "Next page" is the Terms of Use, and the Terms' is About Aijutsu.
+- **The top nav has one link, "Courses Overview", to the Courses page.** It and the sidebar's "Courses" heading both go to `/courses`. The nav link's `activeMatch` (`^/(courses|\d{3}-)`) keeps it highlighted on every course and lesson page too. The glossary isn't in the top nav: readers reach it from the sidebar's "Reference" group and the home hero's "Glossary" button.
 - **Home hero.** `transformPageData` gives `course/index.md` the `home` layout and a hero built from the page's `title` and `description`. The hero's buttons go to the first course and to the glossary.
   - **Mutate `pageData.frontmatter` in place.** A returned object is shallow-merged, and a returned `frontmatter` would replace the page's `title` and `description`.
   - `course/index.md` has no `# H1`, because the hero already shows the title.
@@ -57,6 +59,38 @@ The one rule behind everything here: **`course/` stays renderer-neutral.** Anyth
   - It HTML-escapes names and renders descriptions with `md.renderInline`.
   - It wraps everything in `<div v-pre>`. VitePress compiles Markdown output as a Vue template, and `v-pre` stops Vue from reading `{{ }}` in the text.
   - Each term row gets `id="<slug>"`, from the same `slugify()` the validator uses, so `glossary.md#node-js` works. Types get `id="type-<slug>"`.
+
+## SEO and AEO
+
+Metadata for search engines, social cards, and answer engines (ChatGPT, Perplexity, Google's AI Overviews). `.vitepress/seo.ts` works it all out from the course format's own data (page frontmatter, `course.yaml`, `glossary.yaml`), so `course/` has no SEO keys. Pages only need a good `title` and `description`.
+
+| What | Where | Details |
+| --- | --- | --- |
+| `sitemap.xml` | `sitemap` in `config.mts` | VitePress's own. Clean URLs, from every published page. |
+| Canonical URL | `seoHead()`, from `transformHead` | `pageUrl()` gives the same string as the page's `<loc>` in the sitemap: `/` for the home page, `/<dir>/` for a course or lesson, `/<name>` for other pages. The 404 page gets no metadata. |
+| Open Graph, Twitter card | `seoHead()` | Title (the page's own; the site name on the home page), description, URL, and the social card. `og:type` is `website` on the home page and `article` elsewhere, with `article:modified_time` from Git. `og:site_name` is in `head`. |
+| JSON-LD | `seoHead()` | One `@graph` per page. See below. |
+| Social card | `.vitepress/og-image.jpg` → `/og-image.jpg` | A 1200×630 crop of the light-mode hero picture, right-aligned to keep the people. `writeSeoFiles()` copies it to the site root, so its URL doesn't change (Vite would hash it). |
+| `robots.txt` | `writeSeoFiles()`, from `buildEnd` | Allows every crawler, including AI crawlers and answer engines, and points to the sitemap. |
+| `llms.txt` | `writeSeoFiles()` | A Markdown map of the site for LLMs ([llmstxt.org](https://llmstxt.org)): the site summary, every course and lesson with its description, and the reference pages. |
+
+JSON-LD, by page:
+
+| Page | Nodes |
+| --- | --- |
+| Home (`index.md`) | `WebSite`, and Aijutsu as an `Organization` in full (legal name, UEN, founder, services). |
+| About (`about.md`) | `AboutPage` whose `mainEntity` is Aijutsu, and the full `Organization`. It says the same things as the page. |
+| Courses (`courses.md`) | `ItemList` of the courses. |
+| Glossary (`glossary.md`) | `DefinedTermSet`: every term as a `DefinedTerm`, with its description (Markdown removed), its anchor URL, and its reference `url` as `sameAs`. |
+| A course (`NNN-slug/index.md`) | `Course` from `course.yaml`: title, summary, `isAccessibleForFree`, provider Aijutsu, its lessons as `hasPart`, and `outcomes`/`prerequisites` when the manifest has them. |
+| A lesson (`NNN-slug/NN-slug/index.md`) | `LearningResource` (a lesson), `isPartOf` its course. |
+| Terms (`terms.md`) | None. |
+
+- **Aijutsu's `@id` is `https://aijutsu.dev/#organization`,** the same as in aijutsu.dev's own JSON-LD (`src/lib/seo.ts` in aijutsu/website). Engines then see one organisation across both sites. Keep the two in step.
+- **`transformHead` and `buildEnd` run only in `make site-build`.** `make site` doesn't show these tags or files: check them in `.vitepress/dist`.
+- **JSON-LD is escaped:** every `<` becomes `<`, so no text can close the `<script>` early.
+- **Checking a build:** every page's canonical must appear in `sitemap.xml`, byte for byte, and every JSON-LD block must parse. Google's [Rich Results Test](https://search.google.com/test/rich-results) and the [Schema Markup Validator](https://validator.schema.org/) check the live pages.
+- **Adding a kind of page:** add its JSON-LD to `pageGraph()` in `seo.ts`, and a line to `llms.txt` if it's a reference page.
 
 ## Theme
 

@@ -16,7 +16,8 @@ Documentation for people (and AI agents) who work on this repository. None of it
 | Doc | What it covers |
 | --- | --- |
 | [course-format.md](./system/course-format.md) | The content contract (course format v1): where files go, `course.yaml`, page frontmatter, the glossary, allowed Markdown. Enforced by `make validate`. |
-| [site.md](./system/site.md) | How VitePress (`.vitepress/`) turns `course/` into the site: exclusions, generated navigation, the home hero and its banner picture, the Course Overview cards, the glossary block, the footer (copyright notice and Terms of Use link), the theme (brand colour, light/dark switch). |
+| [site.md](./system/site.md) | How VitePress (`.vitepress/`) turns `course/` into the site: exclusions, generated navigation, the home hero and its banner picture, the Course Overview cards, the glossary block, the footer (copyright notice and Terms of Use link), the theme (brand colour, light/dark switch), and the SEO and AEO metadata (sitemap, canonical URLs, social cards, JSON-LD, robots.txt, llms.txt). |
+| [analytics.md](./system/analytics.md) | Plausible analytics, proxied through the site's own Worker so ad-blockers don't block it: how it works, turning it on, testing it (including behind WARP), and what to check if events stop. |
 | [publishing.md](./system/publishing.md) | Build, CI, and deploy; Cloudflare, Terraform, tokens, state, first-time setup, recovery. |
 | [github-mirror.md](./system/github-mirror.md) | Gitea as the source of truth, the public GitHub push mirror, and how to take GitHub pull requests. |
 | [decisions.md](./system/decisions.md) | What we chose and why, with the alternatives we turned down and when to revisit. |

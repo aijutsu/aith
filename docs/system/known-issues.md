@@ -38,12 +38,12 @@ Gotchas we have hit, each with where it's handled. Add one whenever something co
 
 | Issue | What to do | Details |
 | --- | --- | --- |
-| Setup exits with "The Codex CLI is not installed on this machine" | Install Codex before running setup. ChatGPT sign-in needs the `codex` command. | Course step 4 |
+| Setup exits with "The Codex CLI is not installed on this machine" | Install Codex before running setup. ChatGPT sign-in needs the `codex` command. | Course 001, Installations, step 4 |
 | Setup offers "Echo's hardened agent image" before asking which runtime to use | That image is for Claude only. Run setup with `--agent-provider codex`, which skips the offer and the picker. | [decisions.md](./decisions.md) |
 | The Telegram step fails right after you paste a valid token | The token check needs `jq`, and setup doesn't install it. The course installs it in the Git step. | `course/001-building-agents-with-nanoclaw/README.md` |
-| `$setup` in Codex doesn't set anything up | Expected. The skill only says to run `bash nanoclaw.sh`. Setup needs a real terminal, so it can't run inside Codex. | Course step 7 |
-| On Windows, setup installs Docker inside Ubuntu | `docker` wasn't found in WSL, so setup ran Docker's install script. Turn on Docker Desktop's WSL integration for Ubuntu, and check `docker run hello-world` before setup. | Course step 3 |
-| On a Mac with OrbStack, setup says Docker isn't available | OrbStack wasn't running. Setup can only start Docker Desktop (`open -a Docker`). Open OrbStack, then run setup again. | Course step 7 |
+| `$setup` in Codex doesn't set anything up | Expected. The skill only says to run `bash nanoclaw.sh`. Setup needs a real terminal, so it can't run inside Codex. | Course 001, Setting up NanoClaw, step 3 |
+| On Windows, setup installs Docker inside Ubuntu | `docker` wasn't found in WSL, so setup ran Docker's install script. Turn on Docker Desktop's WSL integration for Ubuntu, and check `docker run hello-world` before setup. | Course 001, Installations, step 3 |
+| On a Mac with OrbStack, setup says Docker isn't available | OrbStack wasn't running. Setup can only start Docker Desktop (`open -a Docker`). Open OrbStack, then run setup again. | Course 001, Setting up NanoClaw, step 3 |
 | Setup fails, and doesn't offer "Want to debug this with Codex?" | Codex help only appears after setup has connected Codex, and only if `~/.codex/auth.json` exists (sign in to Codex first, Step 4). Earlier failures go to Claude. Without a Claude plan, answer **No** and ask Codex to read `logs/setup.log`. | `course/001-building-agents-with-nanoclaw/README.md` |
 | NanoClaw's `CLAUDE.md` says the service is `com.nanoclaw` / `nanoclaw` | Out of date. The name is made from the folder path (`src/install-slug.ts`). Use `bash setup/lib/restart.sh` to restart. | — |
 
@@ -69,6 +69,16 @@ Gotchas we have hit, each with where it's handled. Add one whenever something co
 | A screenshot or test with a dark device setting (`colorScheme: 'dark'`) shows light mode | Expected: the site starts in light mode. Set `localStorage['vitepress-theme-appearance'] = 'dark'` before the page loads (Playwright: `page.addInitScript`). | [site.md](./site.md#theme) |
 | The editor flags `appearance: { initialValue: 'light' }` in `config.mts` | VitePress's type only lists `'dark'`, but the value goes to `useDark`, which takes `'light'`. The line has a `@ts-expect-error`. The build doesn't type-check the config, and the repository has no `tsc`: check with a throwaway TypeScript install. | [site.md](./site.md#theme) |
 | A Playwright click on the light/dark switch fails with "strict mode violation" | The nav bar has two switches: one in the bar, one in the "…" menu. Use `.VPNavBarAppearance .VPSwitchAppearance`. | — |
+| The SEO tags, `robots.txt` or `llms.txt` are missing in `make site` | `transformHead` and `buildEnd` run only in a build. Check `.vitepress/dist` after `make site-build`. | [site.md](./site.md#seo-and-aeo) |
+
+## The Worker and analytics
+
+| Issue | What to do | Details |
+| --- | --- | --- |
+| `wrangler dev` or a deploy fails with `Incorrect type for map entry 'EVENT_PATH': the provided value is not of type 'function or ExportedHandler'` | The Workers runtime treats every named export of the entry module as an entry point. Export only the default handler from `worker/index.ts`, and keep constants and helpers in `worker/analytics.ts`. Unit tests can't catch this: only the real runtime does (`make worker-dev`). | [analytics.md](./analytics.md#files) |
+| Locally, every call from the Worker to Plausible fails with `Error: internal error; reference = …` (500) | Cloudflare WARP inspects encrypted traffic, and the local runtime doesn't trust its "Gateway CA - Cloudflare Managed G1". Run with `NODE_EXTRA_CA_CERTS` pointing at that CA, exported from the System keychain. curl works without it, because it uses the keychain. | [analytics.md](./analytics.md#checking-it) |
+| `/api/e` returns 502 | The upstream didn't answer 2xx. `returned 302` in the Worker logs means ponzu's Cloudflare Access bypass for `/api/*` is gone. | [analytics.md](./analytics.md#if-events-stop) |
+| `/js/p.js` returns 404 | `PLAUSIBLE_SCRIPT` in `wrangler.jsonc` is empty: analytics is off until the site is added in Plausible. | [analytics.md](./analytics.md#turning-it-on) |
 
 ## Local tooling (macOS)
 
@@ -87,4 +97,7 @@ As of 2026-09-22:
 - The CI token and the GitHub mirror token will expire. Set reminders. When the mirror token expires, GitHub quietly stops getting updates.
 - Gitea 1.26 or later would make `concurrency:` work.
 - VitePress 2 is still alpha. Upgrade when it's stable.
-- Course format: lesson fields and exercise, solution and checkpoint blocks are reserved. Define them when the first lesson is written.
+- Course format: lesson fields `duration` and `outcomes`, and exercise, solution and checkpoint blocks, are still reserved. Define them when a lesson needs them.
+- `course/index.md` says workshop info is at https://aijutsu.dev/ai-in-the-heartlands, which returns 404. aijutsu.dev doesn't mention AI in the Heartlands anywhere. Add the page there, or change the link. The site build can't catch this: it only checks links between its own pages.
+- `course/courses.md` links to `./index.md#course-overview`, but the home page heading is now "Courses Overview" (anchor `#courses-overview`). The link lands at the top of the home page. VitePress doesn't check anchors.
+- `course/about.md` is written from https://aijutsu.dev (read on 2026-09-22). Check it again when Aijutsu's services or website change.

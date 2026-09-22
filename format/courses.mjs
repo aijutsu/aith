@@ -71,7 +71,7 @@ export function readYaml(file) {
 
 /**
  * Courses in content order. Each course is a `NNN-slug/` folder; its lessons
- * (reserved in v1) are `NN-slug/index.md` folders inside it.
+ * are `NN-slug/index.md` folders inside it, in folder-number order.
  */
 export function discoverCourses(root = ROOT) {
   const contentRoot = join(root, CONTENT_DIR)

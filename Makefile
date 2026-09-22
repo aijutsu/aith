@@ -9,7 +9,7 @@ TF_CONFIG := $(CURDIR)/deploy/config
 AWS_ENDPOINT_URL_S3 ?= https://$(CLOUDFLARE_ACCOUNT_ID).r2.cloudflarestorage.com
 
 .DEFAULT_GOAL := help
-.PHONY: help install site site-build site-preview validate deploy check-env .tf-init .tf \
+.PHONY: help install site site-build site-preview validate worker-test worker-dev deploy check-env .tf-init .tf \
 	deploy-tf-reconfigure deploy-tf-validate \
 	deploy-tf-cloudflare-init deploy-tf-cloudflare-plan deploy-tf-cloudflare-apply
 
@@ -32,6 +32,14 @@ site-preview: site-build ## Serve the built site locally
 
 validate: ## Check course/ against course format v1
 	node format/validate.mjs
+
+worker-test: ## Test the Worker's analytics proxy (worker/, no network)
+	node --test worker/analytics.test.ts
+
+# Behind Cloudflare WARP, calls to Plausible fail with "internal error": run with
+# NODE_EXTRA_CA_CERTS pointing at the Gateway CA (docs/system/analytics.md, "Testing locally").
+worker-dev: site-build ## Run the built site and the Worker locally (http://localhost:8787)
+	npx wrangler dev --port 8787
 
 deploy: site-build ## Upload the built site to the Cloudflare Worker (needs CLOUDFLARE_* env)
 	npx wrangler deploy

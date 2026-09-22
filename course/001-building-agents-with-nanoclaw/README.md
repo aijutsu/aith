@@ -2,13 +2,13 @@
 
 This README is for people who maintain this course. It is not published. Learners read [index.md](./index.md), which is published at https://aith.aijutsu.dev/001-building-agents-with-nanoclaw/.
 
-- `index.md` is the course page. `course.yaml` is the course manifest. Both follow the [course format](../../docs/system/course-format.md).
+- `index.md` is the course page: the objectives, the list of lessons, and the References table. Each lesson is a folder with its own `index.md`: `01-installations/` and `02-setting-up-nanoclaw/`. Images sit next to the lesson that uses them. `course.yaml` is the course manifest. Both follow the [course format](../../docs/system/course-format.md).
 - `nanoclaw/` is our fork of NanoClaw, pinned as a submodule. We customised it with NanoClaw's own `/add-codex` and `/add-telegram` skills. The fork lives at https://github.com/aijutsu/aith-nanoclaw-codex-telegram. See `AGENTS.md` → Fork submodules.
 - To move the fork to a newer NanoClaw version, use this repository's `update-submodule` skill. It runs NanoClaw's own `/update-nanoclaw` skill for you, and then checks the course against the new version.
 
 ## What the install steps depend on
 
-The installation steps in `index.md` (Section 1) describe what the pinned fork does. They were checked against the fork at `9e4ee0c8` on 2026-09-22. When the pin moves, check these again (the `update-submodule` skill asks you to re-check every course instruction):
+The steps in the two lessons, `01-installations/index.md` and `02-setting-up-nanoclaw/index.md`, describe what the pinned fork does. They were checked against the fork at `9e4ee0c8` on 2026-09-22. When the pin moves, check these again (the `update-submodule` skill asks you to re-check every course instruction):
 
 | Course step | Depends on (paths inside `nanoclaw/`) |
 | --- | --- |

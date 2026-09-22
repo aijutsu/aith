@@ -4,9 +4,11 @@
 
 import { defineConfig, type DefaultTheme } from 'vitepress'
 import { CONTENT_DIR, contentExcludes, contentSubmodulePaths, discoverCourses } from '../format/courses.mjs'
+import { analyticsHead } from './analytics'
 import { courseOverviewPlugin } from './course-overview-plugin'
 import { coursesPlugin } from './courses-plugin'
 import { glossaryPlugin } from './glossary-plugin'
+import { SITE_NAME, SITE_URL, seoHead, writeSeoFiles } from './seo'
 
 const REPO = 'https://github.com/aijutsu/aith'
 const courses = discoverCourses()
@@ -33,6 +35,7 @@ const sidebar: DefaultTheme.SidebarItem[] = [
     items: [
       { text: 'Glossary', link: '/glossary' },
       { text: 'Terms of Use', link: '/terms' },
+      { text: 'About Aijutsu', link: '/about' },
     ],
   },
 ]
@@ -52,6 +55,14 @@ export default defineConfig({
   // @ts-expect-error fails, and can go.
   // @ts-expect-error initialValue: 'light' works at runtime (see docs/system/site.md#theme).
   appearance: { initialValue: 'light' },
+
+  // Search and answer-engine metadata (.vitepress/seo.ts): sitemap.xml here; per-page
+  // canonical, Open Graph, Twitter and JSON-LD in transformHead; robots.txt, llms.txt and the
+  // social card in buildEnd. Analytics (.vitepress/analytics.ts) runs only on the live site.
+  sitemap: { hostname: SITE_URL },
+  head: [['meta', { property: 'og:site_name', content: SITE_NAME }], ...analyticsHead],
+  transformHead: ({ pageData, siteConfig }) => seoHead(pageData, siteConfig.site.description),
+  buildEnd: writeSeoFiles,
 
   markdown: {
     config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(courseOverviewPlugin),
@@ -81,10 +92,10 @@ export default defineConfig({
   },
 
   themeConfig: {
+    // The glossary isn't here: it's in the sidebar ("Reference") and in the home hero's buttons.
     nav: [
       // Active on the Courses page and on every course and lesson page.
-      { text: 'Courses', link: '/courses', activeMatch: '^/(courses|\\d{3}-)' },
-      { text: 'Glossary', link: '/glossary' },
+      { text: 'Courses Overview', link: '/courses', activeMatch: '^/(courses|\\d{3}-)' },
     ],
     sidebar,
     search: { provider: 'local' },
