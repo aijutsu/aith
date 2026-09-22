@@ -3,50 +3,48 @@
 | Where | What | Who can see it |
 | --- | --- | --- |
 | https://gohan.aijutsu.dev/aijutsu/aith (`git@gohans.aijutsu.dev:aijutsu/aith.git`) | **The source of truth.** All work lands here, and CI runs here (`.gitea/workflows/`). | The Aijutsu team, behind Cloudflare Access |
-| https://github.com/aijutsu/aith | A **read-only public mirror** of `main`. The site's "Suggest a change on GitHub" and source links, and the README's clone command, point here. | Everyone |
+| https://github.com/aijutsu/aith | A **read-only public mirror**. The site's "Suggest a change on GitHub" and source links, and the README's clone command, point here. | Everyone |
 
-`.gitea/workflows/mirror-to-github.yml` pushes `main` to GitHub after every push to Gitea's `main`.
+Gitea's built-in **push mirror** copies the repository to GitHub (Gitea › aijutsu/aith › Settings › Repository › Mirror Settings › Push Mirror). There is no workflow or Actions secret for it: the GitHub token is saved in the push mirror's own settings.
 
 ## Rules
 
-- **Never merge a pull request on GitHub, and never push to GitHub by hand.** The mirror is fast-forward only: it never force-pushes, so it can't rewrite GitHub's history. If GitHub's `main` gets a commit Gitea doesn't have, the next mirror run fails with `non-fast-forward`. Adding `--force` to fix that would throw the GitHub commit away. So take a GitHub pull request into Gitea instead:
+- **Never merge a pull request on GitHub, and never push to GitHub by hand.** The push mirror force-pushes every branch and tag, and deletes GitHub branches that Gitea doesn't have. Anything that lands only on GitHub is silently erased at the next sync, with no error. So take a GitHub pull request into Gitea instead:
 
   ```bash
   git fetch github pull/<number>/head:pr-<number>   # the `github` remote is github.com/aijutsu/aith
   git switch main && git merge --no-ff pr-<number>  # or cherry-pick; review as usual
-  git push origin main                              # Gitea; the mirror carries it to GitHub
+  git push origin main                              # Gitea; the push mirror carries it to GitHub
   ```
 
-  Then close the GitHub pull request with a link to the merged commit.
-- **CI lives in `.gitea/workflows/` only.** Gitea reads `.gitea/workflows/` *or* `.github/workflows/`: whichever exists first wins, and the other is ignored. A `.github/workflows/` directory would not run on Gitea. It would also make every mirror push need a token with the Workflows permission (see below).
+  Then close the GitHub pull request with a link to the merged commit. (GitHub keeps `pull/<number>/head` refs even though the mirror prunes branches.)
+- **CI lives in `.gitea/workflows/` only.** Gitea reads `.gitea/workflows/` *or* `.github/workflows/`: whichever exists first wins, and the other is ignored. A `.github/workflows/` directory would not run on Gitea. It would also make the mirror's token need the Workflows permission (see below).
 
 ## Setting it up
 
-1. **Create `github.com/aijutsu/aith` empty.** No README, license, or .gitignore. Otherwise the first push is `non-fast-forward`, and the only fix without force is to recreate the repo. Keep it public, since learners and the site link to it.
+1. **Create `github.com/aijutsu/aith`** and keep it public, since learners and the site link to it. The first sync overwrites whatever is in it.
 2. **Create a GitHub token** for the mirror:
    - Fine-grained (recommended): repository `aijutsu/aith` only, **Contents: Read and write**. An org repo may need the org to approve the token.
    - Classic: `repo`.
    - Only if this repo ever gains `.github/workflows/`: add **Workflows: Read and write** (classic: `workflow`). Without it, GitHub rejects the whole push.
-3. **Add it to Gitea** as the repository secret **`MIRROR_GITHUB_TOKEN`** (Settings › Actions › Secrets). Gitea rejects secret names starting with `GITHUB_` or `GITEA_`.
-4. **Set a reminder for the token's expiry.** When it expires, the mirror fails with 403 errors and GitHub quietly stops getting updates.
-5. **Run it once by hand** (Actions › Mirror to GitHub › Run workflow), then check that both sides match:
+3. **Add the push mirror** in Gitea (Settings › Repository › Mirror Settings):
+   - Git remote URL: `https://github.com/aijutsu/aith.git`
+   - Username: your GitHub username. Password: the token.
+   - Turn on **Sync when commits are pushed**, so GitHub updates right after each push instead of only on the timer.
+4. **Set a reminder for the token's expiry.** When it expires, syncs fail and GitHub quietly stops getting updates. The error shows next to the mirror in Mirror Settings.
+5. **Sync once by hand** (Mirror Settings › Synchronize Now), then check that both sides match:
 
    ```bash
    git rev-parse origin/main
    git ls-remote https://github.com/aijutsu/aith.git refs/heads/main   # same SHA
    ```
 
-   In the run log, the push URL must show as `https://x-access-token:***@github.com/...`. If the raw token is visible, stop and rotate it.
-
 ## When it fails
+
+Gitea shows the last sync time and any error next to the push mirror in Mirror Settings.
 
 | Symptom | Cause |
 | --- | --- |
-| Job waits forever, with no error | `runs-on: ubuntu-latest` matches no online runner, or Actions is off for the repo |
-| `MIRROR_GITHUB_TOKEN is not set` | The secret is missing or misnamed |
-| 403, `Write access ... not granted`, or `Repository not found` | The token lacks Contents write, has expired, or isn't approved for the org |
-| `refusing to allow a Personal Access Token to create or update workflow ...` | Someone added `.github/workflows/`; the token needs the Workflows permission |
-| `non-fast-forward` or `fetch first` | GitHub has a commit Gitea lacks (a PR merged on GitHub, or a hand push). Bring that commit into Gitea (see Rules), or recreate the GitHub repo. **Never add `--force`.** |
-| `shallow update not allowed` | `fetch-depth: 0` was removed from the checkout step |
-
-Gitea also has a built-in **push mirror** (Settings › Mirror Settings), which needs no workflow. It runs on a timer and force-pushes and prunes. That would silently undo any mistake on GitHub rather than flag it, so we use the workflow instead.
+| 403, `Write access ... not granted`, or `Repository not found` | The token lacks Contents write, has expired, or isn't approved for the org. Paste a new token into the mirror settings. |
+| `refusing to allow a Personal Access Token to create or update workflow ...` | Someone added `.github/workflows/`; the token needs the Workflows permission. |
+| A commit or branch on GitHub vanished | Working as designed: it existed only on GitHub, and the mirror overwrote it. Recover it from the GitHub pull request, if there was one, and bring it into Gitea. |

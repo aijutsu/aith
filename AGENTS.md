@@ -6,7 +6,7 @@ Instructions for any AI agent working in this repository.
 
 Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is open source. The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
 
-The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror of `main`: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)).
+The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror, kept in sync by Gitea's push mirror, which overwrites it: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)).
 
 **Your main responsibility is to keep the course materials up to date**: accurate for the pinned versions of the software they reference, accurate about the outside services they mention (plans, prices, sign-up steps), and consistent with the rules below.
 
@@ -23,7 +23,7 @@ The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin
     - Submodules for the Git repositories that course uses (e.g. `course/001-building-agents-with-nanoclaw/nanoclaw`). A submodule is either an upstream copy or, when a course needs a customised version, an Aijutsu fork (see [Fork submodules](#fork-submodules)). Submodules are never published.
 - `docs/updates.md` — the Submodule Update Events log: one row per submodule bump, written by the `update-submodule` skill.
 - `docs/system/` — how the repository works: `course-format.md` (the content rules), `publishing.md` (site build, Cloudflare, Terraform), and `github-mirror.md` (Gitea and the GitHub mirror).
-- `.gitea/workflows/` — Gitea Actions: `site.yml` (check, build, deploy) and `mirror-to-github.yml`. Don't add `.github/workflows/`: Gitea would ignore it.
+- `.gitea/workflows/site.yml` — Gitea Actions CI: check, build, and deploy. Don't add `.github/workflows/`: Gitea would ignore it.
 - `format/` — the course format's JSON Schemas, content discovery code, and validator. `.vitepress/` — the site's VitePress config.
 - `deploy/infra/cloudflare/` — Terraform for the site's Cloudflare Worker and domain. Its settings are in `deploy/config/`.
 - `Makefile` — every command (`make help` lists them). `.claude/skills/` — skills for maintaining this repository.

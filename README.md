@@ -36,7 +36,7 @@ make site-build  # builds the site; fails if any link is broken
 
 Run `make help` to see every command.
 
-## Documentation
+## Contributor Documentation
 
 | Doc | What it covers |
 | --- | --- |

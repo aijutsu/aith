@@ -40,7 +40,7 @@ Editing `course/glossary.yaml` while `make site` is running needs a restart of `
 
 ## CI and deploys
 
-CI runs on Gitea Actions (`.gitea/workflows/site.yml`) at https://gohan.aijutsu.dev/aijutsu/aith, on every pull request and every push to `main`. A second workflow mirrors `main` to the public GitHub copy (see [github-mirror.md](./github-mirror.md)). The CI workflow runs these steps:
+CI runs on Gitea Actions (`.gitea/workflows/site.yml`) at https://gohan.aijutsu.dev/aijutsu/aith, on every pull request and every push to `main`. Gitea's push mirror copies the repository to the public GitHub copy (see [github-mirror.md](./github-mirror.md)). The CI workflow runs these steps:
 
 1. Install pinned Node.js and Terraform (versions in the workflow's `env:`), then `make install validate site-build deploy-tf-validate`.
 2. On `main` only: `make deploy`, which rebuilds and runs `wrangler deploy`.
