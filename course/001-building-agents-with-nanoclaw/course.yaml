@@ -1,0 +1,10 @@
+# Course manifest (course format v1). See docs/system/course-format.md.
+format: 1
+id: building-agents-with-nanoclaw # never change this, even if the folder or title changes
+title: Building community agents with NanoClaw
+summary: Learn the basics of AI agents by building your own with NanoClaw.
+software:
+  - name: NanoClaw
+    path: nanoclaw
+    url: https://github.com/aijutsu/aith-nanoclaw-codex-telegram
+    upstream: https://github.com/nanocoai/nanoclaw

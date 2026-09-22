@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "course.yaml (course format v1)",
+  "description": "Manifest for one course. A folder with a valid course.yaml is a course.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "title", "summary"],
+  "properties": {
+    "format": {
+      "description": "Version of the course format this course follows.",
+      "const": 1
+    },
+    "id": {
+      "description": "Stable identifier. Never change it after publishing, even if the folder or title changes.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "outcomes": {
+      "description": "What a learner can do after finishing the course.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "prerequisites": {
+      "description": "What a learner needs before starting the course.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "software": {
+      "description": "Git repositories this course pins as submodules. Must match .gitmodules.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "path", "url"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "path": {
+            "description": "Submodule path, relative to the course folder.",
+            "type": "string",
+            "pattern": "^[^/.][^\\s]*[^/]$"
+          },
+          "url": {
+            "description": "The repository the submodule is cloned from (the fork, for fork submodules).",
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "upstream": {
+            "description": "The original project, for fork submodules.",
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      }
+    }
+  }
+}

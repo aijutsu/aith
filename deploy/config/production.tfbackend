@@ -1,0 +1,4 @@
+# R2 bucket for deploy/infra/cloudflare state. Create the bucket once by hand
+# (docs/system/publishing.md). The endpoint comes from AWS_ENDPOINT_URL_S3.
+bucket = "aith-tfstate"
+key    = "cloudflare/production.tfstate"

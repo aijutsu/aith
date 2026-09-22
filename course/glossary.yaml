@@ -1,0 +1,184 @@
+# The single glossary for all course material (course format v1).
+# The site shows it at /glossary. Keep terms in alphabetical order, ignoring case.
+# Descriptions follow the writing rules in AGENTS.md. Check with: make validate
+types:
+  Cloud Service Provider: A company that rents out computers, storage, and other services over the internet.
+  Compliance Standard: A set of rules that a company can be checked against, to prove that it keeps data safe.
+  Concept: An idea or a way of working. It is not a product that you can buy or download.
+  Email Service Provider: A company that sends emails for your app, and makes sure they reach people's inboxes.
+  Hardware: A physical machine that you can touch.
+  Law: A rule made by a government. Companies must follow it, or they can be fined.
+  Messaging App: An app for sending messages to people or groups. In this course, you can also use these apps to chat with your AI agents.
+  Protocol: An agreed way for different programs to talk to each other.
+  SaaS: Short for "Software as a Service". An app that you use over the internet, usually by signing up or paying every month, without installing it yourself.
+  Software: A program that you install and run, often in the background, to power your apps.
+  Tool: A program that you use directly to get a task done, often by typing commands.
+terms:
+  - term: API
+    type: Concept
+    description: "Short for Application Programming Interface. A set of rules that lets one program ask another program for information, or ask it to do something. For example, when your app sends an email with Resend, it talks to Resend's API. It works like a waiter in a restaurant: you give your order, the waiter takes it to the kitchen, and then brings back your food."
+    url: https://en.wikipedia.org/wiki/API
+  - term: AWS
+    type: Cloud Service Provider
+    description: Short for Amazon Web Services. Amazon rents out computers, storage, and many other services over the internet, so you can run your apps on their machines instead of buying your own. This is called "the cloud".
+    url: https://aws.amazon.com/
+  - term: Beelink
+    type: Hardware
+    description: A company that makes small, low-cost computers that fit in one hand. They are popular for building a homelab, which is a small server that you keep and run at home.
+    url: https://www.bee-link.com/
+  - term: ChatGPT
+    type: SaaS
+    description: An AI chat app made by the company OpenAI. You type a question or a task in normal words, and it writes an answer back, like chatting with a person.
+    url: https://chatgpt.com/
+  - term: Claude
+    type: SaaS
+    description: An AI assistant made by the company Anthropic. You can chat with it, and it can also help you write, study, and build software.
+    url: https://claude.ai/
+  - term: Cloudflare
+    type: Cloud Service Provider
+    description: A company that helps websites load fast and stay safe from attacks. It also lets you put your own websites and apps on the internet, often for free.
+    url: https://www.cloudflare.com/
+  - term: Cloudflare R2 Object Storage
+    type: SaaS
+    description: A Cloudflare service for keeping files online, like photos, videos, and documents. Your app can save files to it and load files from it. Unlike many others, it does not charge you when people download your files.
+    url: https://www.cloudflare.com/developer-platform/products/r2/
+  - term: Codex
+    type: Tool
+    description: An AI helper for writing code, made by OpenAI. You tell it what you want to build in normal words, and it writes and changes the code for you. It comes with a ChatGPT Plus plan.
+    url: https://developers.openai.com/codex
+  - term: DigitalOcean
+    type: Cloud Service Provider
+    description: A company that rents out computers on the internet (called servers) to run your apps and websites. It is simpler and cheaper to start with than big companies like AWS or GCP.
+    url: https://www.digitalocean.com/
+  - term: Discord
+    type: Messaging App
+    description: A free chat app where people join groups called "servers" to talk by text, voice, or video. It started with gamers, but now many kinds of communities use it. NanoClaw can connect your AI agents to Discord, so you can chat with them there.
+    url: https://discord.com/
+  - term: Docker
+    type: Tool
+    description: A tool that puts a program and everything it needs into a closed box called a "container". The program works the same way on every computer, and it cannot touch the rest of your computer.
+    url: https://www.docker.com/
+  - term: Evals
+    type: Concept
+    description: Short for "evaluations". These are tests that check how well an AI does a job. You give the AI a fixed list of tasks and score its answers. When you change something, you run the tests again to see if the AI got better or worse.
+    url: https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents
+  - term: Fork
+    type: Concept
+    description: Your own copy of someone else's project. You can change your copy as much as you like, and the original stays the same. Later, you can bring in new updates from the original. Think of it like photocopying a recipe so that you can write your own notes on it.
+    url: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks
+  - term: GCP
+    type: Cloud Service Provider
+    description: Short for Google Cloud Platform. Google rents out computers, storage, and AI tools over the internet, so you can run your apps on their machines. It works like AWS.
+    url: https://cloud.google.com/
+  - term: GDPR
+    type: Law
+    description: Short for General Data Protection Regulation. A European Union law that protects people's personal information, like names, emails, and addresses. Any company that handles the data of people in Europe must follow it, even if the company is in another country.
+    url: https://commission.europa.eu/law/law-topic/data-protection_en
+  - term: Gemini
+    type: SaaS
+    description: An AI assistant made by Google. It works like ChatGPT, and it is also built into Google apps such as Gmail and Google Docs.
+    url: https://gemini.google.com/
+  - term: Git
+    type: Tool
+    description: A tool that saves the history of changes to your files. You can see what changed, who changed it, and go back to an older version if something breaks.
+    url: https://git-scm.com/
+  - term: GitHub
+    type: SaaS
+    description: A website where people keep their Git projects online. It makes it easy to share work, work together with other people, and download projects made by others.
+    url: https://github.com/
+  - term: Grok
+    type: SaaS
+    description: An AI assistant made by the company xAI. You can use it on its own website and app, or inside X (the app that used to be called Twitter).
+    url: https://grok.com/
+  - term: Harness
+    type: Concept
+    description: The program around a model that lets it do real work. A model by itself can only read and write text. The harness connects it to tools (like reading files or searching the web) and data, and keeps it working step by step until the job is done. Codex and NanoClaw are both harnesses.
+    url: https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+  - term: herdr
+    type: Tool
+    description: A tool that lets you run many AI coding helpers (like Codex or Claude Code) at the same time in one terminal, which is the window where you type commands. It shows you which helpers are working, which are finished, and which are waiting for your answer.
+    url: https://herdr.dev/
+  - term: HIPAA
+    type: Law
+    description: Short for Health Insurance Portability and Accountability Act. A United States law that protects people's health information, like medical records. Hospitals, clinics, and companies that work with them must keep this information private and safe.
+    url: https://www.hhs.gov/hipaa/index.html
+  - term: ISO 27001
+    type: Compliance Standard
+    description: A world standard for keeping information safe inside a company. A company with this certificate has been checked by an outside expert, who confirmed that it has good rules to protect its data.
+    url: https://www.iso.org/standard/27001
+  - term: MCP
+    type: Protocol
+    description: "Short for Model Context Protocol. A common way for AI tools to connect to other apps and services, like Notion or GitHub. Think of it like a USB plug for AI: one standard plug that works with many different things."
+    url: https://modelcontextprotocol.io/
+  - term: Model
+    type: Concept
+    description: The "brain" of an AI tool, also called an LLM (large language model). It is a program that learned from a huge amount of text, so it can understand what you write and write back. Companies give their models names, like GPT (from OpenAI), Claude (from Anthropic) and Gemini (from Google).
+    url: https://en.wikipedia.org/wiki/Large_language_model
+  - term: MongoDB
+    type: Software
+    description: A database, which is a program that stores and organises your app's information. MongoDB saves each record as a flexible document, so you do not need to plan the exact shape of your data at the start.
+    url: https://www.mongodb.com/
+  - term: NanoClaw
+    type: Software
+    description: A small and simple AI assistant that you run on your own computer. Each AI agent works inside its own Docker container, so it can only see the things you allow it to see.
+    url: https://nanoclaw.dev/
+  - term: Node.js
+    type: Software
+    description: A program that lets your computer run code written in JavaScript, a language first made for websites. NanoClaw needs Node.js to run.
+    url: https://nodejs.org/
+  - term: Notion
+    type: SaaS
+    description: An app for writing notes, making to-do lists, and keeping tables of information in one place. In this course, we also use it to store data that our AI agents can read and write.
+    url: https://www.notion.com/
+  - term: Ollama
+    type: Tool
+    description: A free tool that lets you download an AI model and run it on your own computer, instead of using one on the internet. Your data stays on your machine, but you need a fairly powerful computer.
+    url: https://ollama.com/
+  - term: OpenClaw
+    type: Software
+    description: A popular AI assistant that can do many things, but it is very big and hard to understand. NanoClaw was made as a smaller and safer idea based on OpenClaw.
+    url: https://github.com/openclaw/openclaw
+  - term: PDPA
+    type: Law
+    description: Short for Personal Data Protection Act. A Singapore law that protects people's personal information, like names, phone numbers, and NRIC numbers. Companies usually need to ask for permission before they collect or use this information, and they must keep it safe.
+    url: https://www.pdpc.gov.sg/
+  - term: PostgreSQL
+    type: Software
+    description: A popular free database. It stores information in tables with rows and columns, like a very powerful spreadsheet with strict rules about what can go into each column.
+    url: https://www.postgresql.org/
+  - term: Resend
+    type: Email Service Provider
+    description: A service that lets your app send emails, like sign-up messages, password resets, or daily reports. It makes sure your emails reach people's inboxes instead of their spam folder.
+    url: https://resend.com/
+  - term: Skills
+    type: Concept
+    description: A set of written instructions, saved as files, that teaches an AI harness how to do one kind of job, like making slides or following your company's writing style. The harness only reads a skill when it needs it, so you can add many skills without confusing the AI. Claude and Codex both support skills.
+    url: https://agentskills.io/
+  - term: SOC 2 Type II
+    type: Compliance Standard
+    description: A report that shows a company protects its customers' data well. An outside checker watches the company for several months, not just one day, to make sure it really follows its own safety rules.
+    url: https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+  - term: Telegram
+    type: Messaging App
+    description: A free messaging app for sending texts, photos, and files to people and groups. It is easy to make "bots" (automatic chat accounts) on Telegram, so it is a popular place to chat with AI agents. NanoClaw can connect your AI agents to Telegram.
+    url: https://telegram.org/
+  - term: Temporal
+    type: Software
+    description: A tool for building workflows, like Trigger.dev. It remembers how far each workflow has gone, so if a computer crashes in the middle, the work continues from where it stopped instead of starting again. Companies use it for jobs that must not fail, like payments.
+    url: https://temporal.io/
+  - term: Terraform
+    type: Tool
+    description: A tool that lets you set up cloud computers and services by writing what you want in a file, instead of clicking buttons on a website. You can then build the same setup again and again, and see exactly what changed. It works with AWS, GCP, Cloudflare, DigitalOcean, and many others.
+    url: https://developer.hashicorp.com/terraform
+  - term: Trigger.dev
+    type: Software
+    description: A tool for building workflows, which are lists of steps that run one after another in the background. For example, it can send a report every morning or run a long AI task. If a step fails, it tries again so the job still finishes.
+    url: https://trigger.dev/
+  - term: WhatsApp
+    type: Messaging App
+    description: A free messaging app owned by Meta, the company behind Facebook. It is one of the most used chat apps in Singapore and around the world. NanoClaw can connect your AI agents to WhatsApp, so you can message them like a friend.
+    url: https://www.whatsapp.com/
+  - term: Wrangler
+    type: Tool
+    description: A tool from Cloudflare that you use by typing commands. It lets you test your website or app on your own computer, and then put it on Cloudflare for everyone to see.
+    url: https://developers.cloudflare.com/workers/wrangler/

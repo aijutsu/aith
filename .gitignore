@@ -1,0 +1,15 @@
+.remember
+
+# Site
+node_modules/
+.vitepress/dist/
+.vitepress/cache/
+.wrangler/
+
+# Local environment (direnv)
+.envrc
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*

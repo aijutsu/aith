@@ -1,0 +1,10 @@
+# Copy to .envrc (gitignored), fill in, then run `direnv allow`.
+# Only needed to run Terraform or deploy by hand. See docs/system/publishing.md.
+
+# Cloudflare account that hosts aith.aijutsu.dev.
+export CLOUDFLARE_ACCOUNT_ID=
+# API token: Account > Workers Scripts > Edit, and Zone (aijutsu.dev) > Zone > Read.
+export CLOUDFLARE_API_TOKEN=
+# R2 API token (S3 credentials) with Object Read & Write on the aith-tfstate bucket.
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=

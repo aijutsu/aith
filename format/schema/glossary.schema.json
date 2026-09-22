@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "glossary.yaml (course format v1)",
+  "description": "The single glossary. Terms are sorted alphabetically, ignoring case.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["types", "terms"],
+  "properties": {
+    "types": {
+      "description": "Each term type, mapped to a plain-English description.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "terms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "type", "description", "url"],
+        "properties": {
+          "term": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "url": { "type": "string", "pattern": "^https?://" }
+        }
+      }
+    }
+  }
+}

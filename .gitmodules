@@ -1,0 +1,3 @@
+[submodule "course/001-building-agents-with-nanoclaw/nanoclaw"]
+	path = course/001-building-agents-with-nanoclaw/nanoclaw
+	url = https://github.com/aijutsu/aith-nanoclaw-codex-telegram.git
