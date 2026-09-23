@@ -4,7 +4,7 @@
 
 **To follow the course, go to https://aith.aijutsu.dev.** The same pages are in [`course/`](./course/index.md) if you prefer to read them on GitHub. Workshop info is at https://aijutsu.dev/ai-in-the-heartlands.
 
-This README is for people who contribute to the course materials. All materials are open source, and pull requests are welcome on GitHub. The materials are copyright Aijutsu Pte. Ltd.: anyone may learn from them for free, but teaching them or using them in other course materials needs written approval. The [Terms of Use](./course/terms.md) have the details, including what a pull request lets Aijutsu do with your change. GitHub is a public mirror: the maintainers work on Aijutsu's own Git server and bring your pull request across from there (see [github-mirror.md](./docs/system/github-mirror.md)).
+This README is for people who contribute to the course materials. All materials are public, and pull requests are welcome on GitHub. The materials are copyright Aijutsu Pte. Ltd.: anyone may learn from them for free, but teaching them or using them in other course materials needs written approval. [LICENSE.md](./LICENSE.md) summarises what you may do; the [Terms of Use](./course/terms.md) are the full terms, including what a pull request lets Aijutsu do with your change. GitHub is a public mirror: the maintainers work on Aijutsu's own Git server and bring your pull request across from there (see [github-mirror.md](./docs/system/github-mirror.md)).
 
 ## How this repository works
 

@@ -43,20 +43,33 @@ const aijutsu = {
   url: 'https://aijutsu.dev',
   email: 'hello@aijutsu.dev',
   description:
-    'Aijutsu is a founder-led, coaching-informed, AI-leveraged technology practice in Singapore. It provides senior technical advisory, transformation journeys across AI, cloud, and compliance, and bespoke software development. Aijutsu created AI in the Heartlands.',
+    'Aijutsu is a founder-led, coaching-informed, AI-leveraged technology practice in Singapore. It provides senior technical advisory, transformation journey facilitation, and bespoke app and web app development, across the AI, cloud, and compliance domains. Aijutsu created AI in the Heartlands.',
   address: { '@type': 'PostalAddress', addressLocality: 'Singapore', addressCountry: 'SG' },
   identifier: { '@type': 'PropertyValue', propertyID: 'UEN', value: '202610279E' },
   founder: {
     '@type': 'Person',
     name: 'Joseph Matthias Goh',
     jobTitle: 'Founder',
+    description:
+      'Joseph Matthias Goh founded Aijutsu. He is a builder and a coach with over a decade of hands-on delivery across government, cybersecurity, fintech, cloud, and compliance, and a formally trained ontological coach.',
     sameAs: ['https://sg.linkedin.com/in/joeir'],
+    // Past roles, as the About page lists them. schema.org allows a plain Organization here.
+    alumniOf: [
+      { '@type': 'Organization', name: 'watchTowr' },
+      { '@type': 'Organization', name: 'StashAway' },
+      { '@type': 'Organization', name: 'GovTech' },
+    ],
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      name: 'Newfield Ontological Coaching Certification',
+      credentialCategory: 'certification',
+    },
   },
-  knowsAbout: ['Artificial intelligence', 'Cloud computing', 'ISO 27001', 'SOC 2', 'Software development', 'Technical advisory'],
+  knowsAbout: ['Artificial intelligence', 'Cloud computing', 'Cloud migration', 'ISO 27001', 'SOC 2', 'Compliance automation', 'Software development', 'Technical advisory'],
   makesOffer: [
-    ['Technical advisory', 'Senior technical opinion on a needs basis, or on retainer.'],
-    ['Transformation journeys', 'Cloud migration, ISO 27001 and SOC 2 compliance, and AI adoption, with a coaching-informed methodology.'],
-    ['Bespoke development', 'AI-leveraged delivery of websites, e-commerce sites, internal tools, and platforms.'],
+    ['Senior technical advisory', 'Senior technical opinion on a needs basis, or on retainer, across AI, cloud, and compliance.'],
+    ['Transformation journey facilitation', 'Organisation-wide technology change: AI integration, cloud migration and cloud-native operation, and ISO 27001 and SOC 2 compliance, with a coaching-informed methodology.'],
+    ['Bespoke app and web app development', 'AI-leveraged delivery of websites, web applications, internal tools, and platforms.'],
   ].map(([name, description]) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name, description } })),
 }
 
@@ -73,9 +86,45 @@ interface GlossaryTerm {
   url: string
 }
 
+interface Lesson {
+  dir: string
+  path: string
+  order: number
+  frontmatter: { title?: string; description?: string }
+  lessons: Lesson[]
+}
+
+/** A lesson's public URL. `lesson.path` already starts with the course folder. */
+const lessonUrl = (lesson: Lesson) => pageUrl(`${lesson.path}/index.md`)
+
+/** A lesson by reference, for the isPartOf / hasPart links between the pages of a course. */
+const lessonRef = (lesson: Lesson) => ({
+  '@type': 'LearningResource',
+  '@id': `${lessonUrl(lesson)}#lesson`,
+  name: lesson.frontmatter.title,
+  url: lessonUrl(lesson),
+})
+
+/**
+ * The lesson at `dirs` (folder names under the course), with every lesson above it, so a
+ * sub-lesson can name its parent. Null when the path is not a lesson.
+ */
+function lessonChain(lessons: Lesson[], dirs: string[]): Lesson[] | null {
+  const chain: Lesson[] = []
+  let level = lessons
+  for (const dir of dirs) {
+    const found = level.find((lesson) => lesson.dir === dir)
+    if (!found) return null
+    chain.push(found)
+    level = found.lessons
+  }
+  return chain
+}
+
 /** The JSON-LD nodes for one page, by its place in the course format. */
 function pageGraph(relativePath: string, url: string, title: string, description: string): object[] {
-  const [first, second] = relativePath.split('/')
+  const parts = relativePath.split('/')
+  const [first, second] = parts
 
   if (relativePath === 'index.md') {
     const website = {
@@ -133,7 +182,7 @@ function pageGraph(relativePath: string, url: string, title: string, description
     ]
   }
 
-  // A course (NNN-slug/index.md) or a lesson (NNN-slug/NN-slug/index.md).
+  // A course (NNN-slug/index.md), or a lesson at any depth (NNN-slug/NN-slug/[NN-slug/]index.md).
   const course = discoverCourses().find((c) => c.dir === first && c.manifest)
   if (!course) return []
   const courseUrl = pageUrl(`${course.dir}/index.md`)
@@ -151,22 +200,21 @@ function pageGraph(relativePath: string, url: string, title: string, description
         provider: aijutsuRef,
         ...(outcomes?.length && { teaches: outcomes }),
         ...(prerequisites?.length && { coursePrerequisites: prerequisites }),
-        ...(course.lessons.length && {
-          hasPart: course.lessons.map((lesson) => ({
-            '@type': 'LearningResource',
-            name: lesson.frontmatter.title,
-            url: pageUrl(`${course.dir}/${lesson.dir}/index.md`),
-          })),
-        }),
+        // Only the course's own lessons. Each lesson page names its sub-lessons itself.
+        ...(course.lessons.length && { hasPart: course.lessons.map(lessonRef) }),
       },
     ]
   }
 
-  const lesson = course.lessons.find((l) => l.dir === second)
-  if (!lesson) return []
+  // The lesson folders between the course and index.md: one for a lesson, two for a sub-lesson.
+  const chain = lessonChain(course.lessons as Lesson[], parts.slice(1, -1))
+  if (!chain?.length) return []
+  const lesson = chain[chain.length - 1]
+  const parent = chain[chain.length - 2]
   return [
     {
       '@type': 'LearningResource',
+      '@id': `${url}#lesson`,
       learningResourceType: 'Lesson',
       name: title,
       description,
@@ -174,7 +222,9 @@ function pageGraph(relativePath: string, url: string, title: string, description
       position: lesson.order,
       inLanguage: 'en',
       isAccessibleForFree: true,
-      isPartOf: courseRef,
+      // A sub-lesson belongs to its lesson; a lesson belongs to its course.
+      isPartOf: parent ? lessonRef(parent) : courseRef,
+      ...(lesson.lessons.length && { hasPart: lesson.lessons.map(lessonRef) }),
       publisher: aijutsuRef,
     },
   ]
@@ -243,11 +293,18 @@ function llmsTxt(): string {
     '## Courses',
     '',
   ]
+  // Lessons nest, so each line's label carries the path down from the course title:
+  // "Course: Lesson" for a lesson, "Course: Lesson: Sub-lesson" for a sub-lesson.
+  const lessonLines = (lessons: Lesson[], prefix: string) => {
+    for (const lesson of lessons) {
+      const label = `${prefix}: ${lesson.frontmatter.title}`
+      lines.push(entry(`${lesson.path}/index.md`, label))
+      lessonLines(lesson.lessons, label)
+    }
+  }
   for (const course of discoverCourses().filter((c) => c.manifest)) {
     lines.push(`- [${course.manifest.title}](${pageUrl(`${course.dir}/index.md`)}): ${plainText(course.manifest.summary)}`)
-    for (const lesson of course.lessons) {
-      lines.push(entry(`${course.dir}/${lesson.dir}/index.md`, `${course.manifest.title}: ${lesson.frontmatter.title}`))
-    }
+    lessonLines(course.lessons as Lesson[], course.manifest.title)
   }
   lines.push('', '## Reference', '', entry('glossary.md'), entry('about.md'), entry('terms.md'), '', '## Optional', '', entry('courses.md'), '')
   return lines.join('\n')

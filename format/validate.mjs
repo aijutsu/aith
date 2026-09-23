@@ -9,6 +9,7 @@ import {
   ALLOWED_BLOCKS,
   CONTENT_DIR,
   COURSE_DIR,
+  LESSON_DEPTH,
   LESSON_DIR,
   ROOT,
   discoverCourses,
@@ -48,12 +49,15 @@ function prose(body) {
 // ---- Pages ---------------------------------------------------------------
 
 const pages = publishedPages(ROOT)
+// A page is either one of the fixed top-level pages, a course's index.md, or a lesson's
+// index.md: NNN-slug/, then up to LESSON_DEPTH levels of NN-slug/ (a lesson, then its
+// sub-lessons).
 const knownPage = (p) => {
   const parts = p.split('/')
   if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md', 'about.md'].includes(p)
-  if (parts.length === 2) return COURSE_DIR.test(parts[0]) && parts[1] === 'index.md'
-  if (parts.length === 3) return COURSE_DIR.test(parts[0]) && LESSON_DIR.test(parts[1]) && parts[2] === 'index.md'
-  return false
+  if (parts.at(-1) !== 'index.md' || !COURSE_DIR.test(parts[0])) return false
+  const lessonDirs = parts.slice(1, -1)
+  return lessonDirs.length <= LESSON_DEPTH && lessonDirs.every((dir) => LESSON_DIR.test(dir))
 }
 
 for (const page of pages) {
@@ -63,8 +67,8 @@ for (const page of pages) {
     continue
   }
   const { frontmatter, body } = readPage(ROOT, page)
-  // Lessons (NNN-slug/NN-slug/index.md) also need a stable id.
-  check(page.split('/').length === 3 ? 'lesson' : 'page', frontmatter, `${where} frontmatter`)
+  // Lessons, at any depth (NNN-slug/NN-slug/[NN-slug/]index.md), also need a stable id.
+  check(page.split('/').length >= 3 ? 'lesson' : 'page', frontmatter, `${where} frontmatter`)
 
   const text = prose(body)
   // [ \t], not \s: \s crosses lines, so a closing ::: would read the next paragraph as a block name.
@@ -108,14 +112,22 @@ for (const course of courses) {
   if (courseIds.has(id)) fail(`${where}/course.yaml`, `id "${id}" is also used by ${courseIds.get(id)}`)
   courseIds.set(id, where)
 
-  // Lesson ids are unique within their course. (Their shape is checked with the page frontmatter.)
-  const lessonIds = new Map()
-  for (const lesson of course.lessons) {
-    const lessonId = lesson.frontmatter.id
-    if (lessonId === undefined) continue
-    if (lessonIds.has(lessonId)) fail(`${where}/${lesson.dir}/index.md`, `lesson id "${lessonId}" is also used by ${lessonIds.get(lessonId)}`)
-    else lessonIds.set(lessonId, lesson.dir)
+  // Lesson ids are unique among their brothers and sisters: a lesson's id is unique within
+  // its course, and a sub-lesson's within its lesson. Together with the course id, that makes
+  // one stable path per page. (Their shape is checked with the page frontmatter.)
+  const checkLessonIds = (lessons, parent) => {
+    const ids = new Map()
+    for (const lesson of lessons) {
+      const lessonId = lesson.frontmatter.id
+      if (lessonId !== undefined) {
+        if (ids.has(lessonId)) {
+          fail(`${CONTENT_DIR}/${lesson.path}/index.md`, `lesson id "${lessonId}" is also used by ${ids.get(lessonId)} in ${parent}`)
+        } else ids.set(lessonId, lesson.dir)
+      }
+      checkLessonIds(lesson.lessons, `${parent}/${lesson.dir}`)
+    }
   }
+  checkLessonIds(course.lessons, course.dir)
 
   const escaped = course.dir.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
   if (!new RegExp(`\\]\\((\\./)?${escaped}/(index\\.md)?(#[^)]*)?\\)`).test(home)) {

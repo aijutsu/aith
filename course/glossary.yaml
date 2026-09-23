@@ -114,6 +114,14 @@ terms:
     type: Compliance Standard
     description: A world standard for keeping information safe inside a company. A company with this certificate has been checked by an outside expert, who confirmed that it has good rules to protect its data.
     url: https://www.iso.org/standard/27001
+  - term: jq
+    type: Tool
+    description: A small tool for the terminal that picks out one piece of an answer. When you ask a website or a service a question, it often answers in a format called JSON, which is long and hard to read. jq reads it for you and shows only the part you asked for. NanoClaw's setup uses it to check that your Telegram bot works.
+    url: https://jqlang.org/
+  - term: Make
+    type: Tool
+    description: "A tool that runs a long command for you when you type a short name. The short names live in a file called a Makefile, next to the project's other files. You type `make start`, and Make runs the real command written under `start`. Think of it like the speed-dial buttons on a phone: one short press instead of typing the whole number."
+    url: https://www.gnu.org/software/make/
   - term: MCP
     type: Protocol
     description: "Short for Model Context Protocol. A common way for AI tools to connect to other apps and services, like Notion or GitHub. Think of it like a USB plug for AI: one standard plug that works with many different things."

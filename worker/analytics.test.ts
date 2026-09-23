@@ -3,7 +3,7 @@
 
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
-import { EVENT_PATH, SCRIPT_PATH, buildEventRequest, clientIp, handleRequest, type Env } from './analytics.ts'
+import { EVENT_PATH, SCRIPT_PATH, buildEventRequest, clientIp, handleRequest, scriptPath, type Env } from './analytics.ts'
 
 const SITE = 'https://aith.aijutsu.dev'
 const realFetch = globalThis.fetch
@@ -78,6 +78,15 @@ test('the tracker script comes from the configured Plausible script, as JavaScri
   assert.equal(response.status, 200)
   assert.equal(response.headers.get('Content-Type'), 'application/javascript')
   assert.equal(calls[0].url, 'https://plausible.example/js/pa-test.js')
+})
+
+test('PLAUSIBLE_SCRIPT takes a path or a bare id from the Plausible snippet', () => {
+  assert.equal(scriptPath('/js/pa-abc123.js'), '/js/pa-abc123.js')
+  assert.equal(scriptPath('pa-abc123.js'), '/js/pa-abc123.js')
+  assert.equal(scriptPath('abc123'), '/js/pa-abc123.js')
+  assert.equal(scriptPath(' abc123 '), '/js/pa-abc123.js')
+  assert.equal(scriptPath(''), '')
+  assert.equal(scriptPath(undefined), '')
 })
 
 test('with no PLAUSIBLE_SCRIPT, the tracker answers 404 without calling Plausible', async () => {

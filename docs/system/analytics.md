@@ -40,9 +40,21 @@ Every other request is served straight from the static assets, without running t
 | Var | Value | What it is |
 | --- | --- | --- |
 | `PLAUSIBLE_UPSTREAM` | `https://ponzu.aijutsu.dev` | The Plausible instance. |
-| `PLAUSIBLE_SCRIPT` | e.g. `/js/pa-XXXXXXXX.js` | The site's tracker, from Plausible: Site Settings → Installation. The file name identifies the site (the script has the domain built in), so the page has no `data-domain`. **Empty means analytics is off:** `/js/p.js` answers 404 and nothing is sent. If the snippet is ever regenerated in Plausible, the name changes: update it here. |
+| `PLAUSIBLE_SCRIPT` | `/js/pa-XXXXXXXX.js`, or just `XXXXXXXX` | The tracker of the Plausible site these visits go to, from Site Settings → Installation. Either the path, the file name, or the bare id (`scriptPath()` fills in the rest). The tracker has its site's domain built in, which is why this site loads **aijutsu.dev's** tracker (see below). **Empty means analytics is off:** `/js/p.js` answers 404 and nothing is sent. If the snippet is ever regenerated in Plausible, the id changes: update it here. |
 
 Neither is a secret. The tracker itself names ponzu (its default endpoint), and every visitor downloads it.
+
+## Which Plausible site the visits go to
+
+They go to the **`aijutsu.dev`** site in Plausible, not a site of their own. That site covers every `aijutsu.dev` subdomain, which is how Plausible says to handle subdomains: load the same tracker everywhere, and split the reports with the **Hostname** filter (URL → Hostname). The course site is `aith.aijutsu.dev` there.
+
+What that means when reading the numbers:
+
+- **Totals include aijutsu.dev**: filter by Hostname to see the course site alone.
+- **Pages are grouped by path, without the hostname.** `/about` exists on both sites, so their views add up in the Pages report until a Hostname filter is set.
+- **Goals are shared** by both sites.
+
+To split them later, add `aith.aijutsu.dev` as its own site in Plausible and set its own tracker as `PLAUSIBLE_SCRIPT`. Nothing else changes. Past visits stay in the `aijutsu.dev` site.
 
 ## The Worker (`worker/analytics.ts`)
 
@@ -65,11 +77,11 @@ The site config's `head` adds one inline script to every page. On `aith.aijutsu.
 
 ## Turning it on
 
-1. In Plausible (https://ponzu.aijutsu.dev, behind Access), add the site `aith.aijutsu.dev`.
-2. Copy the tracker's file name from Site Settings → Installation (`pa-….js`).
-3. Set it as `PLAUSIBLE_SCRIPT` in `wrangler.jsonc` (`/js/pa-….js`), and push. CI deploys it.
+It is on: `PLAUSIBLE_SCRIPT` holds the `aijutsu.dev` site's tracker, and a push to `main` deploys it. Nothing had to be created in Plausible, and its Cloudflare Access bypass for `/js/*` and `/api/*` was already in place for aijutsu.dev.
 
-Plausible's Cloudflare Access bypass for `/js/*` and `/api/*` is already in place (it serves aijutsu.dev too).
+If the tracker's id ever changes (regenerating the snippet in Plausible), update `PLAUSIBLE_SCRIPT`. To turn analytics off, set it to `""`.
+
+**Plausible's "Verify installation" step won't find this site.** It looks for a tracker on a known URL in the page's HTML, and here the tracker is proxied (`/js/p.js`) and added by an inline script. Check the live dashboard instead: open the site, then look for a current visitor with the Hostname filter set to `aith.aijutsu.dev`.
 
 ## Checking it
 
@@ -97,6 +109,7 @@ After a deploy: open the site, and check DevTools → Network: `/js/p.js` (200) 
 ## If events stop
 
 - `/api/e` returns **502**: read the Worker logs. `returned 302` means ponzu's Access bypass for `/api/*` is gone: restore it in Zero Trust → Access → Applications (see the website's `docs/analytics.md`, "Access must bypass the ingest path").
-- `/js/p.js` returns **404**: `PLAUSIBLE_SCRIPT` is empty. **502**: the name is wrong (regenerated in Plausible?) or ponzu is down.
+- `/js/p.js` returns **404**: `PLAUSIBLE_SCRIPT` is empty. **502**: the id is wrong (regenerated in Plausible?) or ponzu is down.
+- Events arrive, but nothing shows under the course site: check the **Hostname** filter (`aith.aijutsu.dev`). Without it, the dashboard shows aijutsu.dev and the course site together.
 - No `/js/p.js` request at all: the page isn't on `aith.aijutsu.dev`, or an extension blocks inline scripts.
 - If a Content-Security-Policy is ever added, it must allow the inline snippet, and `'self'` for `script-src` and `connect-src`.

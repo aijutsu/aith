@@ -13,6 +13,7 @@ The one rule behind everything here: **`course/` stays renderer-neutral.** Anyth
 | `.vitepress/courses-plugin.ts` | Renders the `:::courses` block: one card per course, from `discoverCourses()`. |
 | `.vitepress/glossary-plugin.ts` | Renders the `:::glossary` block from `course/glossary.yaml`. |
 | `.vitepress/theme/index.ts`, `.vitepress/theme/custom.css` | The default theme with the site's brand colour and the light/dark switch placement. See [Theme](#theme). |
+| `.vitepress/theme/details-scroll.ts` | The theme's one behaviour: opening or closing a collapsible section scrolls its header to the top of the screen. See [Theme](#theme). |
 | `.vitepress/theme/aith-splash.webp`, `.vitepress/theme/aith-splash-dark.webp` | The pictures behind the home hero: by day for light mode, at night for dark mode. `cwebp -q 82` copies of the original PNGs (2.3 MB to 278 KB, and 2.5 MB to 343 KB). Only `custom.css` uses them. See [Hero banner](#theme). |
 | `.vitepress/seo.ts`, `.vitepress/og-image.jpg` | Search and answer-engine metadata, and the 1200×630 social card. See [SEO and AEO](#seo-and-aeo). |
 | `.vitepress/analytics.ts`, `worker/` | Plausible analytics, proxied through the site's own Worker. See [analytics.md](./analytics.md). |
@@ -32,10 +33,13 @@ The one rule behind everything here: **`course/` stays renderer-neutral.** Anyth
   - `message`: "Open-source course materials by Aijutsu, free for self-learning", and a link to the Terms of Use (`/terms`, from `course/terms.md`).
   - `copyright`: the copyright notice for Aijutsu Pte. Ltd. (202610279E), and that the materials may not be reproduced, or used in other course materials, without written approval.
 
-  Both are raw HTML (`v-html`), so links in them are plain `<a href="/…">`, and the build's dead-link check doesn't see them. The year (2026) is the year of first publication, so it is written in, not worked out at build time. The notice and `course/terms.md` must say the same thing: change them together, and update the "last changed" date at the top of the terms page.
+  Both are raw HTML (`v-html`), so links in them are plain `<a href="/…">`, and the build's dead-link check doesn't see them. The year (2026) is the year of first publication, so it is written in, not worked out at build time. The notice, `course/terms.md` and the root `LICENSE.md` must say the same thing: change all three together, and update the "last changed" date at the top of the terms page.
+
+  The `message` line still says "Open-source course materials". `LICENSE.md` says the opposite (the materials are public, but the licence is not an open-source one). Rewording the footer and the home page intro is an [open follow-up](./known-issues.md#open-follow-ups).
 - **Navigation is generated.** `discoverCourses()` finds every `course/NNN-slug/` folder:
   - course titles come from `course.yaml`;
   - lessons come from `NN-slug/index.md` frontmatter, listed under their course in folder order. The default theme turns the sidebar order into "Previous page" and "Next page" links at the bottom of each page, so learners can read a course from start to end.
+  - **sub-lessons nest under their lesson.** `lessonItems()` in `config.mts` builds a sidebar group the same way at every level, from each lesson's own `lessons` array, so a lesson with sub-lessons becomes an open group with its overview page as the group's link. The default theme styles sidebar items down to `level-5`; the format stops at `level-3` (course, lesson, sub-lesson). The prev/next links walk the tree in reading order, so the last sub-lesson of one lesson leads to the next lesson.
 
   Nothing is hand-maintained. A new course shows up in the sidebar and on the Courses page as soon as its folder and `course.yaml` exist.
 
@@ -72,7 +76,7 @@ Metadata for search engines, social cards, and answer engines (ChatGPT, Perplexi
 | JSON-LD | `seoHead()` | One `@graph` per page. See below. |
 | Social card | `.vitepress/og-image.jpg` → `/og-image.jpg` | A 1200×630 crop of the light-mode hero picture, right-aligned to keep the people. `writeSeoFiles()` copies it to the site root, so its URL doesn't change (Vite would hash it). |
 | `robots.txt` | `writeSeoFiles()`, from `buildEnd` | Allows every crawler, including AI crawlers and answer engines, and points to the sitemap. |
-| `llms.txt` | `writeSeoFiles()` | A Markdown map of the site for LLMs ([llmstxt.org](https://llmstxt.org)): the site summary, every course and lesson with its description, and the reference pages. |
+| `llms.txt` | `writeSeoFiles()` | A Markdown map of the site for LLMs ([llmstxt.org](https://llmstxt.org)): the site summary, every course and lesson with its description, and the reference pages. A sub-lesson's label carries the path down from the course title ("Course: Lesson: Sub-lesson"), so each line stands alone. |
 
 JSON-LD, by page:
 
@@ -82,10 +86,12 @@ JSON-LD, by page:
 | About (`about.md`) | `AboutPage` whose `mainEntity` is Aijutsu, and the full `Organization`. It says the same things as the page. |
 | Courses (`courses.md`) | `ItemList` of the courses. |
 | Glossary (`glossary.md`) | `DefinedTermSet`: every term as a `DefinedTerm`, with its description (Markdown removed), its anchor URL, and its reference `url` as `sameAs`. |
-| A course (`NNN-slug/index.md`) | `Course` from `course.yaml`: title, summary, `isAccessibleForFree`, provider Aijutsu, its lessons as `hasPart`, and `outcomes`/`prerequisites` when the manifest has them. |
-| A lesson (`NNN-slug/NN-slug/index.md`) | `LearningResource` (a lesson), `isPartOf` its course. |
+| A course (`NNN-slug/index.md`) | `Course` from `course.yaml`: title, summary, `isAccessibleForFree`, provider Aijutsu, its own lessons as `hasPart`, and `outcomes`/`prerequisites` when the manifest has them. |
+| A lesson (`NNN-slug/NN-slug/index.md`) | `LearningResource` (a lesson), `isPartOf` its course, and its sub-lessons as `hasPart` when it has any. |
+| A sub-lesson (`NNN-slug/NN-slug/NN-slug/index.md`) | `LearningResource`, `isPartOf` its **lesson**, not the course. |
 | Terms (`terms.md`) | None. |
 
+- **Every lesson node has an `@id` of `<its url>#lesson`.** The `isPartOf` and `hasPart` links between course, lesson and sub-lesson use those ids, so an engine that reads several pages joins them into one tree instead of seeing repeated copies.
 - **Aijutsu's `@id` is `https://aijutsu.dev/#organization`,** the same as in aijutsu.dev's own JSON-LD (`src/lib/seo.ts` in aijutsu/website). Engines then see one organisation across both sites. Keep the two in step.
 - **`transformHead` and `buildEnd` run only in `make site-build`.** `make site` doesn't show these tags or files: check them in `.vitepress/dist`.
 - **JSON-LD is escaped:** every `<` becomes `<`, so no text can close the `<script>` early.
@@ -94,7 +100,7 @@ JSON-LD, by page:
 
 ## Theme
 
-`.vitepress/theme/index.ts` re-exports the default theme and adds `custom.css`. The CSS changes only colours (CSS variables), where the light/dark switch shows, the home hero's picture, the look of the course cards, the Course Overview cards and collapsible sections, how wide images are on desktop, and the footer on pages with a sidebar. Keep it that way. A custom layout or Vue component is a bigger step: record it in [decisions.md](./decisions.md) first.
+`.vitepress/theme/index.ts` extends the default theme, adds `custom.css`, and runs one behaviour in the browser (`details-scroll.ts`). The CSS changes only colours (CSS variables), where the light/dark switch shows, the home hero's picture, the look of the course cards, the Course Overview cards and collapsible sections, how wide images are on desktop, and the footer on pages with a sidebar. Keep it that way. The behaviour is one delegated event listener, started from the theme's `setup()`; keep any new behaviour in that one file. A custom layout or Vue component is a bigger step: record it in [decisions.md](./decisions.md) first.
 
 - **Brand colour `#C83122`.** VitePress uses three brand shades: `--vp-c-brand-1` for link text, `-2` for hover, and `-3` for button backgrounds (with white text).
 
@@ -126,6 +132,19 @@ JSON-LD, by page:
   - `summary` gets `margin: 0`. The default theme gives it a paragraph's 16px margins, which made a closed section almost twice as tall as its title.
   - Code blocks inside get `margin: 16px 0`. Below 640px the default theme makes code blocks run edge to edge with `margin: 16px -24px`, which pushed them out of the box. The default theme does the same for its own custom blocks.
   - An open section has no background. A grey fill matched the code-block background in light mode, and code blocks vanished into it.
+- **Opening or closing a section scrolls its header to the top of the screen** (`details-scroll.ts`). Sections of one group share a `name`, so opening one closes the others. When the open one is above, everything below it — including the header the reader just clicked — slides up by the height of the section that closed, and the reader loses their place. The header now lands 16px below whatever the theme keeps stuck at the top, so the steps the reader picked start where they are looking.
+  - **The offset is measured, not written in.** What covers the top of the screen changes with width, and there is no CSS variable for the local nav bar's height. `stickyBottom()` adds up the `.VPNav` and `.VPLocalNav` bars that are `fixed` or `sticky` right now, from their computed `top` and their height. Measured in Chrome at three widths:
+
+    | Width | Stuck at the top | Offset |
+    | --- | --- | --- |
+    | Below 960px | The local nav bar only. The nav bar is `position: relative` and scrolls away. | 48px |
+    | 960 to 1279px | The nav bar, with the local nav bar under it. | 112px |
+    | 1280px and wider | The nav bar only. The local nav bar is `display: none`. | 64px |
+
+  - **It listens for `click` on the summary, not for the `toggle` event.** `toggle` doesn't bubble, and a group with a `name` fires two of them for one click — one for the section closing, one for the one opening — which would give two scrolls racing each other. A click on the summary happens once, and covers the keyboard too: Enter or Space on a focused `summary` dispatches one.
+  - **It reads the layout one frame later.** A `<details>` opens or closes *after* its summary's click event, so during the handler the old height is still in place. The measurement is inside a `requestAnimationFrame`, as the default theme's own `scrollTo` does for heading anchors.
+  - **Smooth only for short hops.** It animates when the jump is under one screen height and snaps for longer ones, again matching heading anchors. Under `prefers-reduced-motion` it always snaps: a `behavior` of `'smooth'` passed to `scrollTo` beats the `scroll-behavior: auto !important` the default theme sets for that media query, so `details-scroll.ts` checks the query itself.
+  - **The header can't always reach the top.** Closing the last section on a short page leaves too little below it, so the browser scrolls as far as it can and the header stops lower. There is no way around it.
 - **Footer on every page.** The default theme hides the footer on every page with a sidebar (`.VPFooter.has-sidebar { display: none }`). Our sidebar is on every page except the home page, so the copyright notice would never show next to the course itself. `custom.css` shows it again:
   - The selector is `.VPContent.has-sidebar ~ .VPFooter.has-sidebar`. `VPFooter` comes right after `VPContent` in the layout, and the extra class outranks the theme's scoped `.VPFooter.has-sidebar[data-v-…]`.
   - From 960px the sidebar is fixed on the left, so the footer gets the same left padding as `VPContent` (the sidebar width, plus 32px), and from 1440px the same centring. Its text then lines up with the page, not with the whole screen. Below 960px the sidebar is a slide-out menu, and the footer uses the full width.

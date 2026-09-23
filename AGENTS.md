@@ -4,7 +4,7 @@ Instructions for any AI agent working in this repository.
 
 ## What this repository is
 
-Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is open source: anyone may learn from it for free, but the materials are copyright Aijutsu Pte. Ltd., and teaching or reusing them needs written approval (the [Terms of Use](course/terms.md)). The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
+Course materials for "AI in the Heartlands" by Aijutsu: hands-on courses that teach non-technical people to build things with AI. The repository is public, but not open source: anyone may learn from it for free, while the materials are copyright Aijutsu Pte. Ltd., and teaching or reusing them needs written approval ([LICENSE.md](LICENSE.md), with the full [Terms of Use](course/terms.md)). The written material is the product. The only code here is what checks and publishes it: a validator for the [course format](docs/system/course-format.md), a VitePress site built from `course/` and published at https://aith.aijutsu.dev, and Terraform for the Cloudflare resources that serve it.
 
 The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin`), where CI runs. https://github.com/aijutsu/aith is a read-only public mirror, kept in sync by Gitea's push mirror, which overwrites it: never merge pull requests or push there. Apply GitHub pull requests on Gitea instead (see [github-mirror.md](docs/system/github-mirror.md)). This rule is only for `aijutsu/aith`. [Fork submodules](#fork-submodules) such as `aijutsu/aith-nanoclaw-codex-telegram` live on GitHub and have no copy on Gitea. Push them to GitHub directly.
 
@@ -15,16 +15,18 @@ The repository lives on Gitea at https://gohan.aijutsu.dev/aijutsu/aith (`origin
 ## Layout
 
 - `README.md` (the apex README) — for contributors: what the repository is, how to preview and check the site, and where the docs are. Not published.
+- `LICENSE.md` — the repository's licence: all rights reserved, with the "free to learn from" permission. It covers everything here, summarises `course/terms.md`, and defers to it. Not published, and not an open-source licence. Change it only together with the terms.
 - `course/` — all published course material, in [course format v1](docs/system/course-format.md).
   - `course/index.md` — the site's home page: why the course exists, prerequisites, and the Course Overview (every course, in order).
   - `course/courses.md` — the Courses page. Its `:::courses` block lists every course from its `course.yaml`, so it needs no edits when a course is added.
   - `course/glossary.yaml` — the **only** glossary in the repository. `course/glossary.md` shows it on the site.
-  - `course/terms.md` — the Terms of Use. The site footer (`themeConfig.footer` in `.vitepress/config.mts`) repeats its copyright notice: change both together, and update the "last changed" date at the top of the terms.
-  - `course/about.md` — About Aijutsu, the company that makes the courses. Its content comes from https://aijutsu.dev: when that site changes what Aijutsu does, update this page. It has its own writing rules (see [Writing rules](#writing-rules)).
+  - `course/terms.md` — the Terms of Use, and the one place the full terms live. Two other files repeat its copyright notice: the site footer (`themeConfig.footer` in `.vitepress/config.mts`) and `LICENSE.md`. Change all three together, and update the "last changed" date at the top of the terms.
+  - `course/about.md` — About Aijutsu, the company that makes the courses. Four sections, in order: who Aijutsu is, what it does (three services × three domains), why it runs this course, and who is on the team, then the contact section. The team section has one `###` block per person; add new people there. Its content comes from https://aijutsu.dev: when that site changes what Aijutsu does, update this page. The service names and descriptions are repeated in `makesOffer` in `.vitepress/seo.ts`, and the founder's past roles and coaching credential in its `founder` node; change both together. It has its own writing rules (see [Writing rules](#writing-rules)).
   - `course/NNN-<slug>/` — one directory per course, numbered in course order (e.g. `course/001-building-agents-with-nanoclaw/`).
     - `course.yaml` — the course manifest, with a stable `id` that never changes.
     - `index.md` — the course's main page: the index of that course's materials, organised by topic, plus a References table.
     - `NN-<slug>/index.md` — optional lessons: one part of the course per page, numbered in order (e.g. `01-installations/`). Each has an `id` in its frontmatter (e.g. `id: installations`) that never changes, like a course's `id`. The sidebar lists them by itself.
+      - `NN-<slug>/NN-<slug>/index.md` — optional sub-lessons, numbered the same way (e.g. `01-installations/04-make/`). The lesson's own `index.md` is then the overview of them. Lessons nest two levels deep and no further. A sub-lesson's `id` is unique within its lesson, not the whole course.
     - `README.md` — optional notes for contributors. READMEs are never published.
     - Submodules for the Git repositories that course uses (e.g. `course/001-building-agents-with-nanoclaw/nanoclaw`). A submodule is either an upstream copy or, when a course needs a customised version, an Aijutsu fork (see [Fork submodules](#fork-submodules)). Submodules are never published.
 - `docs/updates.md` — the Submodule Update Events log: one row per submodule bump, written by the `update-submodule` skill.
@@ -53,15 +55,29 @@ All published course material is written for non-technical readers, in basic-to-
 - Use short sentences and common words. One idea per sentence.
 - Explain what something is for before explaining how to use it.
 - When a technical term is unavoidable, explain it in plain words where it first appears, or link to its glossary entry.
-- When the reader must type a command, show the exact command and say what should happen after it runs.
+- When the reader must type a command, say **where** to type it, show the exact command, and say what should happen after it runs. Link the word "terminal" to the page that opens one, on its first use in each section a reader might open on its own (each `<details>`, and the page's own prose). Name the right window for the system: Terminal on a Mac, the Ubuntu terminal on Windows, and PowerShell where a Windows step really means PowerShell.
 - Match the voice of the existing glossary, e.g. "Think of it like a USB plug for AI: one standard plug that works with many different things."
 
 **One exception: `course/about.md`** (About Aijutsu). It is Aijutsu's company page, not course material, and it is written for answer engines (AEO) as much as for learners:
 
 - Write in Aijutsu's voice ("we"), and use the proper technical and business terms. The plain-English rules above don't apply, and new terms on this page don't need glossary entries (link to existing ones where they fit).
 - Phrase each heading as a question people ask ("Who founded Aijutsu?"), and make the first sentence under it a complete answer that names Aijutsu, so it still makes sense when an answer engine quotes it alone.
-- Keep the "at a glance" facts table, and use the same names everywhere: Aijutsu, Aijutsu Pte. Ltd., Joseph Matthias Goh, AI in the Heartlands.
+- Use the same names everywhere: Aijutsu, Aijutsu Pte. Ltd., Joseph Matthias Goh, AI in the Heartlands. Keep the legal name, the UEN, and Singapore somewhere on the page, so an answer engine can identify the company without the facts table the page used to carry.
 - Don't attribute the text to Aijutsu's website ("the website says"), and don't copy prices: link to https://aijutsu.dev/pricing.
+
+### Aijutsu's voice
+
+These rules are taken from Aijutsu's own rewrites of drafted copy (2026-09-23). They apply to `course/about.md` and to any other page written in Aijutsu's own voice, such as the home page intro. They do **not** apply to course material, the glossary, or the Terms of Use. When a draft is rewritten, read the rewrite against the draft and add what you learn here.
+
+- **Open with a concrete question, not a mission statement.** A drafted "Aijutsu runs AI in the Heartlands to find out what everyday people would build…" became: Aijutsu runs it "to answer the curious question of: **\"What would my neighbour build if they had some practical and applicable knowledge of how to build with AI?\"**". Put the idea in a question a real person would ask, in their frame ("my neighbour", not "everyday people"), and bold it.
+- **Keep the informal register. Don't smooth it into corporate English.** "TL;DR", "drop an email to", "Find Joseph on LinkedIn if you'd like", "Majority of AI workshops" without the article. These are deliberate. Editing them into "In summary", "email", or "Joseph is on LinkedIn" removes the voice.
+- **People before technology.** A drafted "AI lets small teams achieve outsized outcomes" became "consultants backed by years of industry experience leveraging AI to empower small teams to achieve outsized outcomes". The people and their experience are the subject; AI is the instrument they use.
+- **Lead with conviction, then the CV.** A drafted "Joseph Matthias Goh founded Aijutsu. He is a builder and a coach, with over a decade of…" became "Founded Aijutsu in 2026 as a way of bringing back a consultancy culture where consultants care about doing the right thing rather than getting paid for as long as possible." Why the thing exists comes before the credentials that qualify it.
+- **Say the pointed thing plainly.** "it's rare to have *certified* instructors also have actual prior industry experience"; "actual industry best-practices rather than textbook theories". Name the real difference, and italicise the word the sentence turns on. Don't hedge it into "some providers may…".
+- **Cut positioning that isn't evidence.** A drafted "You work with a senior operator directly, not with an account manager in front of a bench" was deleted, while "led the company through its ISO 27001 and SOC 2 Type II compliance audits" was kept. A claim earns its place when something checkable backs it: a role held, an audit led, a product shipped.
+- **Name an offer the way a buyer would search for it.** "Workshops" became "Instructor-led classes for individuals and companies"; "Licensing and group courses" became "Licensing opportunities".
+- **Keep legalese out of body prose.** "Aijutsu (Aijutsu Pte. Ltd.) is a founder-led…" became "Aijutsu is a founder-led…". The legal name and the UEN belong in the contact section, and are required there.
+- **Where this collides with the AEO rule, AEO wins for the first sentence only.** Aijutsu writes subject-dropped openers ("Founded Aijutsu in 2026…"), which an answer engine can't attribute when it quotes the section alone. So name the subject in the first sentence under a heading, then write as conversationally as the voice wants.
 
 ## Glossary
 

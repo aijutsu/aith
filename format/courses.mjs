@@ -14,6 +14,8 @@ export const CONTENT_DIR = 'course'
 export const COURSE_DIR = /^(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*$/
 export const LESSON_DIR = /^(\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*$/
 export const ALLOWED_BLOCKS = ['glossary', 'courses']
+/** How deep lesson folders may nest inside a course: a lesson, and a sub-lesson inside it. */
+export const LESSON_DEPTH = 2
 
 /** Submodules from .gitmodules, as { path, url } with repo-relative paths. */
 export function submodules(root = ROOT) {
@@ -70,8 +72,11 @@ export function readYaml(file) {
 }
 
 /**
- * Courses in content order. Each course is a `NNN-slug/` folder; its lessons
- * are `NN-slug/index.md` folders inside it, in folder-number order.
+ * Courses in content order. Each course is a `NNN-slug/` folder; its lessons are
+ * `NN-slug/index.md` folders inside it, in folder-number order. A lesson may hold
+ * sub-lessons the same way, up to LESSON_DEPTH levels deep. Every lesson has a
+ * `lessons` array, empty when it has none, so callers can walk the tree the same way
+ * at every level.
  */
 export function discoverCourses(root = ROOT) {
   const contentRoot = join(root, CONTENT_DIR)
@@ -81,26 +86,40 @@ export function discoverCourses(root = ROOT) {
       .map((e) => e.name)
       .sort()
 
+  // `rel` is relative to the content root, so readPage() and the site use the same paths.
+  const lessonsIn = (rel, depth) => {
+    if (depth > LESSON_DEPTH) return []
+    const base = join(contentRoot, rel)
+    return dirs(base)
+      .filter((l) => LESSON_DIR.test(l) && existsSync(join(base, l, 'index.md')))
+      .map((l) => ({
+        dir: l,
+        path: `${rel}/${l}`,
+        depth,
+        order: Number(l.slice(0, 2)),
+        frontmatter: readPage(root, `${rel}/${l}/index.md`).frontmatter,
+        lessons: lessonsIn(`${rel}/${l}`, depth + 1),
+      }))
+  }
+
   return dirs(contentRoot)
     .filter((dir) => COURSE_DIR.test(dir))
     .map((dir) => {
       const courseRoot = join(contentRoot, dir)
       const manifestFile = join(courseRoot, 'course.yaml')
-      const lessons = dirs(courseRoot)
-        .filter((l) => LESSON_DIR.test(l) && existsSync(join(courseRoot, l, 'index.md')))
-        .map((l) => ({
-          dir: l,
-          order: Number(l.slice(0, 2)),
-          frontmatter: readPage(root, `${dir}/${l}/index.md`).frontmatter,
-        }))
       return {
         dir,
         order: Number(dir.slice(0, 3)),
         manifest: existsSync(manifestFile) ? readYaml(manifestFile) : null,
         hasIndex: existsSync(join(courseRoot, 'index.md')),
-        lessons,
+        lessons: lessonsIn(dir, 1),
       }
     })
+}
+
+/** Every lesson in a course, parents before their own sub-lessons (reading order). */
+export function flattenLessons(lessons) {
+  return lessons.flatMap((lesson) => [lesson, ...flattenLessons(lesson.lessons)])
 }
 
 /** Anchor id for a glossary term, e.g. "Node.js" -> "node-js". */

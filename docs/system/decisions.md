@@ -384,3 +384,222 @@ It doesn't say where its text comes from, and it links to aijutsu.dev for prices
 - The classic Plausible script with `data-domain` (works without a per-site file name): aijutsu.dev uses the new script, and one pattern is easier to run.
 
 **Accepted cost:** Analytics stays off until the site is added in Plausible and its tracker's file name is set as `PLAUSIBLE_SCRIPT` in `wrangler.jsonc` ([analytics.md](./analytics.md#turning-it-on)). Until then the Worker answers `/js/p.js` with 404, and nothing is sent.
+
+## 2026-09-23 — A `LICENSE.md` at the root: a summary that defers to the Terms of Use
+
+**Chosen:**
+- The repository has a root `LICENSE.md`. It covers everything here, including the code in `format/`, `.vitepress/`, `worker/` and `deploy/`: all rights reserved, with the "free to learn from" permission carved out.
+- It is a summary, about 45 lines. `course/terms.md` stays the one place the full terms live, and `LICENSE.md` says so: "Where the two differ, the Terms of Use apply."
+- It states plainly that it is not an open-source licence, and that the files being public is not permission to reuse them.
+- It excludes the Git submodules under `course/` and the npm dependencies, which keep their own licences.
+- The apex `README.md` and `AGENTS.md` no longer call the repository "open source". They say public, or public but not open source.
+
+**Why:**
+- This closes the "Revisit" item on [Copyright and Terms of Use](#2026-09-22--copyright-and-terms-of-use-free-to-learn-from-approval-needed-to-teach-or-reuse) above, and supersedes its "The repository has no licence file" reasoning. All rights reserved by default was correct, but it only works for a reader who knows that a missing licence means no permission. Most people check for a LICENSE file and read nothing into its absence.
+- GitHub and Gitea both surface a `LICENSE` file in the repository header. That is where someone deciding whether they may reuse the materials looks first, and they may never reach the site.
+- A summary, not a second copy of the terms, keeps one source of truth. The copyright notice is already in two places (`course/terms.md` and the site footer); a full restatement would make a third legal text to keep in step, and the footer has already drifted once.
+- Once `LICENSE.md` says "not an open-source licence", a README two lines away saying "open source" is a contradiction a reader would have to resolve. Changing the contributor-facing wording was cheaper than qualifying it.
+
+**Turned down:**
+- MIT, Apache-2.0, CC BY-SA, or CC BY-NC. Every one permits teaching the materials, which is the single thing that needs approval. CC BY-NC-ND is closest, but its "NonCommercial" still allows free classes, and it can't be revoked.
+- Dual-licensing: MIT for the publishing code (`format/`, `.vitepress/`, `worker/`, `deploy/`), proprietary for `course/`. It would let others reuse the machinery, but it puts a licence boundary through a repository whose product is the writing, and every new file would need a side picked.
+- Restating the terms in full so `LICENSE.md` stands alone. Rejected for the drift cost above.
+
+**Accepted cost:** GitHub and Gitea will label the repository "Other" rather than a recognised licence, and it won't appear in open-source licence filters. That is accurate.
+
+**Still open:** The published site still says "open source" in the home page intro (`course/index.md`) and the footer message (`themeConfig.footer`). Both are learner-facing copy, so they were left for Aijutsu to reword. See [known-issues.md](./known-issues.md).
+
+**Revisit:** Have a lawyer review `LICENSE.md` alongside the terms. Revisit if the publishing code is ever split into its own repository, where an open licence would cost nothing.
+
+## 2026-09-23 — Lessons may hold sub-lessons, one level deep
+
+**Chosen:** A lesson folder may hold lesson folders of its own: `course/NNN-slug/NN-slug/NN-slug/index.md`. The parent lesson's `index.md` becomes the overview, and each sub-lesson is a page. It stops there: `LESSON_DEPTH = 2` in `format/courses.mjs`, and `make validate` rejects a third level.
+
+Course 001's `01-installations/` is the first user. It was one page with eight steps, and is now an overview plus one page per tool: `01-terminal/`, `02-git/`, `03-docker/`, `04-make/`, `05-codex/`.
+
+**Why:**
+- The installations lesson had grown to 265 lines, with every operating system's steps for four tools on one page. A learner installing Docker had to scroll past Git, and the page's own outline was the only way to find anything.
+- One page per tool gives each one its own URL, its own "Next page" link, and its own place in the sidebar. A learner can stop after Git and come back to Docker.
+- The overview page can then do what a long page can't: say what each tool is for, before any installing starts.
+- Nesting is additive. Nothing about a lesson changed, no published id changed, and a course with no sub-lessons reads exactly as before. So the format stays at v1 (see [Versions](./course-format.md#versions)).
+- The change is small because `format/courses.mjs` is shared: making lesson discovery recursive there gave the validator, the sidebar, the sitemap, `llms.txt` and the JSON-LD the same new shape at once.
+
+**Ids:** A lesson's `id` is unique within its course; a sub-lesson's within its lesson. A page is then identified by the ids down to it (course, lesson, sub-lesson), which is what a platform tracks progress by.
+
+**Turned down:**
+- **Each tool as a top-level lesson** (`02-terminal/`, `03-git/`, …, `07-setting-up-nanoclaw/`). No format change at all, but it flattens the course into seven equal lessons and loses the fact that installing is one phase of the course. The Courses page's lesson count would say seven.
+- **Keeping one page, with a tools table at the top.** The cheapest option, and it was considered seriously. It fixes the "what is each tool for" gap but not the length, the scrolling, or the lack of per-tool URLs.
+- **Unlimited nesting.** Discovery would be simpler (no depth check), but the sidebar and the JSON-LD would have to handle any depth, and no course needs it. Two levels is a rule the validator can enforce.
+
+**Accepted cost:** Relative links from a sub-lesson are one level deeper (`../../../glossary.md`). Nothing checks that automatically apart from the site build's dead-link check, which does catch a wrong count.
+
+**Revisit:** If a course ever needs three levels. Raising `LESSON_DEPTH` is a one-line change, but check the sidebar's look at `level-4` and add a row to the JSON-LD table in [site.md](./site.md#seo-and-aeo) first.
+
+## 2026-09-23 — The course site reports into the `aijutsu.dev` Plausible site, split by Hostname
+
+**Chosen:** The site loads the `aijutsu.dev` tracker, so its visits land in that Plausible site, alongside aijutsu.dev's. The course site is the `aith.aijutsu.dev` value of Plausible's **Hostname** dimension. `PLAUSIBLE_SCRIPT` in `wrangler.jsonc` holds that tracker's id. This settles the "Accepted cost" in "Plausible analytics through the site's own Worker" above: nothing has to be created in Plausible, and analytics works from the first deploy.
+
+**Why:**
+- It is Plausible's own way to cover subdomains: the same tracker everywhere, and the Hostname filter to separate them. Plausible records the hostname on every pageview.
+- One dashboard for everything on `aijutsu.dev`, including the path a reader takes from the marketing site to the course.
+- No second site to set up, and no second tracker id to keep in step.
+
+**Accepted cost:**
+- Totals mix both sites until a Hostname filter is set.
+- The Pages report groups by path without the hostname, so `/about` on both sites adds up.
+- Goals are shared.
+- Plausible's "Verify installation" step can't see this site: the tracker is proxied and added by an inline script. Check the dashboard for a live visitor instead.
+
+**Turned down:**
+- **Its own Plausible site** (`aith.aijutsu.dev`): cleaner totals, its own goals, no path mixing. It needs the site created in the dashboard, and its own tracker id here. This is the way back if the numbers get muddled: add the site, change `PLAUSIBLE_SCRIPT`, and nothing else moves.
+- **The classic tracker with `data-domain`** (configured by hostname, no id): it also needs a separate site, and it's Plausible's older tracker, unlike aijutsu.dev's.
+
+**A correction worth keeping:** the first version of this decision claimed a shared site could not tell the two sites' pages apart. That was wrong: the Hostname filter does exactly that. Only the default, unfiltered Pages report merges identical paths.
+
+## 2026-09-23 — Every install page checks twice: before the steps, and after
+
+**Chosen:** Inside each operating system's `<details>` on an install page, three bold labels in a fixed order: **Check if it's already installed.**, **Install it.**, **Check that it works.** The closing check moved inside the accordion, so it is per system, with only that system's troubleshooting. The page-level `## Check that it works` section is gone.
+
+The two checks answer different questions, so they are usually different commands: `docker --version` (is it there?) then `docker run hello-world` (does it run?); `codex --version` then `codex login status`. Where they would be the same command (Git on Windows and Linux, Make everywhere), the first check ends the section — "skip the rest of this section" — rather than sending the reader to the bottom to type it again.
+
+**Why:**
+- These are common tools. A learner who already has Git, Docker or Make had no way to find that out without working through steps that would either fail or silently reinstall. The first check gives them permission to skip, which is the difference between a 40-minute lesson and a 2-minute one.
+- The closing check was one section for all three systems, so its troubleshooting listed every system's fix ("On a Mac… On Windows… On Linux…"). A reader only ever needs their own. Inside the accordion each page says one thing.
+- A reader opens exactly one accordion, so repeating the check in all three is not repetition they see.
+
+**Bold labels, not headings.** `outline: 'deep'` puts every `##`–`######` into the page's "On this page" list, including headings inside a closed `<details>`. Three headings × three systems would have made a nine-item outline of three repeated names. Bold labels keep the outline at "Install it" and "Next", and match the style the Docker page already used (`**Recommended: OrbStack.**`).
+
+**Turned down:**
+- **Keeping one page-level "Check that it works".** The smaller change, and it avoids writing the check three times. But it can't be tailored per system, which is what made the old one clumsy.
+- **A single check at the top that covers the whole page.** It would have to test every tool at once and couldn't say which step to jump to.
+
+**Accepted cost:** The check text is now written three times per page, so a change to a check has to be made three times. `make validate` can't catch a copy that drifts.
+
+**Note:** `01-installations/05-codex/` has no accordions — the steps are identical on every system — so its three labels are `##` headings, and its outline is the fuller one.
+
+## 2026-09-23 — The About page is restructured: who Aijutsu is, what it does, why it runs the course, who is on the team
+
+**Chosen:**
+- `course/about.md` is restructured to four top-level sections, in this order: **About Aijutsu** (the intro paragraph alone), **What does Aijutsu do?**, **Why does Aijutsu run AI in the Heartlands?**, and **Who is on the Aijutsu team?**, with the contact section left at the end.
+- The team section is a per-person `###` block, so it grows as Aijutsu hires. Today it holds the founder only: Joseph Matthias Goh, his three previous roles (Head of Platform Engineering at watchTowr, Platform Architect at StashAway, DevOps Engineer at GovTech), his Newfield Ontological Coaching Certification, and his LinkedIn profile. It sits second-to-last, after the reader knows what Aijutsu does and why the course exists.
+- "What does Aijutsu do?" is a services × domains model, not a list of offerings. Three services (senior technical advisory, transformation journey facilitation, bespoke app and web app development) are delivered in three domains (AI, cloud, compliance). Two lists name them, then a 3×3 table says what each service looks like in each domain.
+- Removed: the engagement-model table, "Who does Aijutsu work with?", "What makes Aijutsu different?", and the "Aijutsu" name etymology. The founder biography was cut and then brought back as the team section, with specifics the old bio didn't have. The `aijutsu.dev/pricing` link is gone from the page; aijutsu.dev is the only place with pricing now.
+- Headings stay third-person questions that name Aijutsu ("What does Aijutsu do?"), even though the brief phrased them in the first person ("What do we do?"). The body keeps Aijutsu's "we" voice.
+- `.vitepress/seo.ts` was updated in the same change: `makesOffer` now carries the three new service names and descriptions, `knowsAbout` gains cloud migration and compliance automation, the organisation `description` matches the page's opening sentence, and the `founder` node gains a description, `alumniOf` (watchTowr, StashAway, GovTech) and `hasCredential` (the Newfield certification) to match the team section.
+
+**Why:**
+- Aijutsu asked for the three-section shape. The page had grown to eight sections, and the services were described three different ways (a services list, an engagement table, and a differentiators list) that had to be kept in step by hand.
+- The services × domains matrix is the shape of the business: the same three services are sold into three domains. A flat list forced each domain to be repeated inside each service's paragraph.
+- The AEO rule in `AGENTS.md` is that a heading must still make sense when an answer engine quotes its section alone. "What do we do?" has no subject once extracted; "What does Aijutsu do?" does. Same reason the first sentence of each section names Aijutsu.
+- `seo.ts` holds a second, machine-readable copy of the services (its comment says "course/about.md says the same"). Renaming the services on the page alone would have made the JSON-LD contradict the visible text for the engines the page exists to serve.
+- A per-person team section is how a practice that sells senior attention proves it. Naming the companies and the audits is a concrete, checkable claim; "over a decade of experience" is not. It reads better late in the page, once the reader knows what is on offer.
+- The "at a glance" facts table is removed, and with it the `AGENTS.md` rule that required it. The table repeated facts the page already made, and a reader met it before being told what Aijutsu does. Most of what it carried is still on the page: Singapore in the intro, the legal name and UEN in the contact section, the founder in the team section, services and domains in their own lists. Two facts are dropped entirely — "Clients: founders, operators, and enterprises", and the link to aijutsu.dev/pricing.
+
+**Turned down:**
+- Folding the removed sections in as subsections. It keeps every fact, but the page stays long and the three-section shape stops being visible, which was the point.
+- Leaving the removed sections after the three new ones. Same problem, and it puts the weakest material last where the contact details belong.
+- A flat services list with no matrix. Cheaper to maintain, but it loses the one thing the new structure is for: showing that any service can be engaged in any domain.
+
+**Accepted cost:**
+- The engagement models (custom application development, readiness sprint, adoption sprint) and their durations are gone. Anyone wanting them is sent to aijutsu.dev.
+- The nine matrix cells were written from the brief and the previous copy. They describe a real practice's services, so Aijutsu should check them before this is published.
+
+**Supersedes:** the About page's shape as set out in "The About page is written in Aijutsu's voice, for answer engines" (2026-09-22) above: the "at a glance" facts table and the engagement, differentiators and etymology sections are gone. That entry's AEO rules — question headings, a self-contained first sentence naming Aijutsu, no copied prices — all still hold.
+
+**Revisit:** When aijutsu.dev changes what Aijutsu does, as `AGENTS.md` already requires for this page.
+
+## 2026-09-23 — Every command block says where to type it
+
+**Chosen:** In the line directly above every fenced command, the course names the window: "In Terminal, run:" on a Mac, "In the Ubuntu terminal, run:" on Windows, "In the terminal, run:" on Linux, "In your terminal, run:" where the steps are the same everywhere. The word links to the "Open a terminal" page (`01-installations/01-terminal/`) **once per section** — the first command inside each `<details>`, and the first in a page's own prose.
+
+Course 001 has 49 command blocks. All 49 now name a window; 14 carry the link.
+
+**Why:**
+- The course is written for people who have never used a terminal. A bare code block with a copy button doesn't say where it goes, and "open a terminal" was said once, a page or two earlier.
+- Windows is the case that actually breaks. `wsl --install` runs in PowerShell, and everything after it runs in the Ubuntu terminal. Both are "a terminal" to a beginner, and typing `sudo apt install` into PowerShell fails in a way they can't read. Those blocks now say which window, and the PowerShell ones carry no link, so the link never points at the wrong window.
+
+**Once per section, not once per command.** A reader opens exactly one `<details>`, so a link in each is a link they will see. Repeating it on all eleven blocks of the Git page would put the same href on screen three times in a row. This also matches the writing rule in `AGENTS.md`: link a term where it first appears.
+
+**Turned down:**
+- **Linking every occurrence.** Literal, and it needs no judgement about what a "section" is, but it reads as noise.
+- **Linking the glossary entry (`glossary.md#terminal`) instead.** The glossary says what a terminal *is*. A reader stuck at a command needs the page that says how to *open* one, which is the sub-lesson.
+- **A note once at the top of each page.** That is what the course effectively had, and it is the thing that didn't work: readers arrive mid-page from the sidebar or a search result.
+
+**Accepted cost:** Nothing enforces this. A new command block with no lead-in passes `make validate` and the site build. The check is reading the page, or re-running the one-off audit over the fenced blocks.
+
+## 2026-09-23 — Opening a collapsible section scrolls its header to the top of the screen
+
+**Chosen:** When a reader opens or closes a `<details>` section on any page, the site scrolls that section's `<summary>` to 16px below whatever the theme keeps stuck at the top of the screen. `.vitepress/theme/details-scroll.ts` does it, in one delegated listener started from the theme's `setup()`. The details are in [site.md](./site.md#theme).
+
+**Why:**
+- Sections for each operating system share a `name` ([course-format.md](./course-format.md#markdown)), which makes them one accordion: opening "Windows" closes "macOS". When the open one is above, the page under the reader's cursor jumps up by the height of the section that just closed, and they land in the middle of steps they didn't pick. The install pages are where this hurts most: those sections are 20 to 50 lines long.
+- The header is what the reader aimed at, so it is the thing to pin. Putting it at the top also gives the steps below it the whole screen.
+- **The offset is measured from the theme's own bars, not written in.** What covers the top changes with width (48, 112 or 64px), the local nav bar has no height variable to read, and a measured offset survives a VitePress bump that changes those heights.
+- **A `click` on the summary, not the `toggle` event.** `toggle` doesn't bubble, and a named group fires two per click, which would race. One click covers the mouse and the keyboard together.
+- **Smooth under one screen height, instant beyond it, instant under `prefers-reduced-motion`** — the same rule the default theme uses for heading anchors, so a section and a heading link behave alike.
+- Checked in headless Chrome at 1600, 1024 and 390px: opening, switching within a group, closing, Enter on a focused summary, and with reduced motion on. The header landed within 1px of its mark in every case.
+
+**Accepted cost:**
+- Closing a section scrolls too, even when its header is already in view. It is a small move the reader didn't ask for, taken so that the header ends in the same place either way.
+- Closing the last section on a short page leaves too little document below it, so the browser stops short and the header stays lower than 16px. Nothing can be done about that.
+- This is the theme's first behaviour: until now it was the default theme plus CSS. The rule that a custom layout or Vue component needs a decision first still stands, and new behaviour belongs in this one file.
+
+## 2026-09-23 — Aijutsu's voice is codified in AGENTS.md, learned from Aijutsu's own rewrites
+
+**Chosen:**
+- `AGENTS.md` gains an "Aijutsu's voice" sub-section under the `course/about.md` writing exception. Nine rules, each quoting the drafted line and the line Aijutsu replaced it with.
+- It covers `course/about.md` and any other page written in Aijutsu's own voice, such as the home page intro. Not course material, not the glossary, not the Terms of Use.
+- It carries an instruction to keep learning: when a draft is rewritten, read the rewrite against the draft and add what it teaches.
+- Where the voice collides with the AEO rule (Aijutsu writes subject-dropped openers such as "Founded Aijutsu in 2026…"), AEO wins for the first sentence under a heading only. After that, the voice wins.
+
+**Why:**
+- Aijutsu rewrote most of the drafted About copy, and asked that the change be learned rather than repeated. Rules written from the actual before/after pairs are checkable; a general instruction to "write in Aijutsu's voice" is not, and had already produced copy that needed rewriting.
+- `AGENTS.md` is the one file every agent reads, so Codex and Claude Code get the same rules. A note kept only in one assistant's memory would not reach the others.
+- The quoted before/after pairs are the useful part. They make it obvious that "TL;DR", "drop an email to" and "Majority of AI workshops" are deliberate register, not errors to be smoothed away, which is exactly the mistake an agent optimising for correctness would make.
+
+**Turned down:**
+- A separate `docs/system/voice.md`. The rules are three screens from the writing rules they qualify, and `AGENTS.md` already holds the about-page exception.
+- Recording the rules only as personal assistant memory: other agents wouldn't see them, and the repository requires that agent instructions live in `AGENTS.md`.
+
+**Revisit:** Every time Aijutsu rewrites drafted copy. The section says so itself.
+
+## 2026-09-23 — Claude Code gets its own optional page, marked optional in its title
+
+**Chosen:** `01-installations/06-claude-code/`, titled "Install Claude Code (optional)". It is the last page of the Getting Started lesson, after Codex. The install and sign-in steps moved there out of the Claude Code accordion in `02-setting-up-nanoclaw/`, which now links to it.
+
+**Why:**
+- Claude Code was already in the course, but only as two steps buried inside a `<details>` in lesson 2, where a reader deciding whether they want it would never see them. Every other tool the course installs has a page.
+- The page can now do what the buried steps could not: say who should install it and who should skip it, and say plainly that the agent runs on Codex either way. That last point was the real confusion risk — Claude Code is the reader's helper, not the agent's brain.
+- Lesson 2 gets shorter, and its two helper accordions become symmetrical: both now say "you installed this in the Getting Started lesson" and start with the same three steps.
+
+**Optional, and the title says so.** The sidebar, the course page and the overview table all carry the word, so a reader never has to open the page to find out they can skip it. The Codex page's "Next" offers it and names the alternative, rather than marching the reader into it.
+
+**Turned down:**
+- **Leaving the install inside lesson 2.** Fewest moving parts, but it keeps the decision invisible and makes the two helper accordions asymmetrical — one installing a tool mid-setup, the other not.
+- **A required page.** Claude Code needs a paid Claude plan on top of the ChatGPT Plus the course already requires. Making it required would raise the course's cost of entry for no gain.
+- **Putting it before Codex.** Required tools come first; the optional one is easiest to skip at the end.
+
+**Accepted cost:** The install command and `claude auth status --text` are pinned to nothing — they are Claude Code's own, not the fork's, so `update-submodule` won't re-check them. They have a row in the course README's dependency table instead.
+
+## 2026-09-23 — Lesson 2 is split into one page per step, and images live in `img/`
+
+**Chosen:**
+- `02-setting-up-nanoclaw/` becomes an overview plus four sub-lessons, one per step: `01-telegram-bot/`, `02-download-nanoclaw/`, `03-run-setup/`, `04-say-hi/`. Its `index.md` keeps the fork note and gains a table of the steps, the same shape `01-installations/index.md` already uses for its tools.
+- Each sub-lesson is a sidebar entry, because `lessonItems()` in `.vitepress/config.mts` already recurses. No renderer change was needed.
+- The two ways to make a Telegram bot (the BotFather mini app, or the chat) are `<details>` sections of one group, `name="new-bot"`, like the Codex/Claude Code helper sections on the setup page.
+- Page images move into an `img/` folder next to the page, named for what they show (`img/botfather-mini-app-home.png`), replacing screenshots dropped in as `image.png`, `image-1.png`, … This is now written in [course-format.md](./course-format.md#layout).
+
+**Why:**
+- The lesson was one long page with four `### Step N` headings. A reader doing setup over two sittings had no address to come back to, and the sidebar showed the lesson as a single entry while Getting Started listed every tool. The two lessons now read the same way.
+- Each step ends at a natural stopping point (a bot token, a downloaded folder, a running agent), which is what a page break is for.
+- An accordion for the two bot flows means a reader follows one, not both. As headings they read as eight steps to do in order, which is what the page looked like before.
+- `image-4.png` and `image-5.png` were near-identical screenshots of the same screen, and only one was used. Names that say what a picture shows make that obvious at a glance.
+
+**Turned down:**
+- **Leaving "Say hi to your agent" on the overview page.** It is short, but it is the step that proves setup worked, and a reader who comes back to check their agent wants an address for it.
+- **Numbering the pages "Step 1…Step 4" in their titles.** The folder numbers already order them, and the sidebar shows them in order. Titles that say what the reader does survive a renumbering; "Step 3" does not.
+- **A shared `img/` folder for the lesson.** Images belong to the page that uses them, so the page and its pictures move together.
+
+**Accepted cost:**
+- Anchors into the old page (`…/02-setting-up-nanoclaw/index.md#step-3-set-up-nanoclaw`, which `01-installations/06-claude-code/index.md` used) are gone. Nothing checks anchors, so they were found by hand. Links to the pages themselves are unaffected.
+- `img/botfather-mini-app-token-blank.png` is kept but unused: it is the same screen as `botfather-mini-app-token.png`, with the placeholder bot name. Delete it if nobody wants it.

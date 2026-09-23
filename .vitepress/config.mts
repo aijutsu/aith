@@ -14,6 +14,21 @@ const REPO = 'https://github.com/aijutsu/aith'
 const courses = discoverCourses()
 const courseLink = (dir: string) => `/${dir}/`
 
+// Lessons nest (a lesson may hold sub-lessons), so the sidebar is built the same way at
+// every level. `lesson.path` already starts with the course folder, so it is the URL.
+interface Lesson {
+  dir: string
+  path: string
+  frontmatter: { title?: string }
+  lessons: Lesson[]
+}
+const lessonItems = (lessons: Lesson[]): DefaultTheme.SidebarItem[] =>
+  lessons.map((lesson) => ({
+    text: lesson.frontmatter.title ?? lesson.dir,
+    link: `/${lesson.path}/`,
+    ...(lesson.lessons.length && { collapsed: false, items: lessonItems(lesson.lessons) }),
+  }))
+
 const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: 'Courses',
@@ -21,13 +36,7 @@ const sidebar: DefaultTheme.SidebarItem[] = [
     items: courses.map((course) => ({
       text: course.manifest?.title ?? course.dir,
       link: courseLink(course.dir),
-      ...(course.lessons.length && {
-        collapsed: false,
-        items: course.lessons.map((lesson) => ({
-          text: lesson.frontmatter.title ?? lesson.dir,
-          link: `/${course.dir}/${lesson.dir}/`,
-        })),
-      }),
+      ...(course.lessons.length && { collapsed: false, items: lessonItems(course.lessons) }),
     })),
   },
   {

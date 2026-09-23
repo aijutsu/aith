@@ -44,10 +44,22 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 
 const upstreamOf = (env: Env) => (env.PLAUSIBLE_UPSTREAM ?? 'https://ponzu.aijutsu.dev').replace(/\/$/, '')
 
+/**
+ * PLAUSIBLE_SCRIPT may be the whole path (/js/pa-XXXX.js) or just the id from Plausible's
+ * snippet (pa-XXXX, or XXXX). A bare id without this would be pasted straight onto the
+ * upstream host, making a URL with no "/" in it.
+ */
+export function scriptPath(value: string | undefined): string {
+  const script = value?.trim() ?? ''
+  if (!script || script.startsWith('/')) return script
+  return `/js/pa-${script.replace(/^pa-/, '').replace(/\.js$/, '')}.js`
+}
+
 async function proxyScript(env: Env): Promise<Response> {
-  if (!env.PLAUSIBLE_SCRIPT) return new Response(null, { status: 404 })
+  const script = scriptPath(env.PLAUSIBLE_SCRIPT)
+  if (!script) return new Response(null, { status: 404 })
   // `cf` cache options apply on Cloudflare and are ignored elsewhere (tests).
-  const upstream = await fetch(`${upstreamOf(env)}${env.PLAUSIBLE_SCRIPT}`, {
+  const upstream = await fetch(`${upstreamOf(env)}${script}`, {
     cf: { cacheEverything: true, cacheTtl: SCRIPT_CACHE_TTL },
   } as RequestInit)
   if (!upstream.ok) return new Response(null, { status: 502 })

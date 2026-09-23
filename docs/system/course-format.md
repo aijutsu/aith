@@ -34,8 +34,11 @@ The content root is `course/`. A file's role comes from where it is:
 | `course/NNN-slug/course.yaml` | The course manifest. Required. |
 | `course/NNN-slug/index.md` | The course's main page. Required. |
 | `course/NNN-slug/NN-slug/index.md` | A lesson: one part of a course, on its own page. `NN` is a two-digit order number (`01`, `02`, …). Its frontmatter also has an `id` (see [Lesson frontmatter](#lesson-frontmatter)). |
+| `course/NNN-slug/NN-slug/NN-slug/index.md` | A sub-lesson: one part of a lesson, on its own page, numbered the same way. Its parent lesson's `index.md` is then the overview: what the sub-lessons cover, and in what order. Lessons nest two levels deep and no further (`LESSON_DEPTH` in `format/courses.mjs`). |
 
 Slugs use lowercase letters, digits, and single hyphens. Any other Markdown file under `course/` is an error, so new kinds of pages are added to this spec first.
+
+Sub-lessons are optional. Use them when one lesson covers several things a learner does one after another, and each one is long enough to be its own page (course 001's `01-installations/` has one page per tool). A lesson with no sub-lessons is still a normal lesson page.
 
 **Never published**, and never read as content:
 
@@ -43,7 +46,7 @@ Slugs use lowercase letters, digits, and single hyphens. Any other Markdown file
 - anything inside a submodule (paths come from `.gitmodules`);
 - dot-folders and `node_modules`.
 
-Images and other files a page uses sit next to that page.
+Images and other files a page uses sit next to that page, in an `img/` folder: `02-setting-up-nanoclaw/01-telegram-bot/img/botfather-profile.png`, used as `./img/botfather-profile.png`. Name a file for what it shows, in lowercase with hyphens, so the next author can tell the screenshots apart without opening them. An `img/` folder belongs to one page; a picture two pages need is copied, not shared from a folder above.
 
 ## `course.yaml`
 
@@ -88,18 +91,19 @@ No other keys are allowed (lessons add one, below). In particular, no renderer k
 
 ### Lesson frontmatter
 
-Schema: [`format/schema/lesson.schema.json`](../../format/schema/lesson.schema.json). A lesson has the page fields, plus a required `id`:
+Schema: [`format/schema/lesson.schema.json`](../../format/schema/lesson.schema.json). A lesson, at either level, has the page fields, plus a required `id`:
 
 ```yaml
 ---
 id: installations # never change this, even if the folder or title changes
-title: Installations
+title: Getting Started
 description: Get your computer ready for the course.
 ---
 ```
 
-- `id` is a slug, unique within its course. Base it on the folder name without the number: `01-installations/` → `installations`.
-- **Never change it** once the lesson is published, even if the folder, number or title changes. A platform tracks learner progress by the course `id` and the lesson `id` together.
+- `id` is a slug. Base it on the folder name without the number: `01-installations/` → `installations`.
+- It is unique among the lessons that share the same parent: a lesson's id within its course, a sub-lesson's id within its lesson. So a page is identified by the ids on the way down to it — course `building-agents-with-nanoclaw`, lesson `installations`, sub-lesson `make` — and a platform tracks learner progress by that path.
+- **Never change it** once the lesson is published, even if the folder, number or title changes.
 - Lesson ids were defined in v1 before any lesson was published, so no published content changed meaning.
 
 ## `glossary.yaml`
@@ -155,14 +159,15 @@ Not allowed (the validator rejects these outside code blocks and inline code):
 
 ## Links
 
-- Link between pages with **relative links to the `.md` file**, e.g. `./001-building-agents-with-nanoclaw/index.md` or `../glossary.md#fork`. These work on GitHub and on the site.
+- Link between pages with **relative links to the `.md` file**, e.g. `./001-building-agents-with-nanoclaw/index.md` or `../glossary.md#fork`. These work on GitHub and on the site. Count the `../` from the page's own folder: the glossary is `../glossary.md` from a course page, `../../glossary.md` from a lesson, and `../../../glossary.md` from a sub-lesson.
+- **Link to a page, not to a heading inside it**, when the target may be reorganised. A sub-lesson's address (`../01-installations/05-codex/index.md`) survives renumbering; an anchor into a long page (`#step-4-install-codex`) does not, and neither the validator nor the site build checks anchors.
 - Never link to a `README.md` or into a submodule with a relative link: those files are not published, and the site build fails on dead links. Link to files in a submodule with a full GitHub URL instead.
 
 ## Checking
 
 | Command | Checks |
 | --- | --- |
-| `make validate` | Schemas; page locations; no renderer keys or disallowed syntax; `<details>` closed, with a blank line after `</summary>`; every lesson has an `id`, unique within its course; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
+| `make validate` | Schemas; page locations, including how deep lessons nest; no renderer keys or disallowed syntax; `<details>` closed, with a blank line after `</summary>`; every lesson has an `id`, unique among the lessons with the same parent; unique course `id`s; every course linked from `course/index.md`; `software` matches `.gitmodules`; glossary types, uniqueness, and order. |
 | `make site-build` | Everything the renderer needs, including **dead links** (the build fails on any). |
 
 CI runs both on every pull request.
@@ -172,7 +177,7 @@ CI runs both on every pull request.
 | Path | What |
 | --- | --- |
 | `format/schema/*.schema.json` | JSON Schemas (draft 2020-12), usable from any language. |
-| `format/courses.mjs` | Content discovery: courses, published pages, submodule exclusions, anchor slugs. Shared by the validator and the site, so both read the layout the same way. |
+| `format/courses.mjs` | Content discovery: courses, the lesson tree, published pages, submodule exclusions, anchor slugs. Shared by the validator and the site, so both read the layout the same way. `discoverCourses()` gives every lesson a `lessons` array (its sub-lessons, empty when it has none), a `path` from the content root, and a `depth`, so callers walk the tree the same way at every level. `flattenLessons()` gives one flat list in reading order. |
 | `format/validate.mjs` | The validator. |
 | `.vitepress/` | The VitePress renderer. Nothing in `course/` depends on it. |
 

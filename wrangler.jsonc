@@ -19,11 +19,13 @@
     // the assets, as before, and costs no Worker invocation.
     "run_worker_first": ["/js/p.js", "/api/e"]
   },
-  // Analytics (docs/system/analytics.md). PLAUSIBLE_SCRIPT is the site's tracker on
-  // Plausible (Site Settings → Installation: the pa-….js file name). While it's empty,
-  // analytics is off and the site works as before.
+  // Analytics (docs/system/analytics.md). This site reports into the "aijutsu.dev" site in
+  // Plausible, which covers every aijutsu.dev subdomain; the course site is the "Hostname"
+  // filter there. So PLAUSIBLE_SCRIPT is that site's tracker (Site Settings → Installation),
+  // the same one aijutsu.dev itself loads: its domain is built into the file. Either the
+  // path or the bare id works. Empty turns analytics off.
   "vars": {
     "PLAUSIBLE_UPSTREAM": "https://ponzu.aijutsu.dev",
-    "PLAUSIBLE_SCRIPT": ""
+    "PLAUSIBLE_SCRIPT": "/js/pa-eRO2lk6xypVEFuCArhX6m.js"
   }
 }
