@@ -10,7 +10,7 @@ A bot is an automatic Telegram account. Your agent uses it to chat with you. You
 
 In Telegram, search for `@BotFather` and open it. Check that it has a blue tick. Tap **Start**.
 
-## Make the bot
+## Create the bot account
 
 There are two ways to do this, and both give you the same thing: a bot, and a token for it. The mini app is a small app inside Telegram, with buttons to tap. The chat way is a conversation: you send BotFather commands, and it asks you questions.
 
@@ -39,7 +39,7 @@ Pick one. Click its name to open it.
 
    ![The New bot form in the mini app](./img/botfather-mini-app-new-bot.png)
 
-5. Your bot is made, and its page shows the token. The token is hidden behind a sparkle. Don't tap the sparkle: tap **Copy** instead, and paste the token somewhere safe.
+5. Your bot is made, and its page shows the token. The token is hidden behind a sparkle. Don't tap the sparkle: tap **Copy** instead, and paste the token somewhere safe like a password manager. It should look like `123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`
 
    ![Your bot's page in the mini app, with the Copy button](./img/botfather-mini-app-token.png)
 
@@ -51,7 +51,7 @@ Pick one. Click its name to open it.
 1. In the chat with BotFather, send `/newbot`.
 2. BotFather asks for a name. This is the name people see, for example `Heartlands Helper`.
 3. BotFather asks for a username. It must end in `bot`, for example `heartlands_helper_bot`. It can only use letters, numbers and underscores (`_`). You can't change it later.
-4. BotFather replies with a token, like `123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`. Copy it and keep it somewhere safe.
+4. BotFather replies with a token, like `123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`. Copy it and keep it somewhere safe like a password manager.
 
 </details>
 

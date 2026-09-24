@@ -603,3 +603,181 @@ Course 001 has 49 command blocks. All 49 now name a window; 14 carry the link.
 **Accepted cost:**
 - Anchors into the old page (`…/02-setting-up-nanoclaw/index.md#step-3-set-up-nanoclaw`, which `01-installations/06-claude-code/index.md` used) are gone. Nothing checks anchors, so they were found by hand. Links to the pages themselves are unaffected.
 - `img/botfather-mini-app-token-blank.png` is kept but unused: it is the same screen as `botfather-mini-app-token.png`, with the placeholder bot name. Delete it if nobody wants it.
+
+## 2026-09-23 — A "Cleaning Up" lesson, starting with uninstalling NanoClaw
+
+**Chosen:** A third lesson, `03-cleaning-up/`, with one sub-lesson today: `01-uninstalling-nanoclaw/`. It teaches NanoClaw's own `./uninstall.sh`, then deleting the checkout folder. Its overview says the lesson is skippable while the reader is still using NanoClaw, and lists what removal cannot undo.
+
+**Why:**
+- The course tells a reader to install a background service, a Docker image and a credential file on their own computer. It has to tell them how to take it off again, or the only exit is guessing.
+- It is a lesson, not a page on the setup lesson: cleaning up is a phase of the course, like Getting Started and Setting up NanoClaw, and it will grow a page per thing the course leaves behind (a Notion integration, a second channel).
+- The steps are checked against the pinned fork, like every other instruction: `uninstall.sh` is a shim over `nanoclaw.sh --uninstall`, the four confirm groups come from `GROUPS` in `setup/uninstall/flow.ts`, and each has a row in the course README's dependency table so `update-submodule` re-checks them.
+
+**What the page promises, and why it can:** nothing is deleted until every question is answered, Enter keeps (`initialValue: false`), and Ctrl-C during the questions changes nothing. That is the uninstaller's own design — it runs on the `node_modules` it deletes, so it decides everything first and removes the runtime last.
+
+**Turned down:**
+- **A "Troubleshooting / Uninstall" section on the setup page.** It would put "how to delete your agent" on the page where the reader is building it, and it would not have a sidebar entry to come back to months later.
+- **Teaching `./uninstall.sh -y`.** It deletes everything found without asking. The preview flag (`-n`) is taught instead, which is the flag a first-time reader actually wants.
+- **Telling the reader to delete Git, Docker, Make and Codex.** They are ordinary tools that other work uses. The page lists them as left alone instead.
+
+**Accepted cost:** The page tells a non-technical reader to run `rm -rf ~/nanoclaw`, which has no undo and no Trash. It carries a warning, and offers deleting the folder in the file manager first. `.env` is backed up to `.env.bak` *inside that folder*, so the page says to move it out before the folder goes — that trap is easy to miss and costs the reader their keys.
+
+## 2026-09-23 — Clicking a picture shows it big (a lightbox), instead of marking wide images
+
+**Chosen:** `.vitepress/theme/lightbox.ts`, a second delegated listener on `document`, and its styles in `custom.css`. Clicking a picture in a page lays it over the page; clicking the dimmed area around it, the close button, or pressing Escape puts it back. Clicking the picture itself does nothing, so it can't be shut by accident while it is being read.
+
+**Why:**
+- The 400px cap on desktop images is right for a phone screenshot at 2x, and wrong for a wide one. Course 001 now has an 893×332 screenshot of Codex in a terminal, and at 400px its text can't be read. [site.md](./site.md#theme) had already named this case and asked for a way to mark wide images, or click-to-zoom.
+- Click-to-zoom beats marking wide images: the author doesn't have to decide anything per picture, there is no new syntax in `course/`, and the course format stays renderer-neutral. A `wide` marker would have been a format change for a display problem.
+- No dependency. medium-zoom is the usual choice, but this is ~130 lines of plain DOM against a stable browser API, and the repository has no runtime dependencies to keep it that way.
+
+**The size it grows to** is the smallest of: the screen less its padding, the picture's own pixels but never under 720px, and the width that still fits the height. The 720px floor matters: most course screenshots are 374–412px wide, so a natural-size-only rule would have dimmed the page and changed nothing for five of the eight pictures in lesson 2. A little softness on those beats a click that does nothing.
+
+**Checked** in headless Chrome over CDP, at 1440×900 and 390×844: the overlay opens on click and sits above the sidebar; the picture ends up at 893×332 (from 400) on desktop and 351×130 on a phone; a 728×1120 screenshot fits the height at 466×717; a 407×65 strip grows to 720×115; clicking the picture keeps it open; the dimmed area, the close button and Escape all close it; the scrollbar is restored on close; a modified click is ignored; and opening a collapsible section still scrolls without opening a lightbox.
+
+**Turned down:**
+- **Raising the 400px cap for wide images**, with a marker in the Markdown. It puts a display decision in the content, and a wide screenshot would still be smaller than its own pixels.
+- **Making every picture focusable** (`tabindex="0"`, `role="button"`) so the keyboard can open it. It would mean writing attributes into content VitePress hydrates, and re-writing them after every route change. Once open, the lightbox is fully usable by keyboard; a keyboard-only reader still has the picture in the page and the browser's own zoom.
+- **A Vue component.** The theme's rule is that behaviour is a delegated listener in its own file. A component would be the first one, and it buys nothing here.
+
+**Accepted cost:** pictures under ~720px are shown larger than their own pixels, so they are slightly soft. On a phone the lightbox is only a little bigger than the page (351px against 273px), because the screen is the limit; pinch-zoom still works on it.
+
+## 2026-09-23 — The setup page has one path, and starts the agent from a template
+
+**Chosen:** `02-setting-up-nanoclaw/03-run-setup/` no longer has the two helper accordions (`$setup` in Codex, `/setup` in Claude Code). It has one path: run `bash nanoclaw.sh --agent-provider codex` in the terminal, and answer the table of questions. The first agent now comes from **the NanoClaw template library**, using the **`family-assistant`** template, instead of a fresh agent. A "Common issues" table carries the two prompts that stop most readers.
+
+**Why:**
+- Every reader did the same thing anyway — the accordions taught a skill invocation whose only output was "now run `bash nanoclaw.sh`", which is the command the next section gives. Cutting them removes a step that looked like setup but wasn't.
+- A template gives a new reader an agent that already does something, instead of an empty one.
+- The helper still matters when setup fails, so the page keeps one sentence about it, and the optional Claude Code page stays as it was.
+
+**Checked against the pinned fork** (`setup/auto.ts`): `From the NanoClaw template library` (`:1067`), `Choose a template` (`:1158`), the OneCLI prompt and `Install a fresh instance for NanoClaw` (`:375`, `:384`), and the test-agent cleanup warning (`:651`).
+
+**Watch out — the templates are not pinned.** `setup/templates.ts:12` clones https://github.com/nanocoai/nanoclaw-templates at run time, and the fork's own `templates/` ships empty. So `family-assistant` (`lifestyle/family-assistant`, checked 2026-09-23) can change or disappear without any submodule bump, and `update-submodule` will not catch it. It has a row in the course README's dependency table and in [known-issues.md](./known-issues.md), and it is the one course instruction that needs checking on a plain review. Whether that repository should be a pinned submodule, as [AGENTS.md](../../AGENTS.md) requires of referenced repositories, is an open question: the reader never clones it, so a pin would only give us a copy to check against.
+
+**Knock-on edits, in the same change:** the page's own two sentences that pointed at the removed sections; `01-installations/06-claude-code/index.md`, which told a reader who skips Claude Code to "use the **Codex** section"; the course README's accordion note, its "keep three things in step" list, and two dependency rows that are gone; and three stale pointers in [known-issues.md](./known-issues.md).
+
+## 2026-09-23 — The first agent comes from a `community-assistant` template shipped in the fork
+
+**Chosen:** The setup page answers **From local templates**, then **`community-assistant`**. The template lives in the fork at `templates/community/community-assistant/`, and the pin moved to `96848d13` to carry it. This replaces the answers in the entry above (the NanoClaw template library, `family-assistant`), which stood for a few hours and was never published.
+
+**Why:**
+- It pins what the reader gets. The library option clones https://github.com/nanocoai/nanoclaw-templates when setup runs, so its contents could change under the course with no submodule bump, and `update-submodule` would never catch it. A template in the fork moves only when we move it.
+- `community-assistant` is the agent this course is about — neighbourhood events, a member roster, requests, a lending library, all in Notion — so lesson 3's Notion work has something to build on.
+- Upstream ships `templates/` empty, so the fork is the only place this can live.
+
+**Checked against the pin** (`96848d13`): the `local` option at `setup/auto.ts:1069`, `Choose a template` at `:1158`, `What next?` at `:657` and `Your assistant is ready.` at `:933`. The picker's label is the last part of the ref (`setup/templates.ts:147`), so the answer is `community-assistant`, not `community/community-assistant`. `plugin.json` names it the same.
+
+**Open, for the maintainer:** [AGENTS.md](../../AGENTS.md) says every NanoClaw customisation is a skill, and that edits which aren't a skill yet shouldn't be pinned. This template is a committed folder, not a skill. It is in the fork table's "Customised with" column, but either the rule wants a `/add-community-assistant` skill in the fork, or the rule wants an exception for content (templates, prompts) as opposed to code. Worth settling before the next customisation.
+
+## 2026-09-23 — A data-sources lesson, and "Say hi" folded into the setup page
+
+**Chosen:**
+- **"Say hi to your agent" stops being a sub-lesson.** Its content is the end of `02-setting-up-nanoclaw/03-run-setup/`, under a "Say hi to your agent" heading. `04-say-hi/` and its lesson id (`say-hi`) are gone.
+- **A new third lesson, `03-setting-up-data-sources/`**, between setting up NanoClaw and cleaning up, with three sub-lessons: `01-notion-page/`, `02-notion-connection/`, `03-watch-it-fill/`.
+- **`03-cleaning-up/` becomes `04-cleaning-up/`.** The folder number changed; the lesson `id` (`cleaning-up`) did not, and no link into it broke, because its own links are relative to the lesson folder.
+
+**Why:**
+- The setup page already ends with a screenshot of the first Telegram message, with the reader's own "hello" in it. A separate page then told them to do the thing they had just seen themselves do. Replying is the same moment as finishing setup, not a step after it.
+- The agent could chat but had nowhere to keep anything, which is the gap the `community-assistant` template is built around: Notion is its record. Until Notion is connected, every capability in that template is dead.
+- The lesson sits before Cleaning Up because it is part of building the thing, and Cleaning Up is always last.
+
+**What the reader does, and why it is three pages:** one empty parent page; a connection with a token and access to that page; then the handover and the payoff. The break between page two and page three is where the token changes hands, which is the one step with a real mistake in it — a valid token with no page access looks like a broken agent and returns `object_not_found`. The template's own `connecting-notion.md` calls that "the step most setups miss", so it gets its own check at the end of page two.
+
+**The token never goes through the chat.** `mcp.json` ships `NOTION_TOKEN: "placeholder"` and the OneCLI vault swaps in the real value as the request leaves the container, so the agent never holds it. The course says this plainly, because a reader who has just pasted a bot token into a terminal will reasonably expect to paste this one to the bot.
+
+**Turned down:**
+- **Teaching the reader to build the five databases** (Members, Events, Items, Loans, Requests). The agent creates whatever is missing, and a hand-built set with different property names is worse than nothing: the template's references name the real properties.
+- **A page per Notion concept** (workspace, page, database, connection). The reader needs one page, one connection, and a token.
+- **Keeping `say-hi` as an empty stub page** to preserve the id. Nothing is published yet, so no learner's progress points at it.
+
+**Notion's UI is the one unpinned dependency here.** The wording in the course (**Internal connections**, **Create a new connection**, the **Configuration** tab, **Installation access token**, **Content access** → **Edit access**, **•••** → **Connections** → **+ Add connection**) comes from https://developers.notion.com/guides/get-started/internal-connections, checked 2026-09-23 — not from the fork. The template's own reference still uses Notion's older names (`notion.so/profile/integrations`, "Internal Integration Token"); it tells the agent to expect drift and adapt, which the course pages can't do. There is a row for this in the course README's dependency table.
+
+## 2026-09-24 — Nested numbered lists are numbered by the site: 1. / 1.1. / 1.1.1.
+
+**Chosen:** CSS counters in `custom.css` give every nested ordered list its full number, with a trailing dot at each level, on every page. Only nested lists are touched: single-level lists keep the browser's marker. A markdown-it rule (`.vitepress/ordered-list-plugin.ts`) marks the lists the CSS may number, with `class="sub-numbers"` and `role="list"`, and skips three kinds it can't number correctly: one that starts at a number other than 1 (`counters()` can't read `start`), one nested under a bullet (no parent number to carry), and one another rule owns. A list it never sees keeps its own marker, so a miss shows plain numbering rather than none. Pages stay plain `1.` Markdown at every level. The details are in [site.md](./site.md#theme), and the author-facing rule is in [course-format.md](./course-format.md#markdown).
+
+**Why:**
+- The Notion lesson needed sub-steps inside a step, and without this the author had to type the numbers as prose. They were already wrong (the `1.1.`–`1.3.` block sat under step 2), and a picture indented as if it belonged to a sub-step rendered as a code block. Both problems disappear once the sub-steps are real list items.
+- Numbers the site works out can't drift when a step is inserted, and they follow the page rather than the author's memory.
+- It keeps `course/` renderer-neutral: the Markdown is ordinary nested lists that any CommonMark tool renders.
+
+**Turned down:**
+- **`::marker`**, which would keep the native markers and need no `role="list"`. Safari supports only `color` and `font-size` on it (MDN browser-compat-data), so every Mac and iPhone would show a flat `1.`.
+- **Numbering single-level lists the same way**, for one consistent style. It would strip the markers from nearly every list in the course, and so need `role="list"` everywhere, for a result identical to what the browser already draws.
+- **Keeping hand-typed numbers.** They are what broke, and nothing can nest under them.
+
+**Accepted cost:** GitHub renders the same page with flat numbering (`1.` at every level), so a sub-step reads `1.` there and `2.1.` on the site. That is the trade-off already accepted for the Course Overview cards, which are a plain list on GitHub and cards on the site.
+
+## 2026-09-24 — A page per package manager, and Codex and Claude Code move to Homebrew casks
+
+**Chosen:**
+- Two new pages between the terminal and Git: `02-homebrew/` ("Install Homebrew (macOS and Linux)") and `03-chocolatey/` ("Install Chocolatey (Windows)"). The tool pages after them shift to `04-git/`, `05-docker/`, `06-make/`, `07-codex/`, `08-claude-code/`, with their lesson `id`s unchanged.
+- **Codex and Claude Code install from casks**: `brew install --cask codex` and `brew install --cask claude-code@latest`, replacing the two vendor `curl | sh` scripts, which stay on each page as a one-line fallback.
+- **Homebrew goes inside Ubuntu on Windows**, used only for those two casks. `apt` keeps Git, jq and Make there, as on Linux.
+- **Chocolatey's only job is Docker Desktop**, on the Windows side.
+
+**Why:**
+- Homebrew was already required, but it was installed in steps 1–4 of the **macOS** accordion on the Git page, where a reader met it as a side effect of installing Git and nothing named it. Windows had no package manager at all, and Docker Desktop was a manual download with five clicks.
+- **The casks now ship Linux binaries** (`x86_64_linux` and `arm64_linux`, `depends_on: {}`), so the same command works on macOS, Linux and inside Ubuntu on Windows. That is what makes one path possible; it was not true when casks were macOS-only.
+- `@latest` is load-bearing for Claude Code: that cask follows the newest release (2.1.281 when checked), while plain `claude-code` sits on a slower line (2.1.273). Codex has no `@latest` variant — `codex` is the equivalent.
+- Homebrew's prerequisites on Linux (`build-essential procps curl file git`) install Git and Make, so the Git and Make pages get shorter rather than longer on those systems.
+
+**Why Homebrew inside Ubuntu is safe on Windows**, given nobody here has a Windows machine to test on: Homebrew's docs say it "may be used on Linux and Windows Subsystem for Linux (WSL) 2", and list WSL 1 as Tier 3, where "you may experience issues running various executables installed by Homebrew". `wsl --install` gives WSL 2 on the Windows versions this course requires, so the supported setup is the default one. `01-terminal/` now tells a Windows reader to check the **VERSION** column of `wsl -l -v`, and to run `wsl --set-version Ubuntu 2` if it says `1`. That check is the guard on the whole Windows path.
+
+**Turned down:**
+- **Everything through Homebrew on Linux.** `brew install make` installs GNU Make 4 as `gmake` and leaves `make` alone, which reads as a broken instruction, and brew builds are slow on Linux for packages `apt` already has. The rule is: casks for what the distribution doesn't package, `apt`/`dnf` for what it does.
+- **Chocolatey for Git, Make or Codex on Windows.** Those would land on the Windows side, where NanoClaw can't use them. Everything but Docker Desktop belongs inside Ubuntu.
+- **Docker Engine from Homebrew on Linux.** There is no formula for the engine; Docker's own script stays.
+
+**Accepted cost:** the Windows path costs an extra install (`build-essential` and Homebrew inside Ubuntu, a few minutes) for two CLI tools. In exchange, Codex and Claude Code have one command on every system, and the two pages keep their no-accordion shape. The Chocolatey package for Docker Desktop is community-maintained, not Docker's own, so `05-docker/` keeps the manual download as a fallback.
+
+**Not verified here:** the Windows path end to end, and Homebrew on Linux. Every command comes from the vendor's current documentation, and the four cask names were resolved with `brew info --cask` on macOS. Worth one pass on a Windows machine before the course runs.
+
+## 2026-09-24 — Call-outs carry an emoji for how serious they are
+
+**Chosen:** A GitHub alert shows an emoji in front of its title on the site: 💡 for `NOTE`, `TIP`, `IMPORTANT` and `INFO`, ⚠️ for `WARNING`, and ‼️ for `CAUTION` and `DANGER`. Three emoji for three kinds — information, a warning, a serious warning — not one per alert type.
+
+**Why:**
+- The five alert types differ by a coloured bar and a word in capitals. A reader skimming an install page, who is mostly looking at commands, can miss the difference between "worth knowing" and "this deletes things with no undo".
+- Three levels is what a reader can actually hold. `NOTE` and `IMPORTANT` both mean "read this"; the colour and the word still separate them for anyone who is reading closely.
+
+**How, and why not in the Markdown:** `custom.css` sets `::before` content on `.custom-block-title`, inside `.github-alert`. An emoji typed into the page would be wrong on GitHub, where the same alert already gets GitHub's own icon, and it would put a rendering decision inside `course/`, which the format keeps renderer-neutral. The scoping class matters: `.github-alert` is on alerts only, so a VitePress `::: tip` container (which `course/` may not use anyway) is untouched.
+
+**Two details that would otherwise cost an hour:** the emoji are CSS escapes, and ⚠️ and ‼️ (`\26a0`, `\203c`) need their variation selector `\fe0f` or the browser draws the plain black text glyph instead of the emoji. The gap after the emoji is a non-breaking space (`\a0`) so the title never wraps away from its icon.
+
+**Checked** in headless Chrome, light and dark, by reading `getComputedStyle(title, '::before').content` for every type, including `caution` and `danger`, which no page uses yet.
+
+**Open:** the one `IMPORTANT` in the course (don't move the `nanoclaw` folder after setup, in `02-download-nanoclaw/`) now shows 💡, though what it describes — a move that breaks the agent's background service — reads more like a `WARNING`. Left as it is, because retyping call-outs is a content decision, not a styling one.
+
+## 2026-09-24 — `IMPORTANT` is a serious warning: ‼️ and red
+
+**Chosen:** `> [!IMPORTANT]` moves out of the information group. It shows ‼️, like `CAUTION`, and its block turns red: `custom.css` points `--vp-c-important-1/2/3/soft` at the matching `--vp-c-danger-*`. This closes the open question in the entry above, which shipped `IMPORTANT` with 💡 a few hours earlier.
+
+**Why:** the course uses `IMPORTANT` for exactly one thing — "don't move or rename the `nanoclaw` folder after setup", which silently breaks the agent's background service. That is not "key information", it is a way to break a working install, and 💡 next to it read like a tip. The default purple said the same thing: worth knowing, not dangerous.
+
+**Why the variables, not the block:** `--vp-custom-block-important-bg` already reads from `--vp-c-important-soft`, so re-pointing the four colour variables changes the border, the text, the code background and the block background together, in light and dark, with no new rule per element. It also keeps this repository's one CSS rule intact: `custom.css` changes colours through variables.
+
+**What it costs:** `IMPORTANT` and `CAUTION` now look alike — same red, same ‼️ — and differ only by the word. Acceptable: no page uses `CAUTION`, and both mean "this one can hurt". If a page ever needs to separate them, `CAUTION` is the one to restyle, not `IMPORTANT`.
+
+**Checked** in headless Chrome, both themes: the block computes `rgba(244, 63, 94, 0.14)` in light and `0.16` in dark, with `content: "‼️ "` on the title.
+
+## 2026-09-24 — The data-sources lesson follows the template: duplicate, don't build
+
+**Chosen:** with the pin at `48d7260a`, lesson 3 is rewritten around what the `community-assistant` template now does:
+
+- **The reader duplicates a published Notion template** (`01-notion-page/`, retitled "Copy the Louis template into Notion") instead of making an empty page. The agent never creates databases: "They arrive with the copy" (`references/community-onboarding.md`).
+- **Sixteen databases, not five**, and the course lists them by theme rather than by property (`references/notion-schema.md`).
+- **The agent is Louis** (`agentName` in the template's `plugin.json`, v1.1.0), and the pages, the lesson overview and the course page all say so.
+- **The last page binds Louis to the reader's copy** (`03-watch-it-fill/`, retitled "Point Louis at your copy"): send him the link, he checks all sixteen are there and that the relations point inside the copy, then he remembers the page ID and never searches by title.
+- **The token goes in with `make add-notion-connection`**, the Make target the fork added with its `add-notion-credentials` skill.
+
+**Why:** the pin moved and the template underneath the lesson changed shape. The old lesson told readers to make an empty page and wait for the agent to build five tables — with the new template that produces an agent with nowhere to write and no way to recover, because it is forbidden from creating or title-searching databases.
+
+**Two things this fixed elsewhere:**
+- **Make finally has a job.** The fork now ships a `Makefile`, so `01-installations/06-make/` is no longer teaching a tool the course never uses. The open follow-up in [known-issues.md](./known-issues.md) is closed, and the course README row rewritten.
+- **The credential step got safer.** `make add-notion-connection` prompts with the input hidden and writes the secret with the exact host pattern and header the gateway needs. The alternative — the gateway's `secret_url` — has to have its `path=` blanked by hand, and the skill says getting it wrong "surfaces later as an unexplained 401".
+
+**The one unpinned dependency this adds:** the published template URL (`app.notion.com/p/Louis-the-Community-Builder-…`). The template README says the URL is handed over out of band and no plugin file contains it, so it can't be checked against the pin. It has a row in the course README's dependency table. If the page is republished, the course breaks and nothing here notices.
+
+**Not verified by reading:** nobody has walked this lesson end to end against `48d7260a` — the duplicate, the connection, `make add-notion-connection`, and Louis binding to the copy. The steps come from the template's own references and from the screenshots in `02-notion-connection/`, which were taken on a real run of the connection half.

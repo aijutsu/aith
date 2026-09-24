@@ -45,7 +45,8 @@ NanoClaw can't run on Windows by itself. It runs inside [WSL](../../../glossary.
 wsl -l -v
 ```
 
-- If you see a list with `Ubuntu` in it, WSL and Ubuntu are already installed. Skip to step 3.
+- If you see a list with `Ubuntu` in it, WSL and Ubuntu are already installed. Check the **VERSION** column next to `Ubuntu`: it must say `2`. Then skip to step 3.
+- If it says `1`, run `wsl --set-version Ubuntu 2` and wait. Version 1 is an older way of running Linux, and some of the programs in this course don't work properly on it.
 - If you see an error, or a list without `Ubuntu`, start at step 1.
 
 **Install it.**
@@ -105,4 +106,4 @@ You should see `hello` on the next line. That means the terminal is taking your 
 
 ## Next
 
-Your terminal is open. Next, install [Git](../02-git/index.md).
+Your terminal is open. Next, install [Homebrew](../02-homebrew/index.md).

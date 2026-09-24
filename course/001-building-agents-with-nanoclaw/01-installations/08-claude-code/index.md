@@ -8,7 +8,7 @@ description: Optional. Install Claude Code, Anthropic's AI helper for the termin
 
 This page is optional. You can finish the whole course without it.
 
-[Claude Code](../../../glossary.md#claude-code) is Anthropic's AI helper for the terminal. It does the same job for you as [Codex](../05-codex/index.md): it reads NanoClaw's instructions, and helps you when a step goes wrong. In the next lesson you pick one of the two as your helper.
+[Claude Code](../../../glossary.md#claude-code) is Anthropic's AI helper for the terminal. It does the same job for you as [Codex](../07-codex/index.md): it reads NanoClaw's instructions, and helps you when a step goes wrong. In the next lesson you pick one of the two as your helper.
 
 Your agent always runs on Codex, whichever helper you pick. Claude Code is a helper for you, not a brain for your agent, so it does not replace Codex or your ChatGPT plan.
 
@@ -21,9 +21,9 @@ Your agent always runs on Codex, whichever helper you pick. Claude Code is a hel
 - you don't have a Claude plan. Claude Code is not in the free plan, and a paid plan costs money on top of your ChatGPT plan; or
 - you are happy to use Codex. Codex does everything this course needs.
 
-If you skip it, use the **Codex** section when you [run NanoClaw's setup](../../02-setting-up-nanoclaw/03-run-setup/index.md).
+If you skip it, nothing in the course changes: you [run NanoClaw's setup](../../02-setting-up-nanoclaw/03-run-setup/index.md) the same way, and your agent still runs on Codex.
 
-The steps below are the same on macOS, Windows (in Ubuntu) and Linux, so this page has no sections per system.
+You install it with [Homebrew](../02-homebrew/index.md), which works the same on macOS, Windows (in Ubuntu) and Linux, so this page has no sections per system.
 
 ## Check if it's already installed
 
@@ -41,10 +41,14 @@ claude --version
 In your terminal, run:
 
 ```bash
-curl -fsSL https://claude.ai/install.sh | bash
+brew install --cask claude-code@latest
 ```
 
-When it finishes, close the terminal and open a new one, so that it finds Claude Code.
+The `@latest` on the end is part of the name, and it matters: it is the version of this package that follows Claude Code's newest release. Without it you get a version that moves more slowly.
+
+When it finishes, close the terminal and open a new one.
+
+If you skipped the [Homebrew](../02-homebrew/index.md) page, you can install Claude Code with Anthropic's own script instead: `curl -fsSL https://claude.ai/install.sh | bash`.
 
 ## Sign in
 

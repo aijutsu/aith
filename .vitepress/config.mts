@@ -8,6 +8,7 @@ import { analyticsHead } from './analytics'
 import { courseOverviewPlugin } from './course-overview-plugin'
 import { coursesPlugin } from './courses-plugin'
 import { glossaryPlugin } from './glossary-plugin'
+import { orderedListPlugin } from './ordered-list-plugin'
 import { SITE_NAME, SITE_URL, seoHead, writeSeoFiles } from './seo'
 
 const REPO = 'https://github.com/aijutsu/aith'
@@ -74,7 +75,7 @@ export default defineConfig({
   buildEnd: writeSeoFiles,
 
   markdown: {
-    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(courseOverviewPlugin),
+    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(courseOverviewPlugin).use(orderedListPlugin),
   },
 
   vite: {

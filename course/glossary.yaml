@@ -30,6 +30,10 @@ terms:
     type: SaaS
     description: An AI chat app made by the company OpenAI. You type a question or a task in normal words, and it writes an answer back, like chatting with a person.
     url: https://chatgpt.com/
+  - term: Chocolatey
+    type: Tool
+    description: An app store for the terminal on Windows. You type one command, like `choco install docker-desktop`, and Chocolatey downloads and installs the program for you. It does the same job as Homebrew, on the Windows side of a computer.
+    url: https://chocolatey.org/
   - term: Claude
     type: SaaS
     description: An AI assistant made by the company Anthropic. You can chat with it, and it can also help you write, study, and build software.
@@ -50,6 +54,10 @@ terms:
     type: Tool
     description: An AI helper for writing code, made by OpenAI. You tell it what you want to build in normal words, and it writes and changes the code for you. It comes with a ChatGPT Plus plan.
     url: https://developers.openai.com/codex
+  - term: Database
+    type: Concept
+    description: "A place a program keeps information so it can find it again later. Think of it like a table on paper: one row for each thing, and the same columns filled in for every row. Your agent keeps its community's members, events and loans in tables like these, inside Notion."
+    url: https://en.wikipedia.org/wiki/Database
   - term: DigitalOcean
     type: Cloud Service Provider
     description: A company that rents out computers on the internet (called servers) to run your apps and websites. It is simpler and cheaper to start with than big companies like AWS or GCP.
@@ -150,6 +158,10 @@ terms:
     type: Tool
     description: A free tool that lets you download an AI model and run it on your own computer, instead of using one on the internet. Your data stays on your machine, but you need a fairly powerful computer.
     url: https://ollama.com/
+  - term: OneCLI
+    type: Software
+    description: "A keeper for passwords and keys, installed on your own computer alongside NanoClaw. You give it a secret once, and it adds that secret to your agent's requests as they go out. Your agent never sees the secret itself, so it can't repeat it in a chat."
+    url: https://github.com/nanocoai/nanoclaw
   - term: OpenClaw
     type: Software
     description: A popular AI assistant that can do many things, but it is very big and hard to understand. NanoClaw was made as a smaller and safer idea based on OpenClaw.
@@ -198,6 +210,10 @@ terms:
     type: Tool
     description: A tool that lets you set up cloud computers and services by writing what you want in a file, instead of clicking buttons on a website. You can then build the same setup again and again, and see exactly what changed. It works with AWS, GCP, Cloudflare, DigitalOcean, and many others.
     url: https://developer.hashicorp.com/terraform
+  - term: Token
+    type: Concept
+    description: "A long secret code that stands in for a password when one program signs in to another. Your Telegram bot has one, and so does your Notion connection. Treat a token like a password: anyone who has it can act as you."
+    url: https://en.wikipedia.org/wiki/Access_token
   - term: Trigger.dev
     type: Software
     description: A tool for building workflows, which are lists of steps that run one after another in the background. For example, it can send a report every morning or run a long AI task. If a step fails, it tries again so the job still finishes.

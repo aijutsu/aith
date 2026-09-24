@@ -28,10 +28,10 @@ docker --version
 
 **Recommended: OrbStack.** [OrbStack](../../../glossary.md#orbstack) is smaller and lighter than Docker Desktop, so your Mac stays fast. It is free for personal use. If you use it for work, your company needs a paid licence.
 
-1. In the terminal, install OrbStack with Homebrew:
+1. In the terminal, install OrbStack with [Homebrew](../02-homebrew/index.md):
 
    ```bash
-   brew install orbstack
+   brew install --cask orbstack
    ```
 
 2. Open **OrbStack** from your Applications folder.
@@ -41,7 +41,7 @@ NanoClaw needs OrbStack to be running. Open OrbStack before you use NanoClaw.
 
 **Or: Docker Desktop.** Docker Desktop is free for personal use, education, and small businesses.
 
-1. In the terminal, install Docker Desktop with Homebrew:
+1. In the terminal, install Docker Desktop with [Homebrew](../02-homebrew/index.md):
 
    ```bash
    brew install --cask docker-desktop
@@ -82,15 +82,22 @@ docker --version
 - If you see a line like `Docker version 29.4.0, build 9d7ad9f`, Docker Desktop is installed and Ubuntu can see it. Skip to **Check that it works** at the bottom of this section.
 - If you see `command not found: docker`, either Docker Desktop isn't installed, or its WSL integration is off. Do the steps below. If Docker Desktop is already on your computer, you only need steps 6 and 7.
 
-**Install it.**
+**Install it.** Docker Desktop is a Windows program, so you install it on the Windows side, with [Chocolatey](../03-chocolatey/index.md).
 
-1. Go to <https://docs.docker.com/desktop/setup/install/windows-install/> and download Docker Desktop for Windows. Most computers need the x86_64 version.
-2. Open the file you downloaded, `Docker Desktop Installer.exe`.
-3. Keep **Use WSL 2 instead of Hyper-V** ticked. Follow the steps, then click **Close**.
-4. Click Start, type `Docker Desktop`, and open it. Read the Docker Subscription Service Agreement and click **Accept**. Docker Desktop is free for personal use, education, and small businesses.
-5. You don't need a Docker account. If Docker asks you to sign in, you can skip it.
-6. In Docker Desktop, open **Settings** (the gear icon), then **Resources**, then **WSL integration**. Turn on **Ubuntu** and click **Apply**.
-7. Close the Ubuntu terminal and open it again, so that it finds Docker.
+1. Click Start and type `PowerShell`. Right-click **Windows PowerShell** and choose **Run as administrator**. Click **Yes**.
+2. In PowerShell, run:
+
+   ```powershell
+   choco install docker-desktop -y
+   ```
+
+   This downloads and installs Docker Desktop. It takes a few minutes. If Chocolatey says it needs to restart your computer, let it finish first, then restart.
+3. Click Start, type `Docker Desktop`, and open it. Read the Docker Subscription Service Agreement and click **Accept**. Docker Desktop is free for personal use, education, and small businesses.
+4. You don't need a Docker account. If Docker asks you to sign in, you can skip it.
+5. In Docker Desktop, open **Settings** (the gear icon), then **Resources**, then **WSL integration**. Turn on **Ubuntu** and click **Apply**.
+6. Close the Ubuntu terminal and open it again, so that it finds Docker.
+
+If Chocolatey can't install it, download Docker Desktop by hand instead, from <https://docs.docker.com/desktop/setup/install/windows-install/>. Most computers need the x86_64 version. Keep **Use WSL 2 instead of Hyper-V** ticked, then carry on from step 3 above.
 
 NanoClaw needs Docker Desktop to be running. To start it every time you turn on your computer, open Docker Desktop's **Settings**, then **General**, and turn on **Start Docker Desktop when you sign in to your computer**.
 
@@ -151,4 +158,4 @@ If you see `Cannot connect to the Docker daemon` or `permission denied`, log out
 
 ## Next
 
-Docker is ready. Next, install [Make](../04-make/index.md).
+Docker is ready. Next, install [Make](../06-make/index.md).

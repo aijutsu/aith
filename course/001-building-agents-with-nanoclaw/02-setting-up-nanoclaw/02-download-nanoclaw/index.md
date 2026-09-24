@@ -6,7 +6,7 @@ description: Copy NanoClaw onto your computer with Git, into a folder called nan
 
 # Download NanoClaw
 
-Now you copy NanoClaw onto your computer. You use [Git](../../../glossary.md#git) for this, which you installed in [Install Git](../../01-installations/02-git/index.md).
+Now you copy NanoClaw onto your computer. You use [Git](../../../glossary.md#git) for this, which you installed in [Install Git](../../01-installations/04-git/index.md).
 
 This downloads [our copy of NanoClaw](https://github.com/aijutsu/aith-nanoclaw-codex-telegram), the one that works with Telegram and Codex.
 

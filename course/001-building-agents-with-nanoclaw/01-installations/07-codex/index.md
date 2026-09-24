@@ -10,7 +10,7 @@ description: Install Codex, OpenAI's AI helper for the terminal, and sign it in 
 
 Codex needs at least a ChatGPT Plus subscription.
 
-The steps are the same on macOS, Windows (in Ubuntu) and Linux, so this page has no sections per system.
+You install it with [Homebrew](../02-homebrew/index.md), which works the same on macOS, Windows (in Ubuntu) and Linux, so this page has no sections per system.
 
 ## Check if it's already installed
 
@@ -28,10 +28,12 @@ codex --version
 In your terminal, run:
 
 ```bash
-curl -fsSL https://chatgpt.com/codex/install.sh | sh
+brew install --cask codex
 ```
 
-At the end, it says `Codex CLI … installed successfully`. Close the terminal and open a new one, so that it finds Codex.
+Homebrew downloads Codex and puts it where your terminal can find it. When it finishes, close the terminal and open a new one.
+
+If you skipped the [Homebrew](../02-homebrew/index.md) page, you can install Codex with OpenAI's own script instead: `curl -fsSL https://chatgpt.com/codex/install.sh | sh`.
 
 ## Sign in
 
@@ -61,4 +63,4 @@ If you see anything else, run `codex` again and sign in. If you see `command not
 
 Your computer is ready.
 
-One page is left, and it is optional: [Install Claude Code](../06-claude-code/index.md), if you would rather use Claude than Codex as your helper. Otherwise, go straight to [Setting up NanoClaw](../../02-setting-up-nanoclaw/index.md).
+One page is left, and it is optional: [Install Claude Code](../08-claude-code/index.md), if you would rather use Claude than Codex as your helper. Otherwise, go straight to [Setting up NanoClaw](../../02-setting-up-nanoclaw/index.md).

@@ -25,16 +25,23 @@ By the end of this course, you should:
 
 1. [Getting Started](./01-installations/index.md): get your computer ready. One page per tool:
    1. [Open a terminal](./01-installations/01-terminal/index.md)
-   2. [Install Git](./01-installations/02-git/index.md)
-   3. [Install Docker](./01-installations/03-docker/index.md)
-   4. [Install Make](./01-installations/04-make/index.md)
-   5. [Install Codex](./01-installations/05-codex/index.md)
-   6. [Install Claude Code (optional)](./01-installations/06-claude-code/index.md)
+   2. [Install Homebrew (macOS and Linux)](./01-installations/02-homebrew/index.md)
+   3. [Install Chocolatey (Windows)](./01-installations/03-chocolatey/index.md)
+   4. [Install Git](./01-installations/04-git/index.md)
+   5. [Install Docker](./01-installations/05-docker/index.md)
+   6. [Install Make](./01-installations/06-make/index.md)
+   7. [Install Codex](./01-installations/07-codex/index.md)
+   8. [Install Claude Code (optional)](./01-installations/08-claude-code/index.md)
 2. [Setting up NanoClaw](./02-setting-up-nanoclaw/index.md): create a Telegram bot, install NanoClaw, and say hi to your first agent. One page per step:
    1. [Create your Telegram bot](./02-setting-up-nanoclaw/01-telegram-bot/index.md)
    2. [Download NanoClaw](./02-setting-up-nanoclaw/02-download-nanoclaw/index.md)
    3. [Run NanoClaw's setup](./02-setting-up-nanoclaw/03-run-setup/index.md)
-   4. [Say hi to your agent](./02-setting-up-nanoclaw/04-say-hi/index.md)
+3. [Setting up data sources](./03-setting-up-data-sources/index.md): give Louis, your agent, a place to keep what he learns, using a ready-made Notion template. One page per step:
+   1. [Copy the Louis template into Notion](./03-setting-up-data-sources/01-notion-page/index.md)
+   2. [Create a Notion connection](./03-setting-up-data-sources/02-notion-connection/index.md)
+   3. [Point Louis at your copy](./03-setting-up-data-sources/03-watch-it-fill/index.md)
+4. [Cleaning Up](./04-cleaning-up/index.md): remove what the course put on your computer, when you no longer need it.
+   1. [Uninstalling NanoClaw](./04-cleaning-up/01-uninstalling-nanoclaw/index.md)
 
 ## References
 

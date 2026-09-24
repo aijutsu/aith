@@ -42,7 +42,7 @@ Click the name of your computer's system to open its section.
 make --version
 ```
 
-- If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section. Most Macs are in this group, because Apple's Command Line Tools include Make, and Homebrew installed those for you on the [Git](../02-git/index.md) page.
+- If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section. Most Macs are in this group, because Apple's Command Line Tools include Make, and Homebrew installed those for you on the [Homebrew](../02-homebrew/index.md) page.
 - If you see `command not found: make`, do the step below.
 
 **Install it.** In the terminal, run:
@@ -59,7 +59,9 @@ A window opens. Click **Install** and wait for it to finish. This can take a few
 make --version
 ```
 
-The first line starts with `GNU Make`, followed by a number, like `GNU Make 3.81`. Your number may be different. Macs come with an older version of Make than Linux does, which is normal.
+The first line starts with `GNU Make`, followed by a number, like `GNU Make 3.81`. Your number may be different. Macs come with an older version of Make than Linux does, which is normal, and the course only needs what your Mac already has.
+
+This is the one tool the course doesn't install with Homebrew. `brew install make` installs a newer Make under the name `gmake`, and leaves `make` as it was, which is more confusing than helpful here.
 
 </details>
 
@@ -77,10 +79,12 @@ make --version
 - If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section.
 - If you see `command not found: make`, do the step below.
 
-**Install it.** In the Ubuntu terminal, run:
+You usually have it already: the [Homebrew](../02-homebrew/index.md) page installed `build-essential`, which includes Make.
+
+**Install it.** If it is missing, run this in the Ubuntu terminal:
 
 ```bash
-sudo apt update && sudo apt install -y make
+sudo apt install -y make
 ```
 
 Type your Ubuntu password if it asks.
@@ -107,10 +111,12 @@ make --version
 - If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section.
 - If you see `command not found: make`, do the step below.
 
-**Install it.** In the terminal, run this on Ubuntu or Debian:
+You usually have it already: the [Homebrew](../02-homebrew/index.md) page installed your system's build tools, which include Make.
+
+**Install it.** If it is missing, run this on Ubuntu or Debian:
 
 ```bash
-sudo apt update && sudo apt install -y make
+sudo apt install -y make
 ```
 
 On Fedora, run this in the terminal instead:
@@ -133,4 +139,4 @@ The first line starts with `GNU Make`, followed by a number, like `GNU Make 4.3`
 
 ## Next
 
-Make is ready. Next, install [Codex](../05-codex/index.md).
+Make is ready. Next, install [Codex](../07-codex/index.md).

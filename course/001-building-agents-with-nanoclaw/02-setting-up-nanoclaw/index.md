@@ -22,8 +22,7 @@ Do them in this order. Each step has its own page:
 | --- | --- | --- |
 | [Create your Telegram bot](./01-telegram-bot/index.md) | Make a bot with BotFather, and copy its token. | The bot is the Telegram account your agent chats from. |
 | [Download NanoClaw](./02-download-nanoclaw/index.md) | Copy NanoClaw onto your computer with Git. | NanoClaw is the program your agent runs in. |
-| [Run NanoClaw's setup](./03-run-setup/index.md) | Run the setup program, and answer its questions. | This builds your agent and connects it to your bot. |
-| [Say hi to your agent](./04-say-hi/index.md) | Send your agent its first message. | This shows that everything works. |
+| [Run NanoClaw's setup](./03-run-setup/index.md) | Run the setup program, answer its questions, and say hi to your agent. | This builds your agent, connects it to your bot, and proves it works. |
 
 ## How the pages work
 

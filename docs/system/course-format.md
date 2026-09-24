@@ -129,7 +129,15 @@ terms:
 Allowed:
 
 - CommonMark, plus GitHub tables and task lists.
-- GitHub alerts: `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`.
+- Numbered lists, including sub-steps: write `1.`, `2.`, `3.` at every level, and indent a sub-step to its parent's text. **Never type the numbers of a sub-step** (`1.1.`): the site works them out, so the page shows `1.`, `1.1.`, `1.1.1.` while GitHub shows its usual flat numbering ([site.md](./site.md#theme)). Hand-typed numbers go wrong the moment a step is added, and they aren't list items, so anything under them (a picture, a command) lands in the wrong place. Keep to three levels: deeper ones number correctly but leave little room for text on a phone. Two kinds of list keep plain numbering on purpose: one that starts at a number other than 1, and one nested under a bullet.
+
+  ```markdown
+  1. Open the developer portal.
+
+      1. Give the connection a name.
+      2. Choose **API token**.
+  ```
+- GitHub alerts: `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`. Pick the type by how bad it is to ignore, because the site puts an emoji in front of the title from it: 💡 for `NOTE` and `TIP`, ⚠️ for `WARNING`, ‼️ and a red background for `IMPORTANT` and `CAUTION` (see [site.md](./site.md#theme)). Never type the emoji into the page.
 - Collapsible sections, for steps that differ by operating system: `<details>` with a `<summary>`. They open and close on GitHub, on the site, and in any CommonMark tool.
 
   ```markdown
@@ -160,7 +168,7 @@ Not allowed (the validator rejects these outside code blocks and inline code):
 ## Links
 
 - Link between pages with **relative links to the `.md` file**, e.g. `./001-building-agents-with-nanoclaw/index.md` or `../glossary.md#fork`. These work on GitHub and on the site. Count the `../` from the page's own folder: the glossary is `../glossary.md` from a course page, `../../glossary.md` from a lesson, and `../../../glossary.md` from a sub-lesson.
-- **Link to a page, not to a heading inside it**, when the target may be reorganised. A sub-lesson's address (`../01-installations/05-codex/index.md`) survives renumbering; an anchor into a long page (`#step-4-install-codex`) does not, and neither the validator nor the site build checks anchors.
+- **Link to a page, not to a heading inside it**, when the target may be reorganised. A sub-lesson's address (`../01-installations/07-codex/index.md`) survives renumbering; an anchor into a long page (`#step-4-install-codex`) does not, and neither the validator nor the site build checks anchors.
 - Never link to a `README.md` or into a submodule with a relative link: those files are not published, and the site build fails on dead links. Link to files in a submodule with a full GitHub URL instead.
 
 ## Checking

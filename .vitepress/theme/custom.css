@@ -31,6 +31,14 @@
   --vp-c-note-2: var(--vp-c-indigo-2);
   --vp-c-note-3: var(--vp-c-indigo-3);
   --vp-c-note-soft: var(--vp-c-indigo-soft);
+
+  /* IMPORTANT is purple by default, which reads as "worth knowing". In this course it marks
+     something that breaks an install, so it gets the same red as a CAUTION, and the same ‼️
+     below. `-soft` is what paints the background, and both shades follow the light/dark switch. */
+  --vp-c-important-1: var(--vp-c-danger-1);
+  --vp-c-important-2: var(--vp-c-danger-2);
+  --vp-c-important-3: var(--vp-c-danger-3);
+  --vp-c-important-soft: var(--vp-c-danger-soft);
 }
 
 /* Light/dark switch. The default theme shows it in the nav bar only at 1280px and wider,
@@ -156,6 +164,109 @@
   }
 }
 
+/* Click a picture to see it big (lightbox.ts). The cap above keeps a phone screenshot at its
+   real size, but a wide one — a terminal, a settings window — is unreadable at 400px. */
+.vp-doc img {
+  cursor: zoom-in;
+}
+
+.aith-lightbox {
+  position: fixed;
+  inset: 0;
+  /* Over everything the default theme places: the sidebar is 50, the nav bar 20. */
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Kept as a property: the picture needs the same number to work out how tall it may be. */
+  --aith-lightbox-pad: clamp(16px, 5vw, 48px);
+  padding: var(--aith-lightbox-pad);
+  background: rgba(0, 0, 0, 0.75);
+  cursor: zoom-out;
+  animation: aith-lightbox-in 0.12s ease-out;
+}
+
+.aith-lightbox img {
+  /* The smallest of three widths, so the picture always fits and always gets bigger:
+     1. the screen, less the padding (`100%` is the padding box, so both edges keep their gap);
+     2. its own pixels — but at least 720px, because most course screenshots are near the 400px
+        cap already, and a reader who clicks one wants it bigger. A little softness beats no
+        change at all;
+     3. the width it can be without growing taller than the screen. lightbox.ts sets the picture's
+        own width and its width-to-height ratio; `height: auto` then keeps its shape. */
+  width: min(
+    100%,
+    max(var(--aith-lightbox-width, 0px), 720px),
+    calc((100dvh - 2 * var(--aith-lightbox-pad)) * var(--aith-lightbox-ratio, 1))
+  );
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  border-radius: 8px;
+  /* A screenshot with transparent edges still reads against the dimmed page. */
+  background: var(--vp-c-bg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  cursor: default;
+}
+
+.aith-lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.aith-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.aith-lightbox-close:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+@keyframes aith-lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aith-lightbox {
+    animation: none;
+  }
+}
+
+/* Call-outs (GitHub alerts: `> [!NOTE]` and friends, course format v1). An emoji in front of the
+   title says which of three kinds it is, before the reader has read a word: information, a
+   warning, or a serious warning. VitePress turns each alert into a custom block whose class is
+   the type in lowercase, and marks it `.github-alert`, which keeps this off any other block.
+   GitHub draws its own icons, so this is the site's version of the same signal. */
+.vp-doc .github-alert .custom-block-title::before {
+  /* Information: NOTE, TIP, INFO. */
+  content: "\1f4a1\a0";
+}
+
+.vp-doc .github-alert.warning .custom-block-title::before {
+  content: "\26a0\fe0f\a0";
+}
+
+.vp-doc .github-alert.important .custom-block-title::before,
+.vp-doc .github-alert.caution .custom-block-title::before,
+.vp-doc .github-alert.danger .custom-block-title::before {
+  /* A serious warning: something here can lose work, money, or a working install. */
+  content: "\203c\fe0f\a0";
+}
+
 /* Collapsible sections: <details><summary> in pages (course format v1), e.g. one per
    operating system. Styled like the default theme's custom blocks. */
 .vp-doc details {
@@ -245,6 +356,55 @@
 .vp-doc .course-card p:last-child {
   margin: 0;
   color: var(--vp-c-text-2);
+}
+
+/* Nested numbered lists show their whole number: 1. / 1.1. / 1.1.1. Pages stay plain "1."
+   Markdown, so GitHub shows flat numbering and only the site numbers the levels.
+   Only nested lists swap the browser's marker for a ::before, so single-level lists (nearly
+   every list in the course) keep their native marker and their list semantics. ::marker would
+   be neater, but Safari supports only color and font-size on it, so it would show a flat "1."
+   on every Mac and iPhone. list-style: none makes Safari's VoiceOver drop the list, so
+   .vitepress/ordered-list-plugin.ts marks the nested ones role="list". */
+.vp-doc ol {
+  counter-reset: aith-step;
+}
+
+.vp-doc ol > li {
+  counter-increment: aith-step;
+}
+
+/* Only the lists ordered-list-plugin.ts marks: a list under a bullet, a list that starts at 4,
+   and the Course Overview cards keep the browser's numbering and their own markers. */
+.vp-doc ol.sub-numbers {
+  padding-left: 0;
+  list-style: none;
+  /* The number's column: the widest label plus about the gap the browser's own marker leaves.
+     Fits two digits at the top level ("12.9." is 2.25em, "12.9.9." 3.1em). */
+  --aith-step-column: 2.75em;
+}
+
+.vp-doc ol.sub-numbers ol.sub-numbers {
+  --aith-step-column: 3.6em;
+}
+
+.vp-doc ol.sub-numbers ol.sub-numbers ol.sub-numbers {
+  --aith-step-column: 4.5em;
+}
+
+/* The number sits in the item's own gutter, so a line that wraps — or a picture under the
+   step — lines up with the text above it instead of sliding under the number. */
+.vp-doc ol.sub-numbers > li {
+  position: relative;
+  padding-left: var(--aith-step-column);
+}
+
+/* Left-aligned, so the shared start of "1.9." and "1.10." stays in one place down the list.
+   tabular-nums keeps the digits the same width. */
+.vp-doc ol.sub-numbers > li::before {
+  position: absolute;
+  left: 0;
+  font-variant-numeric: tabular-nums;
+  content: counters(aith-step, ".") ".";
 }
 
 /* Course Overview on the home page (.vitepress/course-overview-plugin.ts): the Markdown list
