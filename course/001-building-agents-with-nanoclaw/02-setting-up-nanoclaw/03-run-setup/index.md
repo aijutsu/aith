@@ -85,4 +85,4 @@ If setup stops with an error, it offers to open Codex, or Claude Code, to help y
 
 Your agent is running, and it can chat. It has nowhere to keep what it learns yet, so next, give it one: [Setting up data sources](../../03-setting-up-data-sources/index.md).
 
-When you no longer want NanoClaw on your computer, the [Cleaning Up](../../04-cleaning-up/index.md) lesson removes it.
+When you no longer want NanoClaw on your computer, the [Cleaning Up](../../05-cleaning-up/index.md) lesson removes it.

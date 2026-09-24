@@ -1,20 +1,20 @@
 ---
 id: notion-connection # never change this, even if the folder or title changes
 title: Create a Notion connection
-description: Make a Notion connection, copy its token, and give it access to your page.
+description: Make a Notion connection and hand its token to NanoClaw.
 ---
 
 # Create the Notion Connection
 
 A **Connection** is how a program signs in to Notion. It is not a person and it has no password: it uses what's known as a [token](../../../glossary.md#token), a long series of random alphabets/numbers/symbols that can be used in place of a username and password.
 
-A Connection starts with access to **nothing at all**, even when its token is perfect. You give it access to your page yourself, in the second half of this page. That is the step most people miss.
+A Connection starts with access to **nothing at all**, you have to give it access to pages manually, which we'll do on the next page.
 
 ## Setting up the Connection
 
 Note that you must be the owner of the workspace to do this (this means you probably won't be able to do this in your company unless you're the administrator of Notion)
 
-1. Go to <https://app.notion.com/developers/connections>. This is Notion's developer portal. Sign in if it asks you to and **note your Workspace name**.
+1. Go to [the Developer Connection portal on Notion](https://app.notion.com/developers/connections). This is where we create the integration (a Connection, in Notion's terms). Sign in if it asks you to and **note your Workspace name**.
 
     You should see this header:
 
@@ -61,38 +61,6 @@ Note that you must be the owner of the workspace to do this (this means you prob
 
     ![NanoClaw bot Notion success message](./img/bot-confirms-notion.png)
 
-## Give the Notion Connection access to your page
-
-Your connection still can't see anything. Give it the copy of the Louis template you made on the [last page](../01-notion-page/index.md), and all sixteen databases under it come with it.
-
-Do it in **either** place. Click the one you prefer.
-
-<details name="page-access">
-<summary>In Notion, on the page itself</summary>
-
-1. Open your copy of the Louis template in Notion.
-2. Click the **•••** menu in the top right corner of the page.
-3. Click **Connections**, then **+ Add connection**.
-4. Search for the name you gave your connection, and click it.
-5. Confirm. Notion tells you the connection can reach this page and everything inside it.
-
-</details>
-
-<details name="page-access">
-<summary>In the developer portal</summary>
-
-1. Go back to <https://app.notion.com/developers/connections> and open your connection.
-2. Click the **Content access** tab.
-3. Click **Edit access**, then pick your copy of the Louis template.
-
-</details>
-
-## Check that it worked
-
-Open your copy of the Louis template in Notion, click **•••**, and click **Connections**. Your connection's name is listed there.
-
-If it isn't, your agent will be able to sign in but will find nothing, which is confusing later. It is worth checking now.
-
 ## Next
 
-Your connection exists, NanoClaw has its token, and it can see your copy. Now introduce the two: [Point Louis at your copy](../03-watch-it-fill/index.md).
+Your connection exists and NanoClaw has its token, but it still can't see a single page. Fix that next: [Connect your Notion page](../03-connect-notion-page/index.md).

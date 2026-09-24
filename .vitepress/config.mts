@@ -7,6 +7,7 @@ import { CONTENT_DIR, contentExcludes, contentSubmodulePaths, discoverCourses } 
 import { analyticsHead } from './analytics'
 import { courseOverviewPlugin } from './course-overview-plugin'
 import { coursesPlugin } from './courses-plugin'
+import { glossaryLinkPlugin } from './glossary-link-plugin'
 import { glossaryPlugin } from './glossary-plugin'
 import { orderedListPlugin } from './ordered-list-plugin'
 import { SITE_NAME, SITE_URL, seoHead, writeSeoFiles } from './seo'
@@ -74,8 +75,21 @@ export default defineConfig({
   transformHead: ({ pageData, siteConfig }) => seoHead(pageData, siteConfig.site.description),
   buildEnd: writeSeoFiles,
 
+  // VitePress preloads Inter on every page whenever the default theme is in use, hard-coded in
+  // its build with no option to turn it off. The site reads in IBM Plex Sans now
+  // (theme/index.ts), so that download is wasted: point the preload at the font every page
+  // starts with instead. If a VitePress upgrade changes the tag, the replace finds nothing and
+  // the only cost is the old preload coming back — so check for it after an upgrade.
+  transformHtml(code, _id, { assets }) {
+    const plex = assets.find((file) => /ibm-plex-sans-latin-wght-normal\.\w+\.woff2$/.test(file))
+    return code.replace(
+      /<link rel="preload"[^>]*inter-roman-latin[^>]*>/,
+      plex ? `<link rel="preload" href="${plex}" as="font" type="font/woff2" crossorigin="">` : '',
+    )
+  },
+
   markdown: {
-    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(courseOverviewPlugin).use(orderedListPlugin),
+    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(glossaryLinkPlugin).use(courseOverviewPlugin).use(orderedListPlugin),
   },
 
   vite: {

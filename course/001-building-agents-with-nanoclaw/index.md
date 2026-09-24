@@ -37,11 +37,17 @@ By the end of this course, you should:
    2. [Download NanoClaw](./02-setting-up-nanoclaw/02-download-nanoclaw/index.md)
    3. [Run NanoClaw's setup](./02-setting-up-nanoclaw/03-run-setup/index.md)
 3. [Setting up data sources](./03-setting-up-data-sources/index.md): give Louis, your agent, a place to keep what he learns, using a ready-made Notion template. One page per step:
-   1. [Copy the Louis template into Notion](./03-setting-up-data-sources/01-notion-page/index.md)
+   1. [Create the Notion page](./03-setting-up-data-sources/01-notion-page/index.md)
    2. [Create a Notion connection](./03-setting-up-data-sources/02-notion-connection/index.md)
-   3. [Point Louis at your copy](./03-setting-up-data-sources/03-watch-it-fill/index.md)
-4. [Cleaning Up](./04-cleaning-up/index.md): remove what the course put on your computer, when you no longer need it.
-   1. [Uninstalling NanoClaw](./04-cleaning-up/01-uninstalling-nanoclaw/index.md)
+   3. [Connect your Notion page](./03-setting-up-data-sources/03-connect-notion-page/index.md)
+   4. [Connect your agent to Notion](./03-setting-up-data-sources/04-watch-it-fill/index.md)
+4. [Agent playtime](./04-agent-playtime/index.md): put Louis in front of real people, and make him your own. One page per step:
+   1. [Create a Telegram group](./04-agent-playtime/01-create-telegram-group/index.md)
+   2. [Add your agent to the group](./04-agent-playtime/02-add-agent-to-group/index.md)
+   3. [Add humans to the group](./04-agent-playtime/03-add-humans-to-group/index.md)
+   4. [Update your agent's personality](./04-agent-playtime/04-update-personality/index.md)
+5. [Cleaning Up](./05-cleaning-up/index.md): remove what the course put on your computer, when you no longer need it.
+   1. [Uninstalling NanoClaw](./05-cleaning-up/01-uninstalling-nanoclaw/index.md)
 
 ## References
 

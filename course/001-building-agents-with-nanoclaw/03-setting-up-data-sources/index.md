@@ -25,9 +25,10 @@ Each step has its own page:
 
 | Step | What you do | Why |
 | --- | --- | --- |
-| [Copy the Louis template into Notion](./01-notion-page/index.md) | Duplicate one ready-made page into your own workspace. | It holds the sixteen databases Louis works with. He never builds them himself. |
-| [Create a Notion connection](./02-notion-connection/index.md) | Make a connection, hand NanoClaw its token, and give it access to your copy. | A connection is how a program signs in to Notion. Without it, Louis can't see anything. |
-| [Point Louis at your copy](./03-watch-it-fill/index.md) | Send him the link to your copy, and answer a few questions. | Several copies can look alike, so he uses the one you give him — then he starts recording. |
+| [Create the Notion page](./01-notion-page/index.md) | Duplicate one ready-made page into your own workspace. | It holds the sixteen databases Louis works with. He never builds them himself. |
+| [Create a Notion connection](./02-notion-connection/index.md) | Make a connection and hand NanoClaw its token. | A connection is how a program signs in to Notion. Without it, Louis can't get in at all. |
+| [Connect your Notion page](./03-connect-notion-page/index.md) | Give the connection access to your copy. | A new connection can see nothing until you do. This is the step most people miss. |
+| [Connect your agent to Notion](./04-watch-it-fill/index.md) | Send him the link to your copy, and answer a few questions. | Several copies can look alike, so he uses the one you give him — then he starts recording. |
 
 ## What Louis keeps there
 
@@ -46,4 +47,4 @@ The full list is on the first page.
 
 ## Next
 
-Start with [Copy the Louis template into Notion](./01-notion-page/index.md).
+Start with [Create the Notion page](./01-notion-page/index.md).

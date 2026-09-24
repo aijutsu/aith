@@ -1,10 +1,10 @@
 ---
 id: watch-it-fill # never change this, even if the folder or title changes
-title: Point Louis at your copy
+title: Connect your agent to Notion
 description: Give Louis the link to your copy of the template, then watch him record what you tell him.
 ---
 
-# Point Louis at your copy
+# Connect your agent to Notion
 
 Louis can reach Notion now, but he doesn't know which page is yours. A workspace can hold several copies of the template, all with the same name, so he never goes looking for it: he uses the link you give him, and remembers it.
 
@@ -49,7 +49,7 @@ Louis explains problems in plain words, but he may quote one of these:
 | What Louis says | What it means | What to do |
 | --- | --- | --- |
 | `401`, `unauthorized`, or "API token is invalid" | NanoClaw doesn't have your token, or it is the wrong one. | Run `make add-notion-connection` again, from [Create a Notion connection](../02-notion-connection/index.md). |
-| `object_not_found`, on a page you can see | The token is fine. The connection has no access to your copy. | Give it access: [Create a Notion connection](../02-notion-connection/index.md), "Give the Notion Connection access to your page". |
+| `object_not_found`, on a page you can see | The token is fine. The connection has no access to your copy. | Give it access: [Connect your Notion page](../03-connect-notion-page/index.md). |
 | `restricted_resource` | The connection can read, but not write. | On the connection's **Capabilities**, turn on updating and inserting content. |
 | A database is missing | The copy didn't come through whole. | Copy the template again and send Louis the new link. |
 | The rows look like somebody else's community | Louis is pointed at the original template, or another copy. | Send him the link to your own copy, and check the **Share** menu says your workspace. |
@@ -58,6 +58,4 @@ If Louis doesn't answer at all, it isn't a Notion problem: check that your compu
 
 ## Next
 
-Louis has a memory you can read, and a community to look after. That is the end of this lesson.
-
-When you no longer want NanoClaw on your computer, the [Cleaning Up](../../04-cleaning-up/index.md) lesson removes it.
+Louis has a memory you can read. Now put him in front of people: [Agent playtime](../../04-agent-playtime/index.md).

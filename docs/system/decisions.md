@@ -781,3 +781,57 @@ Course 001 has 49 command blocks. All 49 now name a window; 14 carry the link.
 **The one unpinned dependency this adds:** the published template URL (`app.notion.com/p/Louis-the-Community-Builder-…`). The template README says the URL is handed over out of band and no plugin file contains it, so it can't be checked against the pin. It has a row in the course README's dependency table. If the page is republished, the course breaks and nothing here notices.
 
 **Not verified by reading:** nobody has walked this lesson end to end against `48d7260a` — the duplicate, the connection, `make add-notion-connection`, and Louis binding to the copy. The steps come from the template's own references and from the screenshots in `02-notion-connection/`, which were taken on a real run of the connection half.
+
+## 2026-09-24 — IBM Plex: Sans for the pages, Mono for code, both self-hosted
+
+**Chosen:** the site drops Inter for **IBM Plex Sans** (the variable build, `wght` axis) and sets **IBM Plex Mono** for code, through VitePress's two font variables in `custom.css`. Both come from `@fontsource` packages pinned in `package.json` and are served from the site itself. `transformHtml` in `config.mts` re-points VitePress's hard-coded Inter preload at the Sans file. The details are in [site.md](./site.md#theme).
+
+**Why:**
+- Aijutsu asked for IBM Plex. One family in two voices keeps a command in a sentence looking like a command, which this course does constantly.
+- Self-hosting keeps the privacy promise in `course/terms.md` intact: no third party sees a reader's IP address for a font. It is also what the default theme already does with Inter, so nothing new had to be invented.
+- The variable Sans is one file for the four weights the theme uses, and a page ends up fetching about 60 KB of font — close to what Inter cost.
+
+**Turned down:**
+- **IBM Plex Mono for everything,** which was the first cut and was tried: it suits the brand, but monospace prose fits ~10–15% fewer words per line, and these are long lessons for non-technical readers.
+- **Google Fonts.** One `<link>` instead of a dependency, but every reader's browser would call Google, which the terms say the site doesn't do.
+- **Leaving Inter for the prose.** Plex Sans and Plex Mono are one family and sit together properly.
+- **Keeping VitePress's Inter preload.** Nothing renders in Inter now, so it was ~50 KB fetched on every page for nothing.
+
+**Accepted cost:** `transformHtml` matches VitePress's preload tag by pattern, so a VitePress upgrade can silently bring the Inter preload back. There's a row for it in [known-issues.md](./known-issues.md).
+
+**Checked** in headless Chrome on a lesson page: prose, headings, navigation and sidebar compute to `IBM Plex Sans Variable`, inline code and code blocks to `IBM Plex Mono`, and the only font files fetched are `ibm-plex-sans-latin-wght-normal.woff2` and `ibm-plex-mono-latin-400-normal.woff2`.
+
+## 2026-09-24 — A glossary word explains itself where it stands
+
+**Chosen:** hovering a link into the glossary, or tabbing to it, opens a bubble with the term, its type and its definition (`.vitepress/theme/glossary-tooltip.ts`). The definition rides on the link itself: `glossary-link-plugin.ts` adds `data-glossary*` attributes to any link ending `glossary.md#<anchor>`. Clicking still goes to the glossary page, and a dotted underline marks the words that have a definition.
+
+**Why:**
+- The course explains a term where it first appears and links the rest to the glossary. Following that link costs the reader their place mid-instruction, which is the worst moment to lose it.
+- Nothing changes in `course/`: pages keep writing `[token](../../../glossary.md#token)`, so the link still works on GitHub and without JavaScript, and the format stays renderer-neutral.
+- Inlined, not fetched: the whole glossary is 12KB, a page carries only the terms it uses, and the bubble opens with no request.
+
+**A tap doesn't open it, and that is the honest limit.** VitePress registers its router on `window` with `{capture: true}` and calls `go()` from behind an `await`. It therefore routes before any listener the theme can add, in either phase, and a `preventDefault` that arrives afterwards changes nothing — verified: the bubble opened and the page navigated anyway. Touch readers get the glossary page, which has the same words in full.
+
+**Turned down**, because each buys the tap at a price worth more than 33 links:
+- **Wrapping glossary links in `.vp-raw`**, which the router skips. Every glossary click would become a full page load instead of an SPA transition.
+- **Stripping `href` while the bubble is open.** The router bails on a link with no href, but an `<a>` without one is no longer a link to assistive technology or to "open in new tab".
+
+**Checked** in headless Chrome: the bubble opens on hover and on keyboard focus, carries the term and type, sets `aria-describedby`, stays inside the viewport, and closes on Escape, on leaving, and on scroll.
+
+## 2026-09-24 — A fourth lesson: the agent meets other people
+
+**Chosen:** `04-agent-playtime/`, between the data-sources lesson and Cleaning Up (which becomes `05-cleaning-up/`, id unchanged). Four sub-lessons: make a Telegram group and add the bot; connect the agent to it and watch a Notion round trip; add neighbours and meet the permission tiers; change the agent's personality.
+
+**Why:** everything before it is one person talking to one agent in a private chat. The template is built for a community, and three of its ideas only appear once other people are in the room — that a message's *account* decides what the sender may do, that verification is an admin's job done in a DM, and that the Admin Log records it. A course that stopped at "it answers you" would never show them.
+
+**What each page rests on, checked against `48d7260a`:**
+- **The bot is the phone line; the agent is who answers.** `src/router.ts` creates a messaging group only when the bot is *mentioned*, then escalates through `channelRequestGate` because nothing is wired yet. That two-step is the lesson's spine, not an implementation detail to hide.
+- **The card in the owner's DM** — `📣 Bot mentioned in new channel`, with `Connect to <agent>` / `Choose existing agent` / `Connect new agent` / `Reject` — is `buildApprovalOptions` in `src/modules/permissions/channel-approval.ts`.
+- **Tiers, the matrix, DM-only verification and the append-only Admin Log** come from the template's own `references/permissions.md`.
+- **Personality** is the `self-customize` container skill: memory and `instructions.prepend.md` are the agent's to edit without approval, while the composed `CLAUDE.md`/`AGENTS.md` is rebuilt every spawn. The course says to ask the agent first, and offers Codex for bigger edits.
+
+**One correction to the brief:** the approval card asks which **agent** to connect, not which **template**. `createNewAgentGroup` makes an empty agent group; templates are only applied by `ncl groups create --template` or the setup wizard. The page therefore tells the reader to pick Louis, and says plainly that `Connect new agent` would give them a blank one.
+
+**Screenshot placeholders.** `01-create-telegram-group/` carries `<!-- screenshot: … -->` comments where the author will add pictures. They render as nothing, so the page is publishable while it waits, and `grep -rn "screenshot:" course/` lists what is outstanding.
+
+**Not verified by reading:** nobody has walked this lesson. The Telegram steps, the card, the tier behaviour and the personality edit all come from the fork's code and the template's references, not from a run.

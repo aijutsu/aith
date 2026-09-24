@@ -1,5 +1,15 @@
 /* Site theme on top of the default VitePress theme. See docs/system/site.md#theme. */
 
+/* The site's typefaces, loaded in theme/index.ts: IBM Plex Sans for everything a reader reads,
+   IBM Plex Mono for code, where the fixed width lines characters up. One family, two voices, so
+   a command in a paragraph still looks like a command. The fallbacks are the platform's own
+   fonts: what a reader sees before these arrive, and for the few characters outside the latin
+   subset (→, ✓, ⌘), which fell back the same way when the site used Inter. */
+:root {
+  --vp-font-family-base: 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+}
+
 /* Brand colour #C83122. VitePress uses three brand shades:
    -1 for link text, -2 for hover, -3 for button backgrounds (with white text).
    Light mode uses #C83122 for links and buttons (5.4:1 on white).
@@ -164,6 +174,14 @@
   }
 }
 
+/* A screenshot sits in the middle of whatever holds it — the page column, or the indent of the
+   step it belongs to — rather than against its left edge. `:only-child` keeps this to pictures
+   that stand on their own: an image set in a line of text stays in the line. */
+.vp-doc p > img:only-child {
+  display: block;
+  margin-inline: auto;
+}
+
 /* Click a picture to see it big (lightbox.ts). The cap above keeps a phone screenshot at its
    real size, but a wide one — a terminal, a settings window — is unreadable at 400px. */
 .vp-doc img {
@@ -242,6 +260,69 @@
 
 @media (prefers-reduced-motion: reduce) {
   .aith-lightbox {
+    animation: none;
+  }
+}
+
+/* Glossary words (glossary-tooltip.ts). A dotted underline marks a word the site can explain,
+   so a reader knows there is something behind it without hovering everything to find out. */
+.vp-doc a[data-glossary] {
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.aith-glossary {
+  position: fixed;
+  /* place() overwrites these; they keep the bubble out of the page flow before it does. */
+  top: 0;
+  left: 0;
+  /* Over the nav bar (20) and the sidebar (50), under the lightbox (100). */
+  z-index: 60;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-elv);
+  box-shadow: var(--vp-shadow-3);
+  font-size: 14px;
+  line-height: 1.5;
+  animation: aith-glossary-in 0.12s ease-out;
+}
+
+.aith-glossary-term {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.aith-glossary-type {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vp-c-text-3);
+}
+
+.aith-glossary-body {
+  color: var(--vp-c-text-2);
+}
+
+.aith-glossary-body code {
+  font-size: 0.9em;
+}
+
+@keyframes aith-glossary-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aith-glossary {
     animation: none;
   }
 }
