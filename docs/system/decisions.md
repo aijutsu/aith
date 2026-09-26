@@ -835,3 +835,16 @@ Course 001 has 49 command blocks. All 49 now name a window; 14 carry the link.
 **Screenshot placeholders.** `01-create-telegram-group/` carries `<!-- screenshot: … -->` comments where the author will add pictures. They render as nothing, so the page is publishable while it waits, and `grep -rn "screenshot:" course/` lists what is outstanding.
 
 **Not verified by reading:** nobody has walked this lesson. The Telegram steps, the card, the tier behaviour and the personality edit all come from the fork's code and the template's references, not from a run.
+
+## 2026-09-26 — NanoClaw 2.4.0: pin the fork's own update, and teach replying to Louis
+
+**Chosen:** pin the fork's `main` at `273e181c`: upstream v2.4.0 plus 7 commits (`c313d061`), merged by the fork owner with `/update-nanoclaw`, plus the fork's own Telegram reply-threading (with force-reply) and sender-ID skills. Upstream's two newer commits (`d4ff64f4`, Claude's default output style) are left for the next `/update-nanoclaw`: the course runs on Codex, so they don't touch it.
+
+**What 2.4.0 changed in the course:**
+- **The OneCLI row left Common issues.** OneCLI now installs through the `add-onecli` skill, and its `scripts/setup.ts` reuses a healthy existing OneCLI without asking. The "Found an existing OneCLI… Install a fresh instance" prompt no longer exists.
+- **The uninstaller asks about three groups, not four.** `setup/uninstall/onecli-agents.ts` is gone. OneCLI is now listed under "Shared gateway applications and credentials", which the uninstaller leaves alone, as the page already said.
+- **Replying to Louis in a group.** `telegram-reply-threading` makes his answers quote the question and open the asker's reply box (Telegram's selective ForceReply), and makes replies to him reach him without a mention. The group page teaches this instead of "mention the bot each time".
+
+**Why the fork's refactor matters to the course:** `/update-nanoclaw` reinstalls channel files from the registry, which silently dropped the fork's edits to `src/channels/telegram.ts`. The reply-threading edits now live in files that the update merges, so the behaviour the course teaches survives the next update.
+
+**Not verified by reading:** nobody has run setup, the group conversation or the uninstaller on `273e181c`.

@@ -64,7 +64,7 @@ It will take 30s to 1 minute for the first message to come through. Your agent i
 Reply to it. Your agent answers in two places:
 
 - **In your private chat with the bot**, it answers every message.
-- **In a group**, mention the bot by its username, for example `@heartlands_helper_bot`, so that it knows the message is for it.
+- **In a group**, mention the bot by its username, for example `@heartlands_helper_bot`, so that it knows the message is for it. Replying to one of its messages works too.
 
 ### When your agent is awake
 
@@ -76,7 +76,6 @@ If your agent stops answering, check that Docker is running, and that you have n
 
 | Issue | You answer |
 | --- | --- |
-|  Found an existing OneCLI at http://127.0.0.1:10254. What would you like to do? | Install a fresh instance for NanoClaw |
 | Couldn't clean up the test agent — it may still appear in your agent list. See logs/setup-steps/08-cleanup-cli-agent.log for details. | Continue with setup |
 
 If setup stops with an error, it offers to open Codex, or Claude Code, to help you fix it. You can also run `bash nanoclaw.sh --agent-provider codex` again: it continues from where it stopped. Setup keeps a record of every step in `logs/setup.log`.

@@ -177,7 +177,7 @@ Current fork submodules:
 
 | Submodule | Fork | Upstream | Customised with |
 | --- | --- | --- | --- |
-| `course/001-building-agents-with-nanoclaw/nanoclaw` | https://github.com/aijutsu/aith-nanoclaw-codex-telegram | https://github.com/nanocoai/nanoclaw | `/add-codex`, `/add-telegram`, the `community-assistant` template in `templates/community/` (the course picks it under **From local templates**), and the "Aijutsu fork" section at the end of `CLAUDE.md` |
+| `course/001-building-agents-with-nanoclaw/nanoclaw` | https://github.com/aijutsu/aith-nanoclaw-codex-telegram | https://github.com/nanocoai/nanoclaw | `/add-codex`, `/add-telegram`, `/telegram-reply-threading` (quote the message it answers, open that person's reply box, and hear replies to its own messages in groups), `/sender-id-in-prompt` (show the agent each sender's platform user ID), `/codex-credential-lockdown` (keep Codex's own apps and plugins off, so credentials only go through the gateway), `/add-notion-credentials` (`make add-notion-connection`), the `community-assistant` template in `templates/community/` (the course picks it under **From local templates**), and the "Aijutsu fork" section at the end of `CLAUDE.md` |
 
 When you add, customise, or retire a fork, update this table, the course's `course.yaml` `software` entry, and the References table in the course's `index.md` in the same change.
 

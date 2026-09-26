@@ -38,7 +38,6 @@ It scans your computer first, and says `Scanned copy … at ~/nanoclaw.` Then it
 | 1) App & background service | The service that runs NanoClaw in the background, the box Docker runs your agent in (its container), the build that box was made from (its image), and the `ncl` command. Removing these stops your agent. None of your data is here. |
 | 2) App data, logs & secrets | Your messages and conversations, the logs, the build files, and your `.env` file, which holds your bot token and other keys. |
 | 3) Your agents' memory & files | The notes and memory your agents wrote. This is content you made, and it cannot be recovered. |
-| 4) OneCLI credential agents | Logins that this copy saved in OneCLI, a separate keeper for passwords and keys. You only see this group if you have OneCLI, and the OneCLI app itself is never touched. |
 
 For each group, it shows a table of exactly what it found, then asks. Answer like this:
 

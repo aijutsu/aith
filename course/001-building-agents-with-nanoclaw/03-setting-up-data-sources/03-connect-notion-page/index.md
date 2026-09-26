@@ -22,11 +22,11 @@ Do it in **either** place. Click the one you prefer.
 1. Open your copy of the [Louis template](../01-notion-page/index.md#copy-it) in Notion.
 2. Click the **•••** menu in the top right corner of the page.
 
-    ![Menu that appears after clicking on three dots](image.png)
+    ![The page's ••• menu, with Connections and the search box open](./img/page-menu-connections.png)
 
 3. Click **Connections**, then select the Connection you created
 
-    ![Add Connection confirmation dialog](image-1.png)
+    ![The dialog confirming what the connection may do on this page](./img/add-connection-dialog.png)
 
     Note that the permissions listed there are the permissions you gave your Connection when you first created it. In paid organisational Notions, these can be adjusted to be fine-grained
 
@@ -34,7 +34,7 @@ Do it in **either** place. Click the one you prefer.
 
     You should now see that the Connection now has access to the page:
 
-    ![Connection available](image-2.png)
+    ![The connection listed under Active connections](./img/active-connections.png)
 
 </details>
 

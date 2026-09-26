@@ -26,7 +26,7 @@ Nothing happens in the group. That is expected.
 
 Open your **private** chat with the bot — the one you have been using all along. NanoClaw would have sent you a card that looks like:
 
-![Bot mentioned in new channel](image.png)
+![The approval card in your private chat, with Connect to Louis, Connect new agent and Reject](./img/channel-approval-card.png)
 
 It tells you which group it was (`AI in the Heartlands (Test)` in the example image), and who mentioned it (`that joseph` in the example image). Under that are your choices:
 
@@ -47,13 +47,13 @@ You should now see a message:
 ✅ Connected to Louis by <your username>
 ```
 
-Louis now knows to answer in that group. He replies when someone mentions him, so the group can talk normally without him joining in. You should also see Louis introducing themselves:
+Louis now knows to answer in that group. He replies when someone mentions him, or replies to one of his messages. The rest of the time, the group can talk normally without him joining in. His answers quote the message he is answering, so in a busy group you can see which question each answer is for. You should also see Louis introducing themselves:
 
-![Louis's introduction](image-1.png)
+![Louis introducing himself in the group](./img/louis-first-reply.png)
 
 ## Give him something to do
 
-Everything below happens in the group chat. Mention the bot each time.
+Everything below happens in the group chat. Mention the bot to start. When Louis answers you, Telegram starts your reply to him by itself, so you can just type your next message to carry on the conversation. To reply to an older message of his, press and hold it (or right-click it on a computer), then choose **Reply**.
 
 **Ask Louis something he has to look up:**
 
