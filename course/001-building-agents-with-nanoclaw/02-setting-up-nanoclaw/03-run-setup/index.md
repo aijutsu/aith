@@ -30,6 +30,8 @@ bash nanoclaw.sh --agent-provider codex
 
 Setup installs the rest of what NanoClaw needs, and builds your agent's container. The first build usually takes 3 to 10 minutes. **If you run into any issues, check the section just below this.**
 
+Partway through it installs a **credential keeper** and says `OneCLI gateway ready.` You aren't asked anything: it is how your keys are held later, so your agent never sees them. Setup explains this on screen as it goes.
+
 Use the arrow keys to pick an answer, then press Enter. Answer the questions like this:
 
 | Setup asks | Your answer |
@@ -37,13 +39,14 @@ Use the arrow keys to pick an answer, then press Enter. Answer the questions lik
 | How would you like to begin? | **Standard setup** |
 | How should we create your first agent? | **From local templates** |
 | Choose a template | **`community-assistant`** |
-| How would you like to connect Codex? | **Sign in with my ChatGPT subscription**. Sign in in the browser, then go back to the terminal. On Windows, if no browser opens, copy the link into your browser. |
+| `codex` needs a sandbox image built on this machine. Stop using the pre-built one? | **Yes**. You only see this if your copy was set up to download a ready-made image. Codex needs one built here, and the build is the 3 to 10 minutes above. |
+| How would you like to connect Codex? | **Sign in with my ChatGPT subscription**. Sign in in the browser, then go back to the terminal. If no browser opens — common on Windows — press Escape and choose **ChatGPT device pairing** instead: it shows you a web address and a code to type in, with no browser handoff. |
 | What should your assistant call you? | `<enter your name>` |
 | (Your assistant is ready.) What next? | **Continue with setup** |
 | I detected … from your computer settings. Is that right? | **Yes**, if it shows your time zone |
 | Want to chat with your assistant from your phone? | **Yes, connect Telegram** |
 | Connect Telegram? | **Yes, connect Telegram** |
-| How should this telegram account be registered? | **Owner** |
+| How should this telegram account be registered? | **Owner**. That is your own account, and owner is full access. The other two, Admin and Member, are for other people later. |
 | Paste the bot token from BotFather (looks like `123456:ABC-DEF...`). | The token from the first page. It will appear as "▪▪▪▪..." while you paste. That is normal. |
 | Open `https://telegram.me/<your bot name>` in your browser? | Yes (if prompted in your browser, click **Open Telegram.app** before the next step), when the chat with `<your bot name>` opens, click on **Start** |
 | Ready? The next step starts immediately. | Yes |
@@ -74,9 +77,34 @@ If your agent stops answering, check that Docker is running, and that you have n
 
 ## Common issues
 
-| Issue | You answer |
+| Issue | What to do |
 | --- | --- |
-| Couldn't clean up the test agent — it may still appear in your agent list. See logs/setup-steps/08-cleanup-cli-agent.log for details. | Continue with setup |
+| Couldn't clean up the test agent — it may still appear in your agent list. See logs/setup-steps/08-cleanup-cli-agent.log for details. | Choose **Continue with setup**. |
+| `Couldn't authenticate or verify codex.` <br> `Cannot read the selected OneCLI vault; check that OneCLI is running.` | There is an older `onecli` program on your computer that setup can't use. Delete it and let setup install its own. See below. |
+
+### Couldn't authenticate or verify codex
+
+The credential keeper is a program called `onecli`. If your computer already has an older or broken copy of it, setup finds that one, can't read it, and stops.
+
+Delete it. In your [terminal](../../01-installations/01-terminal/index.md), find out where it is:
+
+```bash
+which onecli
+```
+
+You get back a path, like `/usr/local/bin/onecli` or `/Users/you/.local/bin/onecli`. Delete that file:
+
+```bash
+sudo rm "$(which onecli)"
+```
+
+Type your password if it asks. Then run setup again:
+
+```bash
+bash nanoclaw.sh --agent-provider codex
+```
+
+It continues from where it stopped, installs its own copy of the keeper, and carries on.
 
 If setup stops with an error, it offers to open Codex, or Claude Code, to help you fix it. You can also run `bash nanoclaw.sh --agent-provider codex` again: it continues from where it stopped. Setup keeps a record of every step in `logs/setup.log`.
 
