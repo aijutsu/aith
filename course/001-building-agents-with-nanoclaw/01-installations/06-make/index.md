@@ -19,7 +19,7 @@ start:
 	docker compose up --detach --wait
 ```
 
-`start` is the short name. The line under it is the real command. To run it, you type this in the [terminal](../01-terminal/index.md):
+`start` is the short name. The line under it is the real command. To run it, you type this in the [terminal](../02-terminal/index.md):
 
 ```bash
 make start
@@ -36,13 +36,13 @@ Click the name of your computer's system to open its section.
 <details name="make">
 <summary>macOS</summary>
 
-**Check if it's already installed.** In [Terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In [Terminal](../02-terminal/index.md), run:
 
 ```bash
 make --version
 ```
 
-- If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section. Most Macs are in this group, because Apple's Command Line Tools include Make, and Homebrew installed those for you on the [Homebrew](../02-homebrew/index.md) page.
+- If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section. Most Macs are in this group, because Apple's Command Line Tools include Make, and [Homebrew](../../../glossary.md#homebrew) installed those for you on the [Homebrew](../03-homebrew/index.md) page.
 - If you see `command not found: make`, do the step below.
 
 **Install it.** In the terminal, run:
@@ -68,9 +68,9 @@ This is the one tool the course doesn't install with Homebrew. `brew install mak
 <details name="make">
 <summary>Windows</summary>
 
-Make goes inside Ubuntu, like Git.
+Make goes inside [Ubuntu](../../../glossary.md#ubuntu), like [Git](../../../glossary.md#git).
 
-**Check if it's already installed.** In the [Ubuntu terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [Ubuntu terminal](../02-terminal/index.md), run:
 
 ```bash
 make --version
@@ -79,7 +79,7 @@ make --version
 - If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section.
 - If you see `command not found: make`, do the step below.
 
-You usually have it already: the [Homebrew](../02-homebrew/index.md) page installed `build-essential`, which includes Make.
+You usually have it already: the [Homebrew](../03-homebrew/index.md) page installed `build-essential`, which includes Make.
 
 **Install it.** If it is missing, run this in the Ubuntu terminal:
 
@@ -102,7 +102,7 @@ The first line starts with `GNU Make`, followed by a number, like `GNU Make 4.3`
 <details name="make">
 <summary>Linux</summary>
 
-**Check if it's already installed.** In the [terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [terminal](../02-terminal/index.md), run:
 
 ```bash
 make --version
@@ -111,7 +111,7 @@ make --version
 - If the first line starts with `GNU Make`, you already have Make, and there is nothing to install: skip the rest of this section.
 - If you see `command not found: make`, do the step below.
 
-You usually have it already: the [Homebrew](../02-homebrew/index.md) page installed your system's build tools, which include Make.
+You usually have it already: the [Homebrew](../03-homebrew/index.md) page installed your system's build tools, which include Make.
 
 **Install it.** If it is missing, run this on Ubuntu or Debian:
 
@@ -139,4 +139,4 @@ The first line starts with `GNU Make`, followed by a number, like `GNU Make 4.3`
 
 ## Next
 
-Make is ready. Next, install [Codex](../07-codex/index.md).
+Make is ready. Next, install [Node](../07-node/index.md).

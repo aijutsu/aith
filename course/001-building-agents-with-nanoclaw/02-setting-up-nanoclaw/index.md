@@ -6,13 +6,13 @@ description: Create a Telegram bot, install NanoClaw, and say hi to your first a
 
 # Setting up NanoClaw
 
-In this lesson, you install NanoClaw and connect it to Telegram. At the end, you have your own AI agent, and you can chat with it on Telegram.
+In this lesson, you install [NanoClaw](../../glossary.md#nanoclaw) and connect it to [Telegram](../../glossary.md#telegram). At the end, you have your own AI agent, and you can chat with it on Telegram.
 
-Before you start, finish the [Getting Started](../01-installations/index.md) lesson. You need Git, Docker and Codex.
+Before you start, finish the [Getting started](../01-installations/index.md) lesson. You need [Git](../../glossary.md#git), [Docker](../../glossary.md#docker) and [Codex](../../glossary.md#codex).
 
 ## Important notes
 
-1. This course uses our own copy of NanoClaw. It is a [fork](../../glossary.md#fork): a copy of a project that you can change without changing the original. We changed it with NanoClaw's own skills, so that it works with Telegram and Codex. Our version of Nanoclaw can be found at the [aith-nanoclaw-codex-telegram](https://github.com/aijutsu/aith-nanoclaw-codex-telegram) project on GitHub and can be used independently of this course
+1. This course uses our own copy of NanoClaw. It is a [fork](../../glossary.md#fork): a copy of a project that you can change without changing the original. We changed it with NanoClaw's own [skills](../../glossary.md#skills), so that it works with Telegram and Codex. Our version of Nanoclaw can be found at the [aith-nanoclaw-codex-telegram](https://github.com/aijutsu/aith-nanoclaw-codex-telegram) project on [GitHub](../../glossary.md#github) and can be used independently of this course
 
 ## The steps
 
@@ -20,7 +20,7 @@ Do them in this order. Each step has its own page:
 
 | Step | What you do | Why |
 | --- | --- | --- |
-| [Create your Telegram bot](./01-telegram-bot/index.md) | Make a bot with BotFather, and copy its token. | The bot is the Telegram account your agent chats from. |
+| [Create your Telegram bot](./01-telegram-bot/index.md) | Make a bot with BotFather, and copy its [token](../../glossary.md#token). | The bot is the Telegram account your agent chats from. |
 | [Download NanoClaw](./02-download-nanoclaw/index.md) | Copy NanoClaw onto your computer with Git. | NanoClaw is the program your agent runs in. |
 | [Run NanoClaw's setup](./03-run-setup/index.md) | Run the setup program, answer its questions, and say hi to your agent. | This builds your agent, connects it to your bot, and proves it works. |
 

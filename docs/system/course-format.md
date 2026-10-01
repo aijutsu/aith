@@ -29,6 +29,7 @@ The content root is `course/`. A file's role comes from where it is:
 | `course/glossary.yaml` | The single glossary (data). |
 | `course/glossary.md` | Glossary page. Shows the glossary with a `:::glossary` block. |
 | `course/terms.md` | Terms of Use page: the copyright, what readers may do with the materials, and what needs written approval from Aijutsu. |
+| `course/how-this-site-works.md` | How this site works: a short tour for learners of the site's layout and its helpers (glossary words, sections per system, copy buttons, alerts). Shown first under Courses in the sidebar. When the site gains or loses a helper a learner would notice, update this page. |
 | `course/about.md` | About page: who makes the courses (Aijutsu), what else they do, and how to reach them. |
 | `course/NNN-slug/` | A course. `NNN` is a three-digit order number (`001`, `002`, …). |
 | `course/NNN-slug/course.yaml` | The course manifest. Required. |
@@ -96,7 +97,7 @@ Schema: [`format/schema/lesson.schema.json`](../../format/schema/lesson.schema.j
 ```yaml
 ---
 id: installations # never change this, even if the folder or title changes
-title: Getting Started
+title: Getting started
 description: Get your computer ready for the course.
 ---
 ```
@@ -152,6 +153,16 @@ Allowed:
   - Leave a blank line after `</summary>` and before `</details>`. Without it, the Markdown inside is shown as raw text. `make validate` checks the first one.
   - Give the sections of one group the same `name`. Opening one then closes the others, like an accordion. Browsers that don't support `name` just let several stay open.
   - Put them at the top level of the page (under a heading), not inside a list item.
+- Code blocks with long lines that should wrap instead of scrolling sideways: add `wrap` after the language on the fence line. Use it for prompts the reader pastes into an agent, and for output. Don't use it for commands: a wrapped command looks like two, and the reader may type them as two.
+
+  ````markdown
+  ```text wrap
+  Read my Notion page called "Community Events" and tell me what is on this week.
+  ```
+  ````
+
+  - The language comes first. GitHub and other CommonMark tools read only the first word as the language and ignore the rest, so the block still shows there, just without wrapping. A fence that starts with `wrap` would make "wrap" the language, and `make validate` rejects it.
+- Diagrams: a code block whose language is `mermaid`, written in [Mermaid](https://mermaid.js.org/) syntax. GitHub draws it as a diagram, and so does the site. Any other tool shows its text, so write the labels to make sense as text too. Keep a diagram narrow enough for a page column (a sequence diagram of five participants fits; seven doesn't), and say in the prose what it shows: a reader without the picture still gets the point.
 - Named blocks from this list, written `:::name` on their own line and closed with `:::`:
 
   | Block | Meaning |
@@ -168,7 +179,7 @@ Not allowed (the validator rejects these outside code blocks and inline code):
 ## Links
 
 - Link between pages with **relative links to the `.md` file**, e.g. `./001-building-agents-with-nanoclaw/index.md` or `../glossary.md#fork`. These work on GitHub and on the site. Count the `../` from the page's own folder: the glossary is `../glossary.md` from a course page, `../../glossary.md` from a lesson, and `../../../glossary.md` from a sub-lesson.
-- **Link to a page, not to a heading inside it**, when the target may be reorganised. A sub-lesson's address (`../01-installations/07-codex/index.md`) survives renumbering; an anchor into a long page (`#step-4-install-codex`) does not, and neither the validator nor the site build checks anchors.
+- **Link to a page, not to a heading inside it**, when the target may be reorganised. A sub-lesson's address (`../01-installations/08-codex/index.md`) survives renumbering; an anchor into a long page (`#step-4-install-codex`) does not, and neither the validator nor the site build checks anchors.
 - Never link to a `README.md` or into a submodule with a relative link: those files are not published, and the site build fails on dead links. Link to files in a submodule with a full GitHub URL instead.
 
 ## Checking

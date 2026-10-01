@@ -6,9 +6,9 @@ description: Duplicate the Louis community template into your own Notion workspa
 
 # Create the Notion page
 
-Your agent is known as **Louis**, and Notion is where he keeps everything: who is in your community, what is going on, if anyone has borrowed anything/lending anything.
+Your agent is known as **Louis**, and [Notion](../../../glossary.md#notion) is where they keep everything: who is in your community, what is going on, if anyone has borrowed anything/lending anything.
 
-Like any AI agent, Louis requires a **data store**. This could be a proper database management system, but for this introduction to agents, we can use Notion which provides databases as tables and also allows us to easily edit the page where required.
+Like any AI agent, Louis requires a **data store**. This could be a proper [database](../../../glossary.md#database) management system, but for this introduction to agents, we can use Notion which provides databases as tables and also allows us to easily edit the page where required.
 
 A template you can copy into your own [Notion](../../../glossary.md#notion) workspace has been created for you for the purpose of facilitating more critical learning points like how to connect data stores.
 
@@ -35,7 +35,7 @@ From here on, this copy is yours: Louis writes to it, and nobody else's copy is 
 
 ## What you just copied
 
-This page contains sixteen mini [databases](../../../glossary.md#database) inside it. You don't have to read or understand them all right now, Louis already knows what each one is for based on Skills that we have prepared, but if you're interested, a summary is:
+This page contains sixteen mini [databases](../../../glossary.md#database) inside it. You don't have to read or understand them all right now, Louis already knows what each one is for based on [Skills](../../../glossary.md#skills) that we have prepared, but if you're interested, a summary is:
 
 | These hold | Databases |
 | --- | --- |
@@ -54,11 +54,11 @@ They are empty, and that is normal. They fill up as you and whoever you invite t
 > 
 > This mainly serves as an example of the data being able to shape the behaviour of the agent we create; it'd be useful to also think about other use-cases in your life such as *"What would a database structure that suits my office look like?"* or *"Could I use a similar setup to help me organise different aspects of my work/life?"*
 
-## Verify that it worked
+## Verify that everything's in place
 
 At this point, you should have:
 
-1. A page in **your** workspace, in the sidebar on the left; and
+1. A fresh page in **your** workspace, in the sidebar on the left under the **Private** categroy; and
 2. Sixteen empty Notion tables (read: databases) inside it.
 
 > [!WARNING]
@@ -66,4 +66,4 @@ At this point, you should have:
 
 ## Next
 
-Now make the connection that lets Louis in: [Create a Notion connection](../02-notion-connection/index.md).
+Next, we create the connection/integration that lets Louis use the page: [Create a Notion connection](../02-notion-connection/index.md).

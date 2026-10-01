@@ -54,7 +54,7 @@ const pages = publishedPages(ROOT)
 // sub-lessons).
 const knownPage = (p) => {
   const parts = p.split('/')
-  if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md', 'about.md'].includes(p)
+  if (parts.length === 1) return ['index.md', 'courses.md', 'glossary.md', 'terms.md', 'about.md', 'how-this-site-works.md'].includes(p)
   if (parts.at(-1) !== 'index.md' || !COURSE_DIR.test(parts[0])) return false
   const lessonDirs = parts.slice(1, -1)
   return lessonDirs.length <= LESSON_DEPTH && lessonDirs.every((dir) => LESSON_DIR.test(dir))
@@ -78,6 +78,11 @@ for (const page of pages) {
   for (const m of text.matchAll(/<([A-Z][A-Za-z0-9]*)[\s/>]/g)) fail(where, `component tag <${m[1]}> is not allowed`)
   if (/<(script|style)[\s>]/i.test(text)) fail(where, '<script> and <style> are not allowed')
   if (/\{\{/.test(text)) fail(where, '"{{" is not allowed outside code (renderer template syntax)')
+  // The `wrap` flag goes after the language: the first word on a fence line is always the language.
+  for (const m of body.matchAll(/^[ \t]*(?:```|~~~)[ \t]*wrap(?=\s|$)/gm)) {
+    const line = body.slice(0, m.index).split('\n').length
+    fail(where, `line ${line} of the body: put the language before "wrap" (e.g. \`\`\`text wrap), or "wrap" is read as the language`)
+  }
 
   // Collapsible sections. Without a blank line after </summary>, the Markdown inside is shown as raw text.
   const opened = text.match(/<details[\s>]/g)?.length ?? 0

@@ -6,13 +6,13 @@ description: Make a Telegram bot with BotFather, and copy the token your agent n
 
 # Create your Telegram bot
 
-A bot is an automatic Telegram account. Your agent uses it to chat with you. You make bots with BotFather, Telegram's official bot for making bots.
+A bot is an automatic [Telegram](../../../glossary.md#telegram) account. Your agent uses it to chat with you. You make bots with BotFather, Telegram's official bot for making bots.
 
 In Telegram, search for `@BotFather` and open it. Check that it has a blue tick. Tap **Start**.
 
 ## Create the bot account
 
-There are two ways to do this, and both give you the same thing: a bot, and a token for it. The mini app is a small app inside Telegram, with buttons to tap. The chat way is a conversation: you send BotFather commands, and it asks you questions.
+There are two ways to do this, and both give you the same thing: a bot, and a [token](../../../glossary.md#token) for it. The mini app is a small app inside Telegram, with buttons to tap. The chat way is a conversation: you send BotFather commands, and it asks you questions.
 
 Pick one. Click its name to open it.
 

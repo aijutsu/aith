@@ -9,6 +9,10 @@
 // and a page carries only the terms it links to — a tooltip that has to wait for a request is a
 // tooltip that flickers.
 //
+// A link whose words are a glossary term gets the same bubble wherever it points, so
+// `[terminal](../01-terminal/index.md)` explains itself on hover and still goes to its lesson.
+// The glossary page itself is left alone: every word on it is already its own definition.
+//
 // Restart `make site` after editing the YAML: it is read once per build, and pages are cached by
 // their Markdown source anyway (see glossary-plugin.ts).
 
@@ -48,13 +52,25 @@ export function glossaryLinkPlugin(md: MarkdownIt) {
     return entries
   }
 
+  // The link's words as a glossary term: exact first, then without a plural `s`
+  // ("tokens" → Token). Slugged like the anchors, so case and punctuation don't matter.
+  const byWords = (text: string): Entry | undefined => {
+    const slug = slugify(text.trim())
+    if (!slug) return undefined
+    return byAnchor().get(slug) ?? (slug.endsWith('s') ? byAnchor().get(slug.slice(0, -1)) : undefined)
+  }
+
   const renderLink =
     md.renderer.rules.link_open ??
     ((tokens, idx, options, _env, self) => self.renderToken(tokens, idx, options))
 
   md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const anchor = GLOSSARY_LINK.exec(tokens[idx].attrGet('href') ?? '')?.[1]
-    const entry = anchor ? byAnchor().get(anchor) : undefined
+    const entry = anchor
+      ? byAnchor().get(anchor)
+      : env?.relativePath === 'glossary.md'
+        ? undefined
+        : byWords(linkText(tokens, idx))
 
     if (entry) {
       // markdown-it escapes attribute values, so the HTML arrives at the browser intact and
@@ -66,4 +82,13 @@ export function glossaryLinkPlugin(md: MarkdownIt) {
 
     return renderLink(tokens, idx, options, env, self)
   }
+}
+
+// The visible words of the link that opens at `idx`: its text and inline code, up to its close.
+function linkText(tokens: { type: string; content: string }[], idx: number): string {
+  let text = ''
+  for (let i = idx + 1; i < tokens.length && tokens[i].type !== 'link_close'; i++) {
+    if (tokens[i].type === 'text' || tokens[i].type === 'code_inline') text += tokens[i].content
+  }
+  return text
 }

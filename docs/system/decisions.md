@@ -848,3 +848,180 @@ Course 001 has 49 command blocks. All 49 now name a window; 14 carry the link.
 **Why the fork's refactor matters to the course:** `/update-nanoclaw` reinstalls channel files from the registry, which silently dropped the fork's edits to `src/channels/telegram.ts`. The reply-threading edits now live in files that the update merges, so the behaviour the course teaches survives the next update.
 
 **Not verified by reading:** nobody has run setup, the group conversation or the uninstaller on `273e181c`.
+
+## 2026-09-30 — Code blocks wrap only when the page asks: ```` ```text wrap ````
+
+**Chosen:** a code block wraps its long lines only when its fence line has `wrap` after the language (`.vitepress/code-wrap-plugin.ts`, plus a rule in `custom.css`). All other blocks keep the default theme's sideways scrolling.
+
+**Why:**
+- Prompts to paste into an agent are long sentences. Scrolling sideways through one on a phone hides most of it.
+- Commands must not wrap. A non-technical reader can take the wrapped half of a command for a second command and type it on its own line.
+- CommonMark treats only the first word of the info string as the language, so GitHub and any other tool show the block as before. The format stays renderer-neutral, and only the site reads the flag.
+
+**Turned down:**
+- **Wrapping every block in CSS.** One line, but it wraps commands too.
+- **Breaking lines by hand with `\` (bash) or a backtick (PowerShell).** Works everywhere, but it teaches readers another symbol, the character differs by shell, and a space after it breaks the command. Still fine for the odd very long command.
+- **A `:::wrap` block around the fence.** It would need a new allowed block, and GitHub would show the `:::` lines as text.
+
+
+## 2026-10-01 — Restart Louis with `make reload-community-agent`, and keep his voice in `personality.md`
+
+**Chosen:** pin the fork at `ecc4b18a` (v2.4.0-24), six fork-only commits on `273e181c` with no upstream change, and teach `make reload-community-agent` as the one way to restart Louis after an instruction or personality change, both after asking him and after editing with Codex.
+
+**Why a Make target, not "ask Codex to restart Louis":** an agent's instruction edits only load when its container starts again. Codex can do that, but it has to find the group, the command and the right ID each time, and a non-technical reader can't tell whether it did. The target restarts the one group whose folder is `louis` through the host's socket, and prints a fixed last line the page can quote. It needs NanoClaw running.
+
+**What else the pin changed in the course:**
+- **Voice goes to `personality.md`** (the fork's `group-personality` skill). "Talk like Phua Chu Kang" used to make Louis append to `instructions.prepend.md`, the file that holds his permission and privacy rules. The personality page now names the file and says why it is kept apart.
+- **The uninstaller asks about four groups again.** The fork's `onecli-full-uninstall` adds **4) OneCLI gateway & vault**, default No. This replaces the 2026-09-26 "three groups" note: upstream still leaves OneCLI alone, but its vault survives a reinstall, so a "fresh" install came back already holding the Notion token.
+- **Announcements are posted on their own and pinned** (`<announce/>` in `telegram-reply-threading`). Pinning needs the bot to be a group admin, so the group page says so, and that an unpinned announcement is still sent.
+- **The template's tasks start at first contact**, not paused. No course page said they were paused, so nothing changed.
+
+**The target is its own skill, `reload-community-agent`,** not part of `add-notion-credentials`, which also writes to the `Makefile`. Restarting an agent has nothing to do with Notion, and the fork's skill guidelines ask for one independently removable change per skill. Its test drives the script through the real CLI dispatcher and a migrated test DB, so a renamed `groups-list` or `groups-restart` goes red. It was a bare script in `b5046f3e` for one commit, and was never pinned that way.
+
+**Not verified by reading:** nobody has run `make reload-community-agent`, the personality change or the uninstaller's group 4 on `ecc4b18a`.
+
+## 2026-10-01 — "Agent Customisations", a scheduled-message step, a Concept Recap lesson, and a Node page
+
+**Chosen:**
+- **Lesson 4 is now "Agent Customisations"** (`04-agent-customisations/`, id `agent-playtime` unchanged). It gained a fifth step, `05-schedule-a-message/`: ask Louis for a hello every 5 minutes, watch it arrive, read it with `pnpm ncl tasks list`, then delete it.
+- **A new lesson 5, "Concept Recap"** (`05-concept-recap/`), between Agent Customisations and Cleaning Up (now `06-cleaning-up/`, id unchanged). It has four sub-lessons: what we did, how it fits together, inside NanoClaw, and where to go next.
+- **A new Getting Started page, "Install Node"** (`01-installations/07-node/`). Codex and Claude Code moved to `08-` and `09-`, with their ids unchanged.
+
+**Why every 5 minutes, and why the page teaches the pushback:** a learner has to see the task fire in class, and 7am tomorrow is too late. NanoClaw refuses any schedule that runs more than 4 times a day unless the agent confirms with the user. So the page tells the learner to expect Louis to explain the cost and ask, and gives the reply. The page ends by deleting the task, because left running it posts 288 times a day. The fallback is `pnpm ncl tasks cancel <name>`, never `--all`, which would also stop the three template tasks.
+
+**Why the architecture page teaches four terms:** model, harness, tool call and data explain every agent, not only NanoClaw. The page walks one real message from the course (the pressure washer) through them, then a table maps each customisation to its tool call and to where its data went. **Tool call** and **Data source** were added to the glossary. Harness and Model were already there.
+
+**Why "Inside NanoClaw" sends readers to files, not only to code:** a non-technical reader can run `ls` and `cat` in `groups/louis/` and see `personality.md` and the `# Persona` / `# Personality` sections of `AGENTS.md`. The links into the fork's code are optional extras, and they carry the pinned commit so they match what the reader runs. The page also suggests asking Codex. It is the course's own helper, and it reads the same files.
+
+**Why Node.js 24 and corepack, not Homebrew's `node` and `pnpm`:** the fork's `make` recipes are all `pnpm exec tsx`. NanoClaw needs Node 22 or newer and pins `pnpm@10.34.5`. Homebrew's current `node` (26) has no corepack, and its `pnpm` is 12, ahead of the pin. `node@22` is deprecated on 2026-10-28, so the page uses `node@24`. `corepack enable` into `$(brew --prefix)/bin` copies what `setup.sh` does. Setup's own Node install (`setup/install-node.sh`) uses keg-only `node@22` and only puts it on `PATH` for its own run, which is why the learner's terminal may not have Node afterwards.
+
+**Turned down:**
+- **Teaching the reader to write `*/5 * * * *` with `ncl tasks create` themselves.** The point of the course is that you ask in plain words. The cron code and `ncl` come in as things to read, on the scheduling and internals pages.
+- **Putting the recap at the end of lesson 4.** It covers all four lessons, and the user wanted it as its own main section.
+
+**Not verified by running:** nobody has run the 5-minute task, the internals walk-through, or the Node page on a clean machine. Everything comes from reading the code at `ecc4b18a`.
+
+## 2026-10-01 — Tooltips on links named after a glossary term
+
+**Chosen:** a link whose visible words are a glossary term gets the glossary bubble, wherever it points (`glossary-link-plugin.ts`). `[terminal](../01-terminal/index.md)` still goes to its lesson, and now explains "terminal" on hover too.
+
+**Why:** the writing rules send the first "terminal" in each section to the page that opens one, not to the glossary, and the same is true of every tool named in Getting Started. Those are exactly the words a new reader stops at, and they were the only technical words without a bubble. Matching on the link's words needs no change in `course/`.
+
+**The match is exact on purpose.** Case, punctuation and a plural `s` are ignored, nothing else. A link that only contains a term (`Ubuntu terminal`) gets nothing, because a partial match would put Homebrew's definition on a link about something else. On 2026-10-01 the rule added 59 bubbles, all of them a tool's name linking to that tool's install page.
+
+## 2026-10-01 — Sentence-case headings, and Louis is "they"
+
+**Chosen:** every title and heading under `course/` is in sentence case. That was already true of most of them, so the few title-case ones changed to match: "Agent customisations", "Concept recap", "Getting started", "Cleaning up", "Courses overview" (also the nav link in `.vitepress/config.mts`), "Create a Notion connection". Proper nouns and document names keep their capitals ("Terms of Use", "About Aijutsu", "AI in the Heartlands"). Anchors didn't change, because slugs are lower case anyway.
+
+**Louis is gender neutral.** The pages call Louis "Louis" or "they/them", never "he". Where a neighbour and Louis share a sentence (the membership page), the pages use "Louis", so "they" never has two people to mean. `about.md` keeps "he": it is about Joseph.
+
+**How it was done, for the next time:** a script turned he/him/his into they/them/their and fixed the verb right after "they" ("he writes" → "they write"). It couldn't fix a second verb after "and" ("they draft it and shows it"), "of his" → "of theirs", or a "they" that became ambiguous, so every changed line was then read by hand. Both rules are now in the writing rules in `AGENTS.md`.
+
+## 2026-10-01 — NanoClaw is the orchestrator, Codex is the harness
+
+**Chosen:** "How it fits together" no longer calls NanoClaw an "outer harness". Codex is Louis's harness, and NanoClaw is an **orchestrator**, with its own section and glossary entry. The glossary's Harness entry now names Codex and Claude Code as harnesses, and says NanoClaw is not one.
+
+**Checked in the fork (`ecc4b18a`):** inside the container, NanoClaw's agent-runner spawns `codex app-server` (`container/agent-runner/src/providers/codex-app-server.ts`, `CODEX_APP_SERVER_ARGS`), starts a thread and one turn per batch of messages, and waits for the result (`poll-loop.ts`). Codex runs the model and its tool calls in between. Everything around that loop is NanoClaw: routing and sender checks (`src/router.ts`), containers (`src/container-runner.ts`), schedules (`src/host-sweep.ts`, `src/modules/scheduling/`), and delivery (`src/delivery.ts`). NanoClaw does shape the harness: it writes `AGENTS.md` and chooses which MCP servers Codex gets, including its own `send_message` tool. The page says that, so "orchestrator" doesn't read as "has nothing to do with the agent".
+
+**One correction that followed:** switching an agent to Claude swaps the harness as well as the model (the Claude Agent SDK replaces Codex). The page now says that what stays the same belongs to the orchestrator, not to the harness.
+
+**Refined the same day:** the harness is the program **and** its instruction file together, not Codex alone: Codex + `AGENTS.md` for Louis, or Claude Code + `CLAUDE.md` on Claude. Neither half acts like Louis without the other. This also makes NanoClaw's part exact: it writes the instruction half every time Louis wakes up, and it chooses the tools, but it doesn't run the loop. The architecture page, the internals page's `AGENTS.md` row, and the Harness and Orchestrator glossary entries say this.
+
+## 2026-10-01 — Concept recap says plainly that the course runs a fork
+
+**Chosen:** a new sub-lesson, `05-concept-recap/04-our-modified-nanoclaw/` ("Where to go next" moves to `05-`). It opens with a disclaimer that the course runs our fork, and that a standard NanoClaw doesn't come with Codex or Telegram set up and has no group manners. Then it explains skills (a `SKILL.md` per folder, whose description the harness reads and matches by itself), says the fork was customised by asking Claude and letting it follow NanoClaw's skills or write new ones, and lists the main customisations, each linking to its skill at the pinned commit.
+
+**Why:** the course had been presenting fork behaviour (force-reply in groups, `personality.md`, `make reload-community-agent`, the community template) as if it were NanoClaw's own. A learner who installs NanoClaw from the original project would hit the difference with no explanation. The page also turns the fork into a lesson: it is "ask in plain words" again, one level down.
+
+**Kept "Inside NanoClaw" as the title** of the page before it, not "Inside standard NanoClaw": that page shows `personality.md` and `make reload-community-agent`, which come from the fork. The fork page names both, and the internals page now hands over to it.
+
+**Keep in step:** the customisation table here, the fork table in `AGENTS.md`, and the skill links' pinned commit.
+
+## 2026-10-01 — A course's learning outcomes as cards
+
+**Chosen:** the learning outcomes on a course's page are shown as numbered cards, in the style of the home page's Course Overview, each with a bold header and a short description (`.vitepress/outcome-cards-plugin.ts`, styles in `custom.css`). In `course/`, they stay a plain numbered list whose items open with `**Header.**`, so the page still reads well on GitHub and the course format doesn't change.
+
+**Why found by shape:** the same reason as the Course Overview. A heading can be renamed, while "every item opens in bold" is what makes the list an outcomes list. Only a course's own `index.md` is checked, so a lesson page with bold-led steps is never turned into cards.
+
+**Checked** in headless Chrome at 1280px: eight cards, two across. At phone width they stack in one column. Headless Chrome won't render narrower than about 500px, so that screenshot is clipped on every page, not just this one.
+
+## 2026-10-01 — The sidebar opens only the section you are in
+
+**Chosen:** every course and lesson group in the sidebar starts collapsed (`collapsed: true` in `config.mts`). The default theme opens the group that holds the current page by itself, so on load the reader sees the course, their lesson and its pages, and every other lesson as one line with a caret.
+
+**Why:** with nine lessons open, the sidebar ran past the screen, and the reader's own place in it was easy to lose.
+
+**What it doesn't do:** close a group when the reader moves on. VitePress opens the new group but never closes the old one, and forcing that would also close groups the reader opened on purpose. A fresh page load starts clean.
+
+## 2026-10-01 — No Chocolatey: Windows installs everything inside Ubuntu, except Docker Desktop
+
+**Chosen:** the Chocolatey page is gone. Its only job was `choco install docker-desktop`. The Docker page's Windows section now uses Docker's own installer, which it already offered as a fallback. The pages after it moved up one number (`03-git/` … `08-claude-code/`), with their ids unchanged. The Homebrew page is now titled "Install Homebrew", because it has always had a Windows section. That section opens by checking that WSL 2 is in place (`wsl -l -v`) and saying how to open the Ubuntu terminal, where every `brew` command goes.
+
+**Why:** a whole page, a second app store, and the course's only long PowerShell one-liner, all for one program that has a normal Windows installer. For a non-technical reader, a setup wizard they click through is easier than a pasted command. The Getting started overview now says plainly that on Windows almost everything happens inside Ubuntu, and Docker Desktop is the one exception.
+
+**Glossary:** the Chocolatey entry was removed, because nothing links to it any more.
+
+## 2026-10-01 — WSL gets its own page, before "Open a terminal"
+
+**Chosen:** a new first page in Getting started, `01-installations/01-wsl/` ("Install WSL (Windows only)", id `wsl`). It holds everything that used to be in the terminal page's Windows section: the `wsl -l -v` check, `wsl --install`, the Ubuntu username and password, and `apt upgrade`. The terminal page's Windows section now only opens Ubuntu (Start → `Ubuntu`), like the macOS and Linux sections only open their terminal. Every page after it moved down one number (`02-terminal/` … `09-claude-code/`), with ids unchanged.
+
+**Why:** "Open a terminal" was three steps on a Mac and a restart-your-computer install on Windows. Splitting it gives each page one job, and the Windows reader sees from the sidebar that there is one extra page for them.
+
+**PowerShell lives on one page only.** The WSL page says it is the only one that needs PowerShell. So the Homebrew page's WSL check, added the same day, now points back to that page's last check, instead of opening PowerShell again.
+
+## 2026-10-01 — Cleaning up removes the tools too, if the reader wants
+
+**Chosen:** a second, optional sub-lesson in Cleaning up, `06-cleaning-up/02-uninstalling-tools/`. It undoes Getting started in reverse order, after NanoClaw, whose uninstaller needs Node.js and Docker. Each step matches its install page: `brew uninstall` for the casks and `node@24` (with `corepack disable` first), `--zap` for OrbStack and Docker Desktop, Docker's packages and `/var/lib/docker` on Linux, and Homebrew's own `uninstall.sh` plus removing the `brew shellenv` line it leaves behind. It ends with the accounts and services that live elsewhere: the bot, the Notion connection, the template copy, and the paid plans.
+
+**Left in place on purpose:** Make, and on Linux Git. Both come with the system's own build tools, which other programs use. On a Mac, `git --version` keeps answering after `brew uninstall git`, because Apple's copy stays. The page says so.
+
+**Windows is a shortcut:** everything but Docker Desktop lives in Ubuntu, so uninstalling Docker Desktop and running `wsl --unregister Ubuntu` removes it all. A warning says this also deletes the reader's own files inside Ubuntu, and shows `explorer.exe .` for copying them out first.
+
+**Not verified by running:** the commands come from each tool's own uninstall instructions, checked by reading on 2026-10-01.
+
+
+## 2026-10-01 — Lesson 4 is "Customising your agent"
+
+**Chosen:** lesson 4 is now titled "Customising your agent", after "Agent playtime" and then "Agent customisations". The folder stays `04-agent-customisations/` and the id stays `agent-playtime`, so no address or link changed.
+
+## 2026-10-01 — Every term is a glossary link where it first appears on a page
+
+**Chosen:** on every published page (all of `course/` except `glossary.md` and READMEs), the first use of each glossary term in normal text is a link to its glossary entry. The writing rules already asked for this. A pass on 2026-10-01 added 242 links where it was missing.
+
+**What counts as the first use:** text outside headings, code, image text, web addresses and HTML. A term already linked there, either to the glossary or by a link whose words are the term (`[Make](../06-make/index.md)`, which gets the glossary bubble too), counts as done. A term whose first use is inside a longer link's text (`[Install Docker](…)`) gets its link at the next use.
+
+**Matching:** concept terms match in any case and in the plural ("databases" → Database, "tool calls" → Tool call). Product names match their exact spelling only, so `docker` in a command never matches. "Claude" doesn't match inside "Claude Code", and "Telegram" and "Discord" don't match the Notion database names "Telegram Accounts" and "Discord Accounts".
+
+**Left unlinked on purpose:**
+- **Make**, matched by hand: it is too often the verb "make". Five pages got it linked.
+- **"skills" in another sense:** the Terms of Use ("The materials teach skills"), About ("learners keep the skills"), and "the chef's skill" on How it fits together.
+- **"GitHub" inside the References title "NanoClaw GitHub"** on the course page, where a link would land mid-title.
+
+**To repeat it:** the check is mechanical, so run it again after big edits. Then read every proposed link before applying it. The exceptions above are the kind of thing only a reader catches.
+
+## 2026-10-01 — Mermaid diagrams, drawn in the browser
+
+**Chosen:** a ` ```mermaid ` code block is drawn as a diagram on the site (`.vitepress/mermaid-plugin.ts` marks it, `theme/mermaid.ts` draws it, with Mermaid 12 as a dev dependency). The first one replaces the hand-drawn text diagram in "How it fits together" with a sequence diagram of one message: you, NanoClaw, Codex + `AGENTS.md`, the model, Notion, with the agent loop as a box.
+
+**Why this way:** the course stays plain Markdown. GitHub draws the same block natively, and any other tool shows readable text. It follows the theme's rule of one browser behaviour per file. Mermaid loads only on pages that have a diagram, so every other page stays as light as before. Turned down: `vitepress-plugin-mermaid`, which wraps the whole config and adds a component for something one fence rule and one script do.
+
+**Turned down for this diagram:** seven participants, which was unreadably small and then too wide, and a top-to-bottom flowchart, whose loop arrows tangled. Five participants, wrapped labels and tight spacing fit the 688px column at full size.
+
+**Checked** in headless Chrome: the diagram draws, fits (592px), and its labels aren't cut off once the fonts have loaded. Dark mode wasn't captured: headless Chrome wouldn't start the page in dark. The redraw on switching is in `mermaid.ts` but unverified by eye.
+
+## 2026-10-01 — "How this site works", first under Courses
+
+**Chosen:** a new top-level page, `course/how-this-site-works.md`, shown first in the sidebar's Courses group, above the first course. It tours the site's helpers for a learner:
+- the sidebar, Next/Previous, "On this page" and search;
+- glossary words: hover, keyboard focus, click, and what a tap does on a phone;
+- the sections per system, with a live `<details>` to try;
+- command boxes: where to type, the copy button, what wraps;
+- the four alert types, shown live;
+- screenshots and diagrams;
+- the light/dark switch.
+
+**Why a page, not a home-page section:** readers land on lesson pages from search and links, not only the home page. A sidebar entry is reachable from all of them, and its "Next page" leads into the first course.
+
+**Format:** it is a new kind of top-level page, so the spec's layout table, the validator's list of root files, and AGENTS.md's layout list all name it. Keep it in step with the site: when a helper a learner would notice is added or removed, update the page.
+
+**Fixed while there:** two pages used `> [!INFO]`, which isn't a GitHub alert type and showed as literal text. They are now `> [!NOTE]`.

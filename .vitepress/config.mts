@@ -5,7 +5,10 @@
 import { defineConfig, type DefaultTheme } from 'vitepress'
 import { CONTENT_DIR, contentExcludes, contentSubmodulePaths, discoverCourses } from '../format/courses.mjs'
 import { analyticsHead } from './analytics'
+import { codeWrapPlugin } from './code-wrap-plugin'
 import { courseOverviewPlugin } from './course-overview-plugin'
+import { outcomeCardsPlugin } from './outcome-cards-plugin'
+import { mermaidPlugin } from './mermaid-plugin'
 import { coursesPlugin } from './courses-plugin'
 import { glossaryLinkPlugin } from './glossary-link-plugin'
 import { glossaryPlugin } from './glossary-plugin'
@@ -18,6 +21,10 @@ const courseLink = (dir: string) => `/${dir}/`
 
 // Lessons nest (a lesson may hold sub-lessons), so the sidebar is built the same way at
 // every level. `lesson.path` already starts with the course folder, so it is the URL.
+//
+// Every group starts collapsed, and the default theme opens the one holding the current page
+// by itself (its sidebar composable clears `collapsed` when a group has the active link). So
+// the reader sees where they are, and the caret opens the rest.
 interface Lesson {
   dir: string
   path: string
@@ -28,18 +35,22 @@ const lessonItems = (lessons: Lesson[]): DefaultTheme.SidebarItem[] =>
   lessons.map((lesson) => ({
     text: lesson.frontmatter.title ?? lesson.dir,
     link: `/${lesson.path}/`,
-    ...(lesson.lessons.length && { collapsed: false, items: lessonItems(lesson.lessons) }),
+    ...(lesson.lessons.length && { collapsed: true, items: lessonItems(lesson.lessons) }),
   }))
 
 const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: 'Courses',
     link: '/courses',
-    items: courses.map((course) => ({
-      text: course.manifest?.title ?? course.dir,
-      link: courseLink(course.dir),
-      ...(course.lessons.length && { collapsed: false, items: lessonItems(course.lessons) }),
-    })),
+    items: [
+      // A short tour of the site itself, before the first course.
+      { text: 'How this site works', link: '/how-this-site-works' },
+      ...courses.map((course) => ({
+        text: course.manifest?.title ?? course.dir,
+        link: courseLink(course.dir),
+        ...(course.lessons.length && { collapsed: true, items: lessonItems(course.lessons) }),
+      })),
+    ],
   },
   {
     text: 'Reference',
@@ -89,7 +100,7 @@ export default defineConfig({
   },
 
   markdown: {
-    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(glossaryLinkPlugin).use(courseOverviewPlugin).use(orderedListPlugin),
+    config: (md) => md.use(coursesPlugin).use(glossaryPlugin).use(glossaryLinkPlugin).use(courseOverviewPlugin).use(outcomeCardsPlugin).use(orderedListPlugin).use(codeWrapPlugin).use(mermaidPlugin),
   },
 
   vite: {
@@ -119,7 +130,7 @@ export default defineConfig({
     // The glossary isn't here: it's in the sidebar ("Reference") and in the home hero's buttons.
     nav: [
       // Active on the Courses page and on every course and lesson page.
-      { text: 'Courses Overview', link: '/courses', activeMatch: '^/(courses|\\d{3}-)' },
+      { text: 'Courses overview', link: '/courses', activeMatch: '^/(courses|\\d{3}-)' },
     ],
     sidebar,
     search: { provider: 'local' },

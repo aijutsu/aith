@@ -5,7 +5,7 @@ The course materials are published at **https://aith.aijutsu.dev**. Anyone can r
 ## What learners get
 
 - **A home page** with what the course is for, what you need before you start, and the list of courses in order, shown as cards. You can click the card of a course that's ready. Courses that aren't written yet have a "Coming soon" badge and no link.
-- **A Courses page** at https://aith.aijutsu.dev/courses, which lists every course you can take now, in order, each with a one-line summary. The "Courses Overview" link at the top of every page goes there.
+- **A Courses page** at https://aith.aijutsu.dev/courses, which lists every course you can take now, in order, each with a one-line summary. The "Courses overview" link at the top of every page goes there.
 - **A page for each course**, e.g. https://aith.aijutsu.dev/001-building-agents-with-nanoclaw/, with what it teaches, its lessons, and links to the software it uses.
 - **Lessons**: each course is split into short pages, e.g. https://aith.aijutsu.dev/001-building-agents-with-nanoclaw/01-installations/. The sidebar lists them, and "Next page" at the bottom of each one leads to the next. A long lesson is split again into one page per step, e.g. https://aith.aijutsu.dev/001-building-agents-with-nanoclaw/01-installations/06-make/. The sidebar nests those under their lesson, and the lesson's own page is the overview, so a learner can stop after one step and come back to the next.
 - **A glossary** at https://aith.aijutsu.dev/glossary, with plain-English meanings of every technical word. Each word has its own link, for example https://aith.aijutsu.dev/glossary#mcp, so pages can point straight at it. It's in the sidebar under "Reference", and the home page has a button for it.

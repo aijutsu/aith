@@ -6,13 +6,13 @@ description: Copy NanoClaw onto your computer with Git, into a folder called nan
 
 # Download NanoClaw
 
-Now you copy NanoClaw onto your computer. You use [Git](../../../glossary.md#git) for this, which you installed in [Install Git](../../01-installations/04-git/index.md).
+Now you copy [NanoClaw](../../../glossary.md#nanoclaw) onto your computer. You use [Git](../../../glossary.md#git) for this, which you installed in [Install Git](../../01-installations/04-git/index.md).
 
-This downloads [our copy of NanoClaw](https://github.com/aijutsu/aith-nanoclaw-codex-telegram), the one that works with Telegram and Codex.
+This downloads [our copy of NanoClaw](https://github.com/aijutsu/aith-nanoclaw-codex-telegram), the one that works with [Telegram](../../../glossary.md#telegram) and [Codex](../../../glossary.md#codex).
 
 ## Download it
 
-In your [terminal](../../01-installations/01-terminal/index.md), run these three commands, one after the other:
+In your [terminal](../../01-installations/02-terminal/index.md), run these three commands, one after the other:
 
 ```bash
 cd ~
@@ -20,7 +20,7 @@ git clone https://github.com/aijutsu/aith-nanoclaw-codex-telegram.git nanoclaw
 cd nanoclaw
 ```
 
-- `cd ~` goes to your home folder. On Windows, this keeps NanoClaw inside Ubuntu, where it runs faster than on your C: drive.
+- `cd ~` goes to your home folder. On Windows, this keeps NanoClaw inside [Ubuntu](../../../glossary.md#ubuntu), where it runs faster than on your C: drive.
 - `git clone` downloads our copy of NanoClaw into a new folder called `nanoclaw`. You see `Cloning into 'nanoclaw'...`.
 - `cd nanoclaw` moves you into that folder.
 

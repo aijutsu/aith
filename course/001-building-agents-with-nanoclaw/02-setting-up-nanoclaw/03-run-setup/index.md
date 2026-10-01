@@ -6,17 +6,17 @@ description: Run NanoClaw's setup program, answer its questions, and connect you
 
 # Run NanoClaw's setup
 
-NanoClaw comes with a setup program. It installs the rest of what NanoClaw needs, builds your agent, and connects it to Telegram. You answer its questions as it runs.
+[NanoClaw](../../../glossary.md#nanoclaw) comes with a setup program. It installs the rest of what NanoClaw needs, builds your agent, and connects it to [Telegram](../../../glossary.md#telegram). You answer its questions as it runs.
 
-Your agent runs on Codex. You run setup yourself, in the terminal. If it stops with an error, it offers to open Codex — or [Claude Code](../../../glossary.md#claude-code), if you installed it — to help you fix it.
+Your agent runs on [Codex](../../../glossary.md#codex). You run setup yourself, in the [terminal](../../../glossary.md#terminal). If it stops with an error, it offers to open Codex — or [Claude Code](../../../glossary.md#claude-code), if you installed it — to help you fix it.
 
 ## Before you run setup
 
-- **On a Mac:** make sure OrbStack or Docker Desktop is running.
+- **On a Mac:** make sure [OrbStack](../../../glossary.md#orbstack) or [Docker](../../../glossary.md#docker) Desktop is running.
 - **On Windows:** make sure Docker Desktop is running.
-- **On Windows or Linux:** run `sudo -v` in your [terminal](../../01-installations/01-terminal/index.md) and type your password. Setup installs some programs, and this lets it do that without stopping to ask.
+- **On Windows or Linux:** run `sudo -v` in your [terminal](../../01-installations/02-terminal/index.md) and type your password. Setup installs some programs, and this lets it do that without stopping to ask.
 
-Have the bot token from [Create your Telegram bot](../01-telegram-bot/index.md) ready. Setup asks for it.
+Have the bot [token](../../../glossary.md#token) from [Create your Telegram bot](../01-telegram-bot/index.md) ready. Setup asks for it.
 
 ## Run it
 
@@ -26,7 +26,7 @@ In your terminal, in the `nanoclaw` folder, run:
 bash nanoclaw.sh --agent-provider codex
 ```
 
-`--agent-provider codex` tells setup to run your agent on Codex. Without it, setup uses Claude.
+`--agent-provider codex` tells setup to run your agent on Codex. Without it, setup uses [Claude](../../../glossary.md#claude).
 
 Setup installs the rest of what NanoClaw needs, and builds your agent's container. The first build usually takes 3 to 10 minutes. **If you run into any issues, check the section just below this.**
 
@@ -40,7 +40,7 @@ Use the arrow keys to pick an answer, then press Enter. Answer the questions lik
 | How should we create your first agent? | **From local templates** |
 | Choose a template | **`community-assistant`** |
 | `codex` needs a sandbox image built on this machine. Stop using the pre-built one? | **Yes**. You only see this if your copy was set up to download a ready-made image. Codex needs one built here, and the build is the 3 to 10 minutes above. |
-| How would you like to connect Codex? | **Sign in with my ChatGPT subscription**. Sign in in the browser, then go back to the terminal. If no browser opens — common on Windows — press Escape and choose **ChatGPT device pairing** instead: it shows you a web address and a code to type in, with no browser handoff. |
+| How would you like to connect Codex? | **Sign in with my [ChatGPT](../../../glossary.md#chatgpt) subscription**. Sign in in the browser, then go back to the terminal. If no browser opens — common on Windows — press Escape and choose **ChatGPT device pairing** instead: it shows you a web address and a code to type in, with no browser handoff. |
 | What should your assistant call you? | `<enter your name>` |
 | (Your assistant is ready.) What next? | **Continue with setup** |
 | I detected … from your computer settings. Is that right? | **Yes**, if it shows your time zone |
@@ -58,7 +58,7 @@ When setup is done, it says **You're set.**:
 
 ![Setup finishing with "You're set."](./img/setup-complete.png)
 
-It will take 30s to 1 minute for the first message to come through. Your agent introduces himself — he is called **Louis** — and asks you to connect Notion, which is where he keeps everything. That is the next lesson, so you can leave it for now. The message looks something like this:
+It will take 30s to 1 minute for the first message to come through. Your agent introduces themselves — they are called **Louis** — and asks you to connect [Notion](../../../glossary.md#notion), which is where they keep everything. That is the next lesson, so you can leave it for now. The message looks something like this:
 
 ![The agent's first message in the Telegram chat, after pairing](./img/telegram-first-message.png)
 
@@ -86,7 +86,7 @@ If your agent stops answering, check that Docker is running, and that you have n
 
 The credential keeper is a program called `onecli`. If your computer already has an older or broken copy of it, setup finds that one, can't read it, and stops.
 
-Delete it. In your [terminal](../../01-installations/01-terminal/index.md), find out where it is:
+Delete it. In your [terminal](../../01-installations/02-terminal/index.md), find out where it is:
 
 ```bash
 which onecli
@@ -112,4 +112,4 @@ If setup stops with an error, it offers to open Codex, or Claude Code, to help y
 
 Your agent is running, and it can chat. It has nowhere to keep what it learns yet, so next, give it one: [Setting up data sources](../../03-setting-up-data-sources/index.md).
 
-When you no longer want NanoClaw on your computer, the [Cleaning Up](../../05-cleaning-up/index.md) lesson removes it.
+When you no longer want NanoClaw on your computer, the [Cleaning up](../../06-cleaning-up/index.md) lesson removes it.

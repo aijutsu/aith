@@ -6,7 +6,7 @@ description: Install Docker, which runs your agent in a closed box so it can't t
 
 # Install Docker
 
-NanoClaw runs your agent inside [Docker](../../../glossary.md#docker). Docker puts the agent in a closed box, called a container, so the agent can't touch the rest of your computer.
+[NanoClaw](../../../glossary.md#nanoclaw) runs your agent inside [Docker](../../../glossary.md#docker). Docker puts the agent in a closed box, called a container, so the agent can't touch the rest of your computer.
 
 ## Install it
 
@@ -15,7 +15,7 @@ Click the name of your computer's system to open its section.
 <details name="docker">
 <summary>macOS</summary>
 
-**Check if it's already installed.** In [Terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In [Terminal](../02-terminal/index.md), run:
 
 ```bash
 docker --version
@@ -24,11 +24,11 @@ docker --version
 - If you see a line like `Docker version 29.4.0, build 9d7ad9f`, you already have Docker. Skip to **Check that it works** at the bottom of this section.
 - If you see `command not found: docker`, install one of the two below.
 
-**Install it.** On a Mac, you can use OrbStack or Docker Desktop. Both give you the `docker` command that NanoClaw needs. You only need one of them.
+**Install it.** On a Mac, you can use [OrbStack](../../../glossary.md#orbstack) or Docker Desktop. Both give you the `docker` command that NanoClaw needs. You only need one of them.
 
 **Recommended: OrbStack.** [OrbStack](../../../glossary.md#orbstack) is smaller and lighter than Docker Desktop, so your Mac stays fast. It is free for personal use. If you use it for work, your company needs a paid licence.
 
-1. In the terminal, install OrbStack with [Homebrew](../02-homebrew/index.md):
+1. In the terminal, install OrbStack with [Homebrew](../03-homebrew/index.md):
 
    ```bash
    brew install --cask orbstack
@@ -41,7 +41,7 @@ NanoClaw needs OrbStack to be running. Open OrbStack before you use NanoClaw.
 
 **Or: Docker Desktop.** Docker Desktop is free for personal use, education, and small businesses.
 
-1. In the terminal, install Docker Desktop with [Homebrew](../02-homebrew/index.md):
+1. In the terminal, install Docker Desktop with [Homebrew](../03-homebrew/index.md):
 
    ```bash
    brew install --cask docker-desktop
@@ -71,33 +71,25 @@ If you see `Cannot connect to the Docker daemon`, Docker is installed but not ru
 <details name="docker">
 <summary>Windows</summary>
 
-On Windows, you install Docker Desktop on Windows itself. It then gives Ubuntu a `docker` command. Don't install Docker inside Ubuntu.
+On Windows, you install Docker Desktop on Windows itself. It then gives [Ubuntu](../../../glossary.md#ubuntu) a `docker` command. Don't install Docker inside Ubuntu.
 
-**Check if it's already installed.** In the [Ubuntu terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [Ubuntu terminal](../02-terminal/index.md), run:
 
 ```bash
 docker --version
 ```
 
 - If you see a line like `Docker version 29.4.0, build 9d7ad9f`, Docker Desktop is installed and Ubuntu can see it. Skip to **Check that it works** at the bottom of this section.
-- If you see `command not found: docker`, either Docker Desktop isn't installed, or its WSL integration is off. Do the steps below. If Docker Desktop is already on your computer, you only need steps 6 and 7.
+- If you see `command not found: docker`, either Docker Desktop isn't installed, or its [WSL](../../../glossary.md#wsl) integration is off. Do the steps below. If Docker Desktop is already on your computer, you only need steps 5 and 6.
 
-**Install it.** Docker Desktop is a Windows program, so you install it on the Windows side, with [Chocolatey](../03-chocolatey/index.md).
+**Install it.** Docker Desktop is a normal Windows app, so you install it on the Windows side, with Docker's own installer. It is the one tool in this course that isn't installed inside Ubuntu.
 
-1. Click Start and type `PowerShell`. Right-click **Windows PowerShell** and choose **Run as administrator**. Click **Yes**.
-2. In PowerShell, run:
-
-   ```powershell
-   choco install docker-desktop -y
-   ```
-
-   This downloads and installs Docker Desktop. It takes a few minutes. If Chocolatey says it needs to restart your computer, let it finish first, then restart.
+1. In your web browser, go to <https://docs.docker.com/desktop/setup/install/windows-install/> and click **Docker Desktop for Windows - x86_64**. Most computers need this one. Choose the **Arm** version only if your computer has an Arm processor, such as a Snapdragon laptop.
+2. Open the file it downloads, `Docker Desktop Installer.exe`. When Windows asks if you want to let it make changes, click **Yes**. Keep **Use WSL 2 instead of Hyper-V** ticked, and click **OK**. It takes a few minutes. When it says **Close and restart**, click it, and let your computer restart.
 3. Click Start, type `Docker Desktop`, and open it. Read the Docker Subscription Service Agreement and click **Accept**. Docker Desktop is free for personal use, education, and small businesses.
 4. You don't need a Docker account. If Docker asks you to sign in, you can skip it.
 5. In Docker Desktop, open **Settings** (the gear icon), then **Resources**, then **WSL integration**. Turn on **Ubuntu** and click **Apply**.
 6. Close the Ubuntu terminal and open it again, so that it finds Docker.
-
-If Chocolatey can't install it, download Docker Desktop by hand instead, from <https://docs.docker.com/desktop/setup/install/windows-install/>. Most computers need the x86_64 version. Keep **Use WSL 2 instead of Hyper-V** ticked, then carry on from step 3 above.
 
 NanoClaw needs Docker Desktop to be running. To start it every time you turn on your computer, open Docker Desktop's **Settings**, then **General**, and turn on **Start Docker Desktop when you sign in to your computer**.
 
@@ -116,7 +108,7 @@ If you see `Cannot connect to the Docker daemon`, Docker is installed but not ru
 <details name="docker">
 <summary>Linux</summary>
 
-**Check if it's already installed.** In the [terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [terminal](../02-terminal/index.md), run:
 
 ```bash
 docker --version

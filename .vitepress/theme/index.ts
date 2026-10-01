@@ -1,7 +1,8 @@
 // The default VitePress theme, with the site's colours and nav tweaks (custom.css), and three
 // behaviours: collapsible sections scroll their header to the top when opened or closed
-// (details-scroll.ts), clicking a picture in a page shows it big (lightbox.ts), and a glossary
-// link shows what the word means without leaving the page (glossary-tooltip.ts).
+// (details-scroll.ts), clicking a picture in a page shows it big (lightbox.ts), a glossary
+// link shows what the word means without leaving the page (glossary-tooltip.ts), and a
+// ```mermaid block is drawn as a diagram (mermaid.ts).
 // See docs/system/site.md#theme.
 
 import type { Theme } from 'vitepress'
@@ -22,6 +23,7 @@ import './custom.css'
 import { useDetailsScroll } from './details-scroll'
 import { useGlossaryTooltip } from './glossary-tooltip'
 import { useImageLightbox } from './lightbox'
+import { useMermaid } from './mermaid'
 
 export default {
   extends: DefaultTheme,
@@ -29,5 +31,6 @@ export default {
     useDetailsScroll()
     useImageLightbox()
     useGlossaryTooltip()
+    useMermaid()
   }
 } satisfies Theme

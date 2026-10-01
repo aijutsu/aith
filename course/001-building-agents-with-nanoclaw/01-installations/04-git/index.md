@@ -6,9 +6,9 @@ description: Install Git, the tool that downloads NanoClaw and keeps the history
 
 # Install Git
 
-[Git](../../../glossary.md#git) keeps the history of a project's files, and copies a project onto your computer. You use it in the next lesson to download NanoClaw.
+[Git](../../../glossary.md#git) keeps the history of a project's files, and copies a project onto your computer. You use it in the next lesson to download [NanoClaw](../../../glossary.md#nanoclaw).
 
-You also install jq here, a small tool that reads the answers that websites send back. NanoClaw's setup uses it to check your Telegram bot.
+You also install [jq](../../../glossary.md#jq) here, a small tool that reads the answers that websites send back. NanoClaw's setup uses it to check your [Telegram](../../../glossary.md#telegram) bot.
 
 ## Install it
 
@@ -17,7 +17,7 @@ Click the name of your computer's system to open its section.
 <details name="git">
 <summary>macOS</summary>
 
-**Check if it's already installed.** In [Terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In [Terminal](../02-terminal/index.md), run:
 
 ```bash
 git --version
@@ -27,7 +27,7 @@ jq --version
 - If you see two version numbers, you already have both, and there is nothing to install: skip the rest of this section.
 - If either one says `command not found`, do the step below.
 
-**Install it.** In the terminal, install Git and jq with [Homebrew](../02-homebrew/index.md):
+**Install it.** In the terminal, install Git and jq with [Homebrew](../03-homebrew/index.md):
 
 ```bash
 brew install git jq
@@ -49,9 +49,9 @@ You should see two lines, like `git version 2.55.0` and `jq-1.7.1`. Your numbers
 <details name="git">
 <summary>Windows</summary>
 
-Git goes inside Ubuntu, not on Windows itself. You don't need "Git for Windows".
+Git goes inside [Ubuntu](../../../glossary.md#ubuntu), not on Windows itself. You don't need "Git for Windows".
 
-**Check if it's already installed.** In the [Ubuntu terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [Ubuntu terminal](../02-terminal/index.md), run:
 
 ```bash
 git --version
@@ -59,7 +59,7 @@ jq --version
 ```
 
 - If you see two version numbers, you already have both, and there is nothing to install: skip the rest of this section.
-- Git is usually there already, because the [Homebrew](../02-homebrew/index.md) page installed it. jq is usually missing, so you probably still need the step below.
+- Git is usually there already, because the [Homebrew](../03-homebrew/index.md) page installed it. jq is usually missing, so you probably still need the step below.
 
 **Install it.** In the Ubuntu terminal, run:
 
@@ -83,7 +83,7 @@ You should see two lines, like `git version 2.55.0` and `jq-1.7.1`. Your numbers
 <details name="git">
 <summary>Linux</summary>
 
-**Check if it's already installed.** In the [terminal](../01-terminal/index.md), run:
+**Check if it's already installed.** In the [terminal](../02-terminal/index.md), run:
 
 ```bash
 git --version
@@ -91,7 +91,7 @@ jq --version
 ```
 
 - If you see two version numbers, you already have both, and there is nothing to install: skip the rest of this section.
-- Git is usually there already, because the [Homebrew](../02-homebrew/index.md) page installed it. jq is usually missing, so you probably still need the step below.
+- Git is usually there already, because the [Homebrew](../03-homebrew/index.md) page installed it. jq is usually missing, so you probably still need the step below.
 
 **Install it.** In the terminal, run this on Ubuntu or Debian:
 

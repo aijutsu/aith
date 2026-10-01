@@ -6,13 +6,13 @@ description: Give the Notion connection access to your copy of the template, so 
 
 # Connect your Notion page
 
-Your connection can sign in to Notion, but it still can't see anything. A new connection starts with access to **nothing at all**, even with a perfect token. You give it your page yourself, and that is this page.
+Your connection can sign in to [Notion](../../../glossary.md#notion), but it still can't see anything. A new connection starts with access to **nothing at all**, even with a perfect [token](../../../glossary.md#token). You give it your page yourself, and that is this page.
 
 This is the step most people miss. Skip it and everything looks fine until your agent tries to read something, and says it can't find a page you are looking straight at.
 
 ## Give it your page
 
-Give it the copy of the Louis template you made on the [first page](../01-notion-page/index.md#copy-it), and all sixteen databases under it come with it. Notion passes access down, so this is one action, not sixteen.
+Give it the copy of the Louis template you made on the [first page](../01-notion-page/index.md#copy-it), and all sixteen [databases](../../../glossary.md#database) under it come with it. Notion passes access down, so this is one action, not sixteen.
 
 Do it in **either** place. Click the one you prefer.
 
@@ -24,7 +24,7 @@ Do it in **either** place. Click the one you prefer.
 
     ![The page's ••• menu, with Connections and the search box open](./img/page-menu-connections.png)
 
-3. Click **Connections**, then select the Connection you created
+3. Click **Connections**, then select the connection you created
 
     ![The dialog confirming what the connection may do on this page](./img/add-connection-dialog.png)
 
@@ -32,7 +32,7 @@ Do it in **either** place. Click the one you prefer.
 
 4. Click on **Add to page**
 
-    You should now see that the Connection now has access to the page:
+    You should now see that the connection now has access to the page:
 
     ![The connection listed under Active connections](./img/active-connections.png)
 

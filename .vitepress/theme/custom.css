@@ -386,6 +386,20 @@
   margin-bottom: 16px;
 }
 
+/* Code blocks marked `wrap` on their fence line (code-wrap-plugin.ts): long lines wrap
+   instead of scrolling sideways. The default theme sizes `code` to its longest line
+   (width: fit-content), so the width goes back to the block's. overflow-wrap breaks a long
+   URL only when it can't fit a line on its own, never in the middle of a normal word. */
+.vp-doc div.wrap[class*='language-'] pre,
+.vp-doc div.wrap[class*='language-'] code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vp-doc div.wrap[class*='language-'] code {
+  width: auto;
+}
+
 /* Course cards from the :::courses block (.vitepress/courses-plugin.ts). The whole card is
    clickable: the title link's ::after covers it. */
 .vp-doc .course-list {
@@ -594,6 +608,89 @@
   font-weight: 500;
   background-color: var(--vp-c-default-soft);
   color: var(--vp-c-text-2);
+}
+
+/* Learning outcomes on a course's page (.vitepress/outcome-cards-plugin.ts): the Markdown list
+   shown as cards, in the Course Overview's style. Each item opens with a bold header, which
+   goes on its own line; the rest is the description. Not links, so no hover state. */
+.vp-doc ol.outcome-cards {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: outcome;
+}
+
+@media (min-width: 640px) {
+  .vp-doc ol.outcome-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.vp-doc .outcome-cards > li {
+  margin: 0;
+  border-radius: 12px;
+  padding: 24px;
+  background-color: var(--vp-c-bg-soft);
+  line-height: 24px;
+  font-size: 14px;
+  color: var(--vp-c-text-2);
+  counter-increment: outcome;
+}
+
+/* The outcome's number, in the same box as the Course Overview's course number. */
+.vp-doc .outcome-cards > li::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--vp-c-brand-soft);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+  content: counter(outcome);
+}
+
+.vp-doc .outcome-cards > li > strong:first-child {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 16px;
+  color: var(--vp-c-text-1);
+}
+
+/* Mermaid diagrams (mermaid-plugin.ts, theme/mermaid.ts). Before drawing, the block shows its
+   source like any code block; once drawn, it is a centred picture that scrolls sideways on a
+   narrow screen rather than shrinking past reading size. */
+.vp-doc pre.aith-mermaid {
+  margin: 16px 0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  background-color: var(--vp-code-block-bg);
+  font-family: var(--vp-font-family-mono);
+  font-size: var(--vp-code-font-size);
+  line-height: var(--vp-code-line-height);
+  white-space: pre;
+}
+
+.vp-doc pre.aith-mermaid.drawn {
+  padding: 16px 8px;
+  background-color: var(--vp-c-bg-soft);
+  font-family: inherit;
+  white-space: normal;
+}
+
+/* Centred when it fits; when it doesn't, it starts at the left edge and scrolls (a flex centre
+   would cut off its left side instead). */
+.vp-doc pre.aith-mermaid.drawn svg {
+  display: block;
+  margin: 0 auto;
+  max-width: none;
+  height: auto;
 }
 
 /* Footer on every page. The default theme hides it on pages with a sidebar (all but the
